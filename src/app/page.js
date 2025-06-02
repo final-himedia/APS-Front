@@ -22,7 +22,7 @@ export default function ListDivider() {
   const [openFind, setopenFind] = useState(false);
   const [openEngine, setOpenEngine] = useState(false);
   const [openResult, setOpenResult] = useState(false);
-
+ 
   const handleClick = () => {
     setOpen(!open);
   };
