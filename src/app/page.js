@@ -1,95 +1,111 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import Box from "@mui/material/Box";
+import * as React from "react";
+import { useState } from "react";
+
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+
+import ListItemIcon from "@mui/material/ListItemIcon";
+import SearchIcon from "@mui/icons-material/Search";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import ScienceIcon from "@mui/icons-material/Science";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import { TextField } from "@mui/material";
+
+export default function ListDivider() {
+  const [openFind, setopenFind] = useState(false);
+  const [openEngine, setOpenEngine] = useState(false);
+  const [openResult, setOpenResult] = useState(false);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box sx={{ width: 240, height: "100vh", p: 2 }}>
+      <TextField defaultValue="검색">
+          <SearchIcon />
+        
+      </TextField>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <List>
+        <ListItemButton onClick={() => setopenFind(!openFind)}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <StarBorderIcon />
+          </ListItemIcon>
+          <ListItemText primary="즐겨찾기" />
+          {openFind ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openFind} timeout="auto" unmountOnExit>
+          <List>
+            <ListItemButton>
+              <ListItemText primary="실행 결과" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="자원 운영 간트" />
+            </ListItemButton>
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={() => setOpenEngine(!openEngine)}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <ScienceIcon />
+          </ListItemIcon>
+          <ListItemText primary="엔진" />
+          {openEngine ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+
+        <Collapse in={openEngine} timeout="auto" unmountOnExit>
+          <List>
+            <ListItemButton>
+              <ListItemText primary="시나리오 관리" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="스케줄 관리" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="실행 결과" />
+            </ListItemButton>
+          </List>
+        </Collapse>
+
+        <ListItemButton onClick={() => setOpenResult(!openResult)}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <QueryStatsIcon />
+          </ListItemIcon>
+          <ListItemText primary="결과 분석" />
+          {openResult ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+
+        <Collapse in={openResult} timeout="auto" unmountOnExit>
+          <List>
+            <ListItemButton>
+              <ListItemText primary="RTF 현황" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="대시보드" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="자원 운영 간트" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="생산 계획 간트" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="설비 가동 현황" />
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemText primary="시나리오 비교" />
+            </ListItemButton>
+          </List>
+        </Collapse>
+      </List>
+    </Box>
   );
 }
