@@ -1,6 +1,7 @@
 "use client";
 
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 import * as React from "react";
 import { useState } from "react";
 
@@ -10,6 +11,9 @@ import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import InputAdornment from "@mui/material/InputAdornment";
+
+import Divider from "@mui/material/Divider";
 
 import ListItemIcon from "@mui/material/ListItemIcon";
 import SearchIcon from "@mui/icons-material/Search";
@@ -17,23 +21,48 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ScienceIcon from "@mui/icons-material/Science";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import { TextField } from "@mui/material";
+import { BorderColor } from "@mui/icons-material";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 export default function ListDivider() {
   const [openFind, setopenFind] = useState(false);
   const [openEngine, setOpenEngine] = useState(false);
   const [openResult, setOpenResult] = useState(false);
- 
+
   const handleClick = () => {
     setOpen(!open);
   };
 
   return (
     <Box sx={{ width: 240, height: "100vh", p: 2 }}>
-      <TextField defaultValue="검색">
-          <SearchIcon />
-        
-      </TextField>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <img src="/logo/main-logo.png" alt="로고" style={{ height: 40 }} />
 
+        <IconButton>
+          <KeyboardBackspaceIcon />
+        </IconButton>
+      </Box>
+
+      <Divider sx={{ my: 1 }} />
+      <TextField
+        placeholder="검색"
+        variant="outlined"
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          ),
+        }}
+      />
+      <Divider sx={{ my: 1 }} />
       <List>
         <ListItemButton onClick={() => setopenFind(!openFind)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
@@ -45,10 +74,10 @@ export default function ListDivider() {
         <Collapse in={openFind} timeout="auto" unmountOnExit>
           <List>
             <ListItemButton>
-              <ListItemText primary="실행 결과" />
+              <ListItemText primary="수정해야함" />
             </ListItemButton>
             <ListItemButton>
-              <ListItemText primary="자원 운영 간트" />
+              <ListItemText primary="수정해야함" />
             </ListItemButton>
           </List>
         </Collapse>
