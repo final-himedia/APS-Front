@@ -12,8 +12,8 @@ import DataGridSection from "./standard/DataGridSection";
 
 export default function Page() {
   const [showSidebar, setShowSidebar] = useState(true);
-
-  return (
+  
+  return ( 
     <Box sx={{ display: "flex", height: "100vh", width: "100vw" }}>
       {/* 사이드바 or 열기 버튼 */}
       {showSidebar ? (
@@ -52,3 +52,4 @@ export default function Page() {
     </Box>
   );
 }
+
