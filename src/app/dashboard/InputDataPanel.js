@@ -122,7 +122,7 @@ export default function InputDataPanel() {
           <List>
             <ListItemButton>
               <ListItemText
-                primary="우선 순위"
+                primary="우선 순위순위"
                 primaryTypographyProps={{ color: "grey.500" }}
               />
             </ListItemButton>
