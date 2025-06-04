@@ -74,26 +74,41 @@ export default function InputDataPanel() {
                 primaryTypographyProps={{ fontWeight: "bold" }}
               />
             </ListItemButton>
-            <ListItemButton>
+            <ListItemButton sx={{ pl: 4 }}>
               <ListItemText
                 primary="생산프로세스"
                 primaryTypographyProps={{ color: "grey.500" }}
               />
             </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="공정 마스터" />
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText
+                primary="공정 마스터"
+                primaryTypographyProps={{ color: "grey.500" }}
+              />
             </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="자재 마스터" />
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText
+                primary="자재 마스터"
+                primaryTypographyProps={{ color: "grey.500" }}
+              />
             </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="BOM" />
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText
+                primary="BOM"
+                primaryTypographyProps={{ color: "grey.500" }}
+              />
             </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="플랜트 마스터" />
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText
+                primary="플랜트 마스터"
+                primaryTypographyProps={{ color: "grey.500" }}
+              />
             </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="공정순서" />
+            <ListItemButton sx={{ pl: 4 }}>
+              <ListItemText
+                primary="공정순서"
+                primaryTypographyProps={{ color: "grey.500" }}
+              />
             </ListItemButton>
           </List>
         </AccordionDetails>
