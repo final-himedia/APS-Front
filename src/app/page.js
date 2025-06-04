@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -10,11 +9,12 @@ import ListDivider from "./standard/ListDivider";
 import ScenarioList from "./standard/ScenarioList";
 
 import DataGridSection from "./standard/DataGridSection";
+import InputDataPanel from "./dashboard/InputDataPanel";
 
 export default function Page() {
   const [showSidebar, setShowSidebar] = useState(true);
-  
-  return ( 
+
+  return (
     <Box sx={{ display: "flex", height: "100vh", width: "100vw" }}>
       {/* 사이드바 or 열기 버튼 */}
       {showSidebar ? (
@@ -49,9 +49,10 @@ export default function Page() {
         <Box sx={{ flex: 1, p: 2, overflow: "auto" }}>
           <DataGridSection />
         </Box>
+        <Box sx={{ width: 260, borderRight: "1px solid #ccc" }}>
+          <InputDataPanel />
+        </Box>
       </Box>
-
     </Box>
   );
 }
-
