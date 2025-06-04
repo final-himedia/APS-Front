@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -49,6 +50,7 @@ export default function Page() {
           <DataGridSection />
         </Box>
       </Box>
+
     </Box>
   );
 }

@@ -8,7 +8,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
+
       <body style={{ height: "100vh" }}>{children}</body>
+
     </html>
   );
 }
