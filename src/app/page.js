@@ -10,47 +10,62 @@ import ScenarioList from "./standard/ScenarioList";
 
 import DataGridSection from "./standard/DataGridSection";
 import InputDataPanel from "./dashboard/InputDataPanel";
+import Header from "./dashboard/Header"; // 👈 새로 만든 헤더 import
+import Schedule from "./dashboard/Schedule";
 
 export default function Page() {
   const [showSidebar, setShowSidebar] = useState(true);
 
+  const [selectedMenu, setSelectedMenu] = useState(null);
+
   return (
-    <Box sx={{ display: "flex", height: "100vh", width: "100vw" }}>
-      {/* 사이드바 or 열기 버튼 */}
-      {showSidebar ? (
-        <Box sx={{ width: 280 }}>
-          <ListDivider onClose={() => setShowSidebar(false)} />
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            width: 40,
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "center",
-            pt: 1,
-            borderRight: "1px solid #ccc",
-          }}
-        >
-          <IconButton onClick={() => setShowSidebar(true)}>
-            <EastIcon />
-          </IconButton>
-        </Box>
-      )}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        width: "100vw",
+      }}
+    >
+      {/* 🔹 상단 헤더 */}
+      <Header />
 
-      {/* 메인 콘텐츠: 시나리오 리스트 + 데이터 테이블 */}
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
-        {/* 시나리오 목록 */}
-        <Box sx={{ width: 260, borderRight: "1px solid #ccc" }}>
-          <ScenarioList />
-        </Box>
+      {/* 🔸 하단 레이아웃 */}
+      <Box sx={{ display: "flex", flex: 1 }}>
+        {showSidebar ? (
+          <Box sx={{ width: 280 }}>
+            <ListDivider
+              onClose={() => setShowSidebar(false)}
+              setSelectedMenu={setSelectedMenu}
+            />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              width: 40,
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "center",
+              pt: 1,
+              borderRight: "1px solid #ccc",
+            }}
+          >
+            <IconButton onClick={() => setShowSidebar(true)}>
+              <EastIcon />
+            </IconButton>
+          </Box>
+        )}
 
-        {/* 테이블 영역 */}
-        <Box sx={{ flex: 1, p: 2, overflow: "auto" }}>
-          <DataGridSection />
-        </Box>
-        <Box sx={{ width: 260, borderRight: "1px solid #ccc" }}>
-          <InputDataPanel />
+        <Box sx={{ flex: 1, display: "flex", flexDirection: "row" }}>
+          <Box sx={{ width: 260, borderRight: "1px solid #ccc" }}>
+            <ScenarioList setSelectedMenu={setSelectedMenu} />
+          </Box>
+          <Box sx={{ flex: 1, p: 2, overflow: "auto" }}>
+            {selectedMenu === "schedule" ? <Schedule /> : <DataGridSection />}
+          </Box>
+          <Box sx={{ width: 260, borderRight: "1px solid #ccc" }}>
+            <InputDataPanel />
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -16,12 +16,71 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 
+// ✅ 타입 제거한 아코디언 렌더 함수 (JS 버전)
+function renderAccordion(title, items) {
+  return (
+    <Accordion disableGutters elevation={0} square>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
+        sx={{
+          backgroundColor: "#e3f2fd",
+          minHeight: "36px",
+          px: 1.5,
+        }}
+      >
+        <Typography
+          sx={{
+            fontWeight: 500,
+            fontSize: "0.85rem",
+            color: "primary.main",
+          }}
+        >
+          {title}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails sx={{ p: 0 }}>
+        <List dense disablePadding>
+          {items.map((item, idx) => (
+            <ListItemButton
+              key={idx}
+              sx={{
+                pl: item.indent ? 4 : 2,
+                py: 0.5,
+              }}
+            >
+              <ListItemText
+                primary={item.label}
+                primaryTypographyProps={{
+                  fontSize: item.bold ? "0.875rem" : "0.8125rem",
+                  fontWeight: item.bold ? 600 : 400,
+                  color: item.bold ? "grey.800" : "grey.500",
+                }}
+              />
+            </ListItemButton>
+          ))}
+        </List>
+      </AccordionDetails>
+    </Accordion>
+  );
+}
+
 export default function InputDataPanel() {
   return (
     <Box
-      sx={{ width: 300, height: "100vh", p: 2, borderLeft: "1px solid #ccc" }}
+      sx={{
+        width: 300,
+        height: "100vh",
+        p: 2,
+        borderLeft: "1px solid #ccc",
+        fontSize: "0.875rem",
+        bgcolor: "white",
+      }}
     >
-      <Typography variant="h6" gutterBottom>
+      <Typography
+        variant="h6"
+        gutterBottom
+        sx={{ fontWeight: "bold", color: "primary.main" }}
+      >
         입력 데이터 목록
       </Typography>
 
@@ -33,148 +92,39 @@ export default function InputDataPanel() {
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon />
+              <SearchIcon color="action" />
             </InputAdornment>
           ),
         }}
         sx={{
           mb: 2,
-          backgroundColor: "#f5f5f5", // 연한 회색 배경
+          backgroundColor: "#f5f5f5",
           borderRadius: 1,
         }}
       />
 
-      {/* Configurations 아코디언 */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="bold">Configurations</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <List>
-            <ListItemButton>
-              <ListItemText
-                primary="엔진 실행 결과"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-          </List>
-        </AccordionDetails>
-      </Accordion>
+      {renderAccordion("Configurations", [{ label: "엔진 실행 옵션" }])}
 
-      {/* Input Data 아코디언 (요구사항 반영) */}
-      <Accordion defaultExpanded>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="bold">Input Data</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <List>
-            <ListItemButton>
-              <ListItemText
-                primary="Bop"
-                primaryTypographyProps={{ fontWeight: "bold" }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText
-                primary="생산프로세스"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText
-                primary="공정 마스터"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText
-                primary="자재 마스터"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText
-                primary="BOM"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText
-                primary="플랜트 마스터"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText
-                primary="공정순서"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-          </List>
-        </AccordionDetails>
-      </Accordion>
+      {renderAccordion("Input Data", [
+        { label: "Bop", bold: true },
+        { label: "생산 프로세스", indent: true },
+        { label: "공정 마스터", indent: true },
+        { label: "자재 마스터", indent: true },
+        { label: "BOM", indent: true },
+        { label: "플랜트 마스터", indent: true },
+        { label: "공정 순서", indent: true },
+      ])}
 
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="bold">Config</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <List>
-            <ListItemButton>
-              <ListItemText
-                primary="우선 순위순위"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-          </List>
-        </AccordionDetails>
-      </Accordion>
+      {renderAccordion("Config", [{ label: "우선순위" }])}
 
-      {/* Resource 아코디언 */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="bold">Resource</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <List>
-            <ListItemButton>
-              <ListItemText
-                primary="작업도구 마스터"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText
-                primary="작업장 마스터"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText
-                primary="생산 라우팅"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-          </List>
-        </AccordionDetails>
-      </Accordion>
+      {renderAccordion("Resource", [
+        { label: "작업도구 마스터" },
+        { label: "작업장 마스터" },
+        { label: "생산 라우팅" },
+        { label: "작업장-도구 매핑관리" },
+      ])}
 
-      {/* Target 아코디언 */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography fontWeight="bold">Target</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <List>
-            <ListItemButton>
-              <ListItemText
-                primary="판매오더"
-                primaryTypographyProps={{ color: "grey.500" }}
-              />
-            </ListItemButton>
-          </List>
-        </AccordionDetails>
-      </Accordion>
+      {renderAccordion("Target", [{ label: "판매오더" }])}
     </Box>
   );
 }
