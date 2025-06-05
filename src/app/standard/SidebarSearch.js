@@ -13,9 +13,16 @@ export default function SidebarSearch() {
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
-            <SearchIcon />
+            <SearchIcon fontSize="small" />
           </InputAdornment>
         ),
+      }}
+      sx={{
+        height: 32,
+        width: 220,
+        '& .MuiInputBase-root': {
+          height: 32, 
+        },
       }}
     />
   );
