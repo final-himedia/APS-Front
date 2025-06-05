@@ -9,7 +9,9 @@ import {
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SidebarSearch from "./SidebarSearch";
 
+
 import { Divider } from "@mui/material";
+
 
 
 const scenarioIds = [
@@ -23,6 +25,7 @@ const scenarioIds = [
 
 export default function ScenarioList({ listKey, onClose }) {
   return (
+
     <Box
       sx={{
         width: 240,
@@ -73,6 +76,7 @@ export default function ScenarioList({ listKey, onClose }) {
 
 
       {/* 시나리오 항목 */}
+
       <List dense>
         {scenarioIds.map((id) => (
           <ListItem key={id} button disablePadding>
