@@ -1,55 +1,72 @@
 "use client";
 
+import Link from "next/link";
 import SidebarSearch from "./SidebarSearch";
 
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import * as React from "react";
-import { useState } from "react";
+import {
+  Box,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemText,
+  Collapse,
+  Divider,
+  ListItemIcon,
+} from "@mui/material";
 
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import Collapse from "@mui/material/Collapse";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
-
-import Divider from "@mui/material/Divider";
-
-import ListItemIcon from "@mui/material/ListItemIcon";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ScienceIcon from "@mui/icons-material/Science";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+
+import { useState } from "react";
 
 export default function ListDivider({ onClose }) {
-  const [openFind, setopenFind] = useState(false);
+  const [openFind, setOpenFind] = useState(false);
   const [openEngine, setOpenEngine] = useState(false);
   const [openResult, setOpenResult] = useState(false);
 
   return (
-    <Box sx={{ width: 240, p: 2 }}>
+    <Box
+      sx={{
+        width: 240,
+        boxSizing: "border-box",
+        backgroundColor: "#fff",
+        height: "100vh",
+        overflowY: "auto",
+        display: "flex",
+
+        flexDirection: "column",
+        px: 2,
+      }}
+    >
+      {/* 로고 + 닫기 */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          height: 40,
+          mt: "5px",
         }}
       >
         <img src="/logo/main-logo.png" alt="로고" style={{ height: 40 }} />
-
-        <IconButton onClick={onClose}>
+        <IconButton onClick={onClose} sx={{ mr: "-10px" }}>
           <KeyboardBackspaceIcon />
         </IconButton>
       </Box>
 
-      <Divider sx={{ my: 1 }} />
+      <Divider sx={{ width: 220, my: 1 }} />
 
       <SidebarSearch />
 
-      <Divider sx={{ my: 1 }} />
+      <Divider sx={{ width: 220, my: 1 }} />
+
       <List>
-        <ListItemButton onClick={() => setopenFind(!openFind)}>
+        {/* 즐겨찾기 */}
+        <ListItemButton onClick={() => setOpenFind(!openFind)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <StarBorderIcon />
           </ListItemIcon>
@@ -67,6 +84,7 @@ export default function ListDivider({ onClose }) {
           </List>
         </Collapse>
 
+        {/* 엔진 */}
         <ListItemButton onClick={() => setOpenEngine(!openEngine)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <ScienceIcon />
@@ -74,21 +92,24 @@ export default function ListDivider({ onClose }) {
           <ListItemText primary="엔진" />
           {openEngine ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-
         <Collapse in={openEngine} timeout="auto" unmountOnExit>
           <List>
-            <ListItemButton>
+            <ListItemButton component={Link} href="/scenario">
               <ListItemText primary="시나리오 관리" />
             </ListItemButton>
-            <ListItemButton>
+            <ListItemButton component={Link} href="/run">
+              <ListItemText primary="실행 관리" />
+            </ListItemButton>
+            <ListItemButton component={Link} href="/schedule">
               <ListItemText primary="스케줄 관리" />
             </ListItemButton>
-            <ListItemButton>
+            <ListItemButton component={Link} href="/result">
               <ListItemText primary="실행 결과" />
             </ListItemButton>
           </List>
         </Collapse>
 
+        {/* 결과 분석 */}
         <ListItemButton onClick={() => setOpenResult(!openResult)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <QueryStatsIcon />
@@ -96,7 +117,6 @@ export default function ListDivider({ onClose }) {
           <ListItemText primary="결과 분석" />
           {openResult ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
-
         <Collapse in={openResult} timeout="auto" unmountOnExit>
           <List>
             <ListItemButton>
