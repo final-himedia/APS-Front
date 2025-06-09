@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
         </div>
       )}
 
-      <div style={{ marginLeft: isSidebarOpen ? sidebarWidth : 0, flex: 0.5 }}>
+      <div style={{ marginLeft: isSidebarOpen ? sidebarWidth : 0, flex: 1 }}>
         {/* 상단바 */}
         <div
           style={{

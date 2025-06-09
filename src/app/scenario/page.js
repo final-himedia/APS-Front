@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ScenarioList from "../standard/ScenarioList";
 import DataGridSection from "../standard/DataGridSection";
-import InputDataPanel from "../dashboard/InputDataPanel";
+import InputDataPanel from "../standard/InputDataPanel";
 
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -19,6 +19,7 @@ export default function ScenarioPage() {
         height: "100%",
         width: "100%",
         position: "relative",
+        flexDirection: "row",
       }}
     >
       {/* 시나리오 목록 패널 */}
@@ -51,7 +52,7 @@ export default function ScenarioPage() {
       )}
 
       {/* 테이블 */}
-      <Box sx={{ flex: 1, p: 2 }}>
+      <Box>
         <DataGridSection />
       </Box>
 
