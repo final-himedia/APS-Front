@@ -16,7 +16,6 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
 
-// ✅ 타입 제거한 아코디언 렌더 함수 (JS 버전)
 function renderAccordion(title, items) {
   return (
     <Accordion disableGutters elevation={0} square>
@@ -65,6 +64,28 @@ function renderAccordion(title, items) {
 }
 
 export default function InputDataPanel() {
+  const inputDataItems = [
+    { label: "Bop", bold: true },
+    { label: "생산 프로세스", indent: true },
+    { label: "공정 마스터", indent: true },
+    { label: "자재 마스터", indent: true },
+    { label: "BOM", indent: true },
+    { label: "플랜트 마스터", indent: true },
+    { label: "공정 순서", indent: true },
+
+    { label: "Config", bold: true },
+    { label: "우선순위", indent: true },
+
+    { label: "Resource", bold: true },
+    { label: "작업도구 마스터", indent: true },
+    { label: "작업장 마스터", indent: true },
+    { label: "생산 라우팅", indent: true },
+    { label: "작업장-도구 매핑관리", indent: true },
+
+    { label: "Target", bold: true },
+    { label: "판매오더", indent: true },
+  ];
+
   return (
     <Box
       sx={{
@@ -103,28 +124,10 @@ export default function InputDataPanel() {
         }}
       />
 
-      {renderAccordion("Configurations", [{ label: "엔진 실행 옵션" }])}
+      {/* ✅ 통합된 Input Data 아코디언 */}
+      {renderAccordion("Input Data", inputDataItems)}
 
-      {renderAccordion("Input Data", [
-        { label: "Bop", bold: true },
-        { label: "생산 프로세스", indent: true },
-        { label: "공정 마스터", indent: true },
-        { label: "자재 마스터", indent: true },
-        { label: "BOM", indent: true },
-        { label: "플랜트 마스터", indent: true },
-        { label: "공정 순서", indent: true },
-      ])}
-
-      {renderAccordion("Config", [{ label: "우선순위" }])}
-
-      {renderAccordion("Resource", [
-        { label: "작업도구 마스터" },
-        { label: "작업장 마스터" },
-        { label: "생산 라우팅" },
-        { label: "작업장-도구 매핑관리" },
-      ])}
-
-      {renderAccordion("Target", [{ label: "판매오더" }])}
+      {/* 별도 아코디언이었던 Config, Resource, Target은 제거 */}
     </Box>
   );
 }
