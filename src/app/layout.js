@@ -10,6 +10,7 @@ export const metadata = {
 export default function Layout({ children }) {
   return (
     <html lang="ko">
+      <h1>sfsdfdsfsdfsd</h1>
       <body>
         <RootLayout>{children}</RootLayout>
       </body>
