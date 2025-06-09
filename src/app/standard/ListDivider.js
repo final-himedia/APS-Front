@@ -14,6 +14,7 @@ import {
   ListItemIcon,
 } from "@mui/material";
 
+import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ScienceIcon from "@mui/icons-material/Science";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
@@ -21,12 +22,57 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ListDivider({ onClose }) {
   const [openFind, setOpenFind] = useState(false);
   const [openEngine, setOpenEngine] = useState(false);
   const [openResult, setOpenResult] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("favorites");
+    if (stored) {
+      try {
+        setFavorites(JSON.parse(stored));
+      } catch (e) {
+        console.error("즐겨찾기 파싱 오류:", e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
+
+  const toggleFavorite = (label, href) => {
+    const exists = favorites.find((item) => item.label === label);
+    if (exists) {
+      setFavorites((prev) => prev.filter((item) => item.label !== label));
+    } else {
+      setFavorites((prev) => [...prev, { label, href }]);
+    }
+  };
+
+  const renderMenuItem = (label, href) => (
+    <ListItemButton component={Link} href={href} key={label}>
+      <ListItemText primary={label} />
+      <IconButton
+        size="small"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleFavorite(label, href);
+        }}
+        sx={{
+          opacity: 0.4,
+          "&:hover": { opacity: 1 },
+        }}
+      >
+        <StarIcon fontSize="small" />
+      </IconButton>
+    </ListItemButton>
+  );
 
   return (
     <Box
@@ -37,7 +83,6 @@ export default function ListDivider({ onClose }) {
         height: "100vh",
         overflowY: "auto",
         display: "flex",
-
         flexDirection: "column",
         px: 2,
       }}
@@ -59,30 +104,45 @@ export default function ListDivider({ onClose }) {
       </Box>
 
       <Divider sx={{ width: 220, my: 1 }} />
-
       <SidebarSearch />
-
       <Divider sx={{ width: 220, my: 1 }} />
 
       <List>
         {/* 즐겨찾기 */}
-        <ListItemButton onClick={() => setOpenFind(!openFind)}>
-          <ListItemIcon sx={{ minWidth: 32 }}>
-            <StarBorderIcon />
-          </ListItemIcon>
-          <ListItemText primary="즐겨찾기" />
-          {openFind ? <ExpandLess /> : <ExpandMore />}
-        </ListItemButton>
-        <Collapse in={openFind} timeout="auto" unmountOnExit>
-          <List>
-            <ListItemButton>
-              <ListItemText primary="수정해야함" />
+        {favorites.length > 0 && (
+          <>
+            <ListItemButton onClick={() => setOpenFind(!openFind)}>
+              <ListItemIcon sx={{ minWidth: 32 }}>
+                <StarBorderIcon />
+              </ListItemIcon>
+              <ListItemText primary="즐겨찾기" />
+              {openFind ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="수정해야함" />
-            </ListItemButton>
-          </List>
-        </Collapse>
+            <Collapse in={openFind} timeout="auto" unmountOnExit>
+              <List>
+                {favorites.map((item) => (
+                  <ListItemButton
+                    key={item.label}
+                    component={Link}
+                    href={item.href}
+                  >
+                    <ListItemText primary={item.label} />
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(item.label, item.href);
+                      }}
+                    >
+                      <StarIcon fontSize="small" />
+                    </IconButton>
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
+          </>
+        )}
 
         {/* 엔진 */}
         <ListItemButton onClick={() => setOpenEngine(!openEngine)}>
@@ -94,18 +154,10 @@ export default function ListDivider({ onClose }) {
         </ListItemButton>
         <Collapse in={openEngine} timeout="auto" unmountOnExit>
           <List>
-            <ListItemButton component={Link} href="/scenario">
-              <ListItemText primary="시나리오 관리" />
-            </ListItemButton>
-            <ListItemButton component={Link} href="/run">
-              <ListItemText primary="실행 관리" />
-            </ListItemButton>
-            <ListItemButton component={Link} href="/schedule">
-              <ListItemText primary="스케줄 관리" />
-            </ListItemButton>
-            <ListItemButton component={Link} href="/result">
-              <ListItemText primary="실행 결과" />
-            </ListItemButton>
+            {renderMenuItem("시나리오 관리", "/scenario")}
+            {renderMenuItem("실행 관리", "/run")}
+            {renderMenuItem("스케줄 관리", "/schedule")}
+            {renderMenuItem("실행 결과", "/result")}
           </List>
         </Collapse>
 
@@ -119,24 +171,12 @@ export default function ListDivider({ onClose }) {
         </ListItemButton>
         <Collapse in={openResult} timeout="auto" unmountOnExit>
           <List>
-            <ListItemButton>
-              <ListItemText primary="RTF 현황" />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="대시보드" />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="자원 운영 간트" />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="생산 계획 간트" />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="설비 가동 현황" />
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="시나리오 비교" />
-            </ListItemButton>
+            {renderMenuItem("RTF 현황", "#")}
+            {renderMenuItem("대시보드", "#")}
+            {renderMenuItem("자원 운영 간트", "#")}
+            {renderMenuItem("생산 계획 간트", "#")}
+            {renderMenuItem("설비 가동 현황", "#")}
+            {renderMenuItem("시나리오 비교", "#")}
           </List>
         </Collapse>
       </List>
