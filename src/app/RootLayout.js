@@ -54,7 +54,7 @@ export default function RootLayout({ children }) {
           )}
         </div>
 
-        <main style={{ marginTop: 20, padding: 16 }}>{children}</main>
+        <main style={{ marginTop: 25, padding: 16 }}>{children}</main>
       </div>
     </div>
   );
