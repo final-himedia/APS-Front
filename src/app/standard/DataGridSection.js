@@ -33,7 +33,7 @@ const columns = [
 
 export default function DataGridSection() {
   return (
-    <Box p={3} flex={1}>
+    <Box p={1} flex={1}>
       <Typography variant="h6" gutterBottom>
         시나리오 관리
       </Typography>

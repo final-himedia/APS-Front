@@ -4,6 +4,7 @@ import { useState } from "react";
 import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
+import { Grid } from "@mui/material";
 
 export default function RootLayout({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
