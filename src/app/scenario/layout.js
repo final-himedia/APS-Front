@@ -45,10 +45,6 @@ export default function ScenarioLayout({ children }) {
       {/* 가운데 영역 */}
       <main style={{ flex: 1, overflowY: "auto" }}>{children}</main>
 
-      {/* 오른쪽 입력 데이터 패널 */}
-      <div style={{ width: 300}}>
-        <InputDataPanel />
-      </div>
     </div>
   );
 }

@@ -1,24 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
-import { Grid } from "@mui/material";
+import InputDataPanel from "./standard/InputDataPanel";
+import ListDivider from "./standard/ListDivider";
 
 export default function RootLayout({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isInputSidebarOpen, setInputSidebarOpen] = useState(true);
+
   const sidebarWidth = 250;
+  const inputPanelWidth = 300;
+  const topBarHeight = 40;
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
+      {/* 왼쪽 사이드바 */}
       {isSidebarOpen && (
         <div
           style={{
-            width: sidebarWidth,
             position: "fixed",
             top: 0,
             left: 0,
+            width: sidebarWidth,
             height: "100vh",
             backgroundColor: "#fff",
             borderRight: "1px solid #ccc",
@@ -29,14 +34,21 @@ export default function RootLayout({ children }) {
         </div>
       )}
 
-      <div style={{ marginLeft: isSidebarOpen ? sidebarWidth : 0, flex: 1 }}>
+      {/* 메인 콘텐츠 영역 */}
+      <div
+        style={{
+          marginLeft: isSidebarOpen ? sidebarWidth : 0,
+          marginRight: isInputSidebarOpen ? inputPanelWidth : 0,
+          flex: 1,
+          transition: "margin 0.3s ease-in-out",
+        }}
+      >
         {/* 상단바 */}
         <div
           style={{
-            height: 40,
+            height: topBarHeight,
             backgroundColor: "#fff",
             borderBottom: "1px solid #ccc",
-            borderLeft: "1px solid #ccc",
             display: "flex",
             alignItems: "center",
             padding: "0 16px",
@@ -54,8 +66,17 @@ export default function RootLayout({ children }) {
           )}
         </div>
 
-        <main style={{ marginTop: 25, padding: 16 }}>{children}</main>
+        {/* 콘텐츠 */}
+        <main style={{ marginTop: topBarHeight, padding: 16 }}>
+          {children}
+        </main>
       </div>
+
+      {/* 오른쪽 입력 패널 - 무조건 렌더링 */}
+      <InputDataPanel
+        isOpen={isInputSidebarOpen}
+        setIsOpen={setInputSidebarOpen}
+      />
     </div>
   );
 }

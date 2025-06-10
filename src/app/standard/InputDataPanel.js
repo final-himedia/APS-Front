@@ -1,5 +1,8 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
+
 import React, { useState } from "react";
 import {
   Accordion,
@@ -20,27 +23,31 @@ import SearchIcon from "@mui/icons-material/Search";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-export default function InputDataPanel() {
-  const [isOpen, setIsOpen] = useState(true);
+
+export default function InputDataPanel({ isOpen, setIsOpen }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
   const inputDataItems = [
     { label: "Bop", bold: true },
-    { label: "생산 프로세스", indent: true },
-    { label: "공정 마스터", indent: true },
-    { label: "자재 마스터", indent: true },
-    { label: "BOM", indent: true },
-    { label: "플랜트 마스터", indent: true },
-    { label: "공정 순서", indent: true },
+    { label: "생산 프로세스", indent: true, url: "/scenario/bop/routing" },
+    { label: "공정 마스터", indent: true, url: "/scenario/bop/operation" },
+    { label: "자재 마스터", indent: true, url: "/scenario/bop/part" },
+    { label: "BOM", indent: true, url: "/scenario/bop/bom" },
+    { label: "플랜트 마스터", indent: true, url: "/scenario/bop/site" },
+    { label: "공정 순서", indent: true, url: "/scenario/bop/operation-routing" },
+
     { label: "Config", bold: true },
-    { label: "우선순위", indent: true },
+    { label: "우선순위", indent: true, url: "/scenario/priority" },
+
     { label: "Resource", bold: true },
-    { label: "작업도구 마스터", indent: true },
-    { label: "작업장 마스터", indent: true },
-    { label: "생산 라우팅", indent: true },
-    { label: "작업장-도구 매핑관리", indent: true },
+    { label: "작업도구 마스터", indent: true, url: "/scenario/resource/tool-master" },
+    { label: "작업장 마스터", indent: true, url: "/scenario/resource/workcenter" },
+    { label: "생산 라우팅", indent: true, url: "/scenario/resource/workcenter-map" },
+    { label: "작업장-도구 매핑관리", indent: true, url: "/scenario/resource/tool-map" },
+
     { label: "Target", bold: true },
-    { label: "판매오더", indent: true },
+    { label: "판매오더", indent: true, url: "/scenario/target/demand" },
   ];
 
   // ✅ 검색어 필터링 처리
@@ -74,10 +81,8 @@ export default function InputDataPanel() {
             {items.map((item, idx) => (
               <ListItemButton
                 key={idx}
-                sx={{
-                  pl: item.indent ? 4 : 2,
-                  py: 0.5,
-                }}
+                sx={{ pl: item.indent ? 4 : 2, py: 0.5 }}
+                onClick={() => item.url && router.push(item.url)}
               >
                 <ListItemText
                   primary={item.label}
@@ -100,7 +105,7 @@ export default function InputDataPanel() {
       sx={{
         position: "fixed",
         right: isOpen ? 0 : -300,
-        top: 0,
+        top: 40,
         width: 300,
         height: "100vh",
         p: 2,
@@ -108,8 +113,6 @@ export default function InputDataPanel() {
         fontSize: "0.875rem",
         bgcolor: "white",
         transition: "right 0.3s ease-in-out",
-        zIndex: 1200,
-        boxShadow: 3,
       }}
     >
       {/* 상단 제목 + 토글 버튼 */}
@@ -165,7 +168,7 @@ export default function InputDataPanel() {
           onClick={() => setIsOpen(true)}
           sx={{
             position: "fixed",
-            top: 20,
+            top: 60,
             right: 0,
             zIndex: 1300,
             bgcolor: "white",
