@@ -15,76 +15,33 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
-
-function renderAccordion(title, items) {
-  return (
-    <Accordion disableGutters elevation={0} square>
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
-        sx={{
-          backgroundColor: "#e3f2fd",
-          minHeight: "36px",
-          px: 1.5,
-        }}
-      >
-        <Typography
-          sx={{
-            fontWeight: 500,
-            fontSize: "0.85rem",
-            color: "primary.main",
-          }}
-        >
-          {title}
-        </Typography>
-      </AccordionSummary>
-      <AccordionDetails sx={{ p: 0 }}>
-        <List dense disablePadding>
-          {items.map((item, idx) => (
-            <ListItemButton
-              key={idx}
-              sx={{
-                pl: item.indent ? 4 : 2,
-                py: 0.5,
-              }}
-            >
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: item.bold ? "0.875rem" : "0.8125rem",
-                  fontWeight: item.bold ? 600 : 400,
-                  color: item.bold ? "grey.800" : "grey.500",
-                }}
-              />
-            </ListItemButton>
-          ))}
-        </List>
-      </AccordionDetails>
-    </Accordion>
-  );
-}
+import { useRouter } from "next/navigation";
 
 export default function InputDataPanel() {
-  const inputDataItems = [
-    { label: "Bop", bold: true },
-    { label: "생산 프로세스", indent: true },
-    { label: "공정 마스터", indent: true },
-    { label: "자재 마스터", indent: true },
-    { label: "BOM", indent: true },
-    { label: "플랜트 마스터", indent: true },
-    { label: "공정 순서", indent: true },
+  const router = useRouter();
 
-    { label: "Config", bold: true },
-    { label: "우선순위", indent: true },
+ const items = [
+  { label: "Bop", bold: true },
+  { label: "생산 프로세스", indent: true, url: "/scenario/bop" },
+  { label: "공정 마스터", indent: true, url: "/scenario/bop/operation" },
+  { label: "자재 마스터", indent: true, url: "/scenario/bop/material" },
+  { label: "BOM", indent: true, url: "/scenario/bop/bom" },
+  { label: "플랜트 마스터", indent: true, url: "/scenario/bop/plant" },
+  { label: "공정 순서", indent: true, url: "/scenario/bop/sequence" },
 
-    { label: "Resource", bold: true },
-    { label: "작업도구 마스터", indent: true },
-    { label: "작업장 마스터", indent: true },
-    { label: "생산 라우팅", indent: true },
-    { label: "작업장-도구 매핑관리", indent: true },
+  { label: "Config", bold: true },
+  { label: "우선순위", indent: true, url: "/scenario/config" },
 
-    { label: "Target", bold: true },
-    { label: "판매오더", indent: true },
-  ];
+  { label: "Resource", bold: true },
+  { label: "작업도구 마스터", indent: true, url: "/scenario/resource/tool" },
+  { label: "작업장 마스터", indent: true, url: "/scenario/resource/workcenter" },
+  { label: "생산 라우팅", indent: true, url: "/scenario/resource/routing" },
+  { label: "작업장-도구 매핑관리", indent: true, url: "/scenario/resource/mapping" },
+
+  { label: "Target", bold: true },
+  { label: "판매오더", indent: true, url: "/scenario/target" },
+];
+
 
   return (
     <Box
@@ -117,17 +74,40 @@ export default function InputDataPanel() {
             </InputAdornment>
           ),
         }}
-        sx={{
-          mb: 2,
-          backgroundColor: "#f5f5f5",
-          borderRadius: 1,
-        }}
+        sx={{ mb: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}
       />
 
-      {/* ✅ 통합된 Input Data 아코디언 */}
-      {renderAccordion("Input Data", inputDataItems)}
-
-      {/* 별도 아코디언이었던 Config, Resource, Target은 제거 */}
+      {/* 🎯 아코디언 하나로 단순하게 */}
+      <Accordion disableGutters elevation={0} square>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
+          sx={{ backgroundColor: "#e3f2fd", minHeight: 36, px: 1.5 }}
+        >
+          <Typography sx={{ fontWeight: 500, fontSize: "0.85rem", color: "primary.main" }}>
+            Input Data
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ p: 0 }}>
+          <List dense disablePadding>
+            {items.map((item, idx) => (
+              <ListItemButton
+                key={idx}
+                sx={{ pl: item.indent ? 4 : 2, py: 0.5 }}
+                onClick={() => item.url && router.push(item.url)}
+              >
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: item.bold ? "0.875rem" : "0.8125rem",
+                    fontWeight: item.bold ? 600 : 400,
+                    color: item.bold ? "grey.800" : "grey.500",
+                  }}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        </AccordionDetails>
+      </Accordion>
     </Box>
   );
 }
