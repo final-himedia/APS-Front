@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import SidebarSearch from "./SidebarSearch";
+import { useEffect, useState } from "react";
 
 import {
   Box,
@@ -12,6 +12,8 @@ import {
   Collapse,
   Divider,
   ListItemIcon,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
 
 import StarIcon from "@mui/icons-material/Star";
@@ -22,8 +24,7 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import SettingsIcon from "@mui/icons-material/Settings";
-
-import { useEffect, useState } from "react";
+import SearchIcon from "@mui/icons-material/Search";
 
 export default function ListDivider({ onClose }) {
   const [openFind, setOpenFind] = useState(false);
@@ -31,6 +32,7 @@ export default function ListDivider({ onClose }) {
   const [openResult, setOpenResult] = useState(false);
   const [openManage, setOpenManage] = useState(false);
   const [favorites, setFavorites] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("favorites");
@@ -56,25 +58,51 @@ export default function ListDivider({ onClose }) {
     }
   };
 
-  const renderMenuItem = (label, href) => (
-    <ListItemButton component={Link} href={href} key={label}>
-      <ListItemText primary={label} />
-      <IconButton
-        size="small"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          toggleFavorite(label, href);
-        }}
-        sx={{
-          opacity: 0.4,
-          "&:hover": { opacity: 1 },
-        }}
-      >
-        <StarIcon fontSize="small" />
-      </IconButton>
-    </ListItemButton>
-  );
+  const matchesSearch = (label) =>
+    label.toLowerCase().includes(searchTerm.toLowerCase());
+
+  const renderMenuItem = (label, href) => {
+    if (searchTerm && !matchesSearch(label)) return null;
+    return (
+      <ListItemButton component={Link} href={href} key={label}>
+        <ListItemText primary={label} />
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleFavorite(label, href);
+          }}
+          sx={{ opacity: 0.4, "&:hover": { opacity: 1 } }}
+        >
+          <StarIcon fontSize="small" />
+        </IconButton>
+      </ListItemButton>
+    );
+  };
+
+  const engineMenuItems = [
+    { label: "시나리오 관리", href: "/scenario" },
+    { label: "실행 관리", href: "/run" },
+    { label: "스케줄 관리", href: "/schedule" },
+    { label: "실행 결과", href: "/result" },
+  ];
+
+  const resultMenuItems = [
+    { label: "RTF 현황", href: "#" },
+    { label: "대시보드", href: "#" },
+    { label: "자원 운영 간트", href: "#" },
+    { label: "생산 계획 간트", href: "#" },
+    { label: "설비 가동 현황", href: "#" },
+    { label: "시나리오 비교", href: "#" },
+  ];
+
+  const manageMenuItems = [
+    { label: "사용자 관리", href: "/admin/users" },
+    { label: "권한 관리", href: "/admin/roles" },
+  ];
+
+  const hasMatches = (items) => items.some((item) => matchesSearch(item.label));
 
   return (
     <Box
@@ -89,7 +117,6 @@ export default function ListDivider({ onClose }) {
         px: 2,
       }}
     >
-      {/* 로고 + 닫기 */}
       <Box
         sx={{
           display: "flex",
@@ -112,11 +139,29 @@ export default function ListDivider({ onClose }) {
       </Box>
 
       <Divider sx={{ width: 220, my: 1 }} />
-      <SidebarSearch />
+      <TextField
+        placeholder="검색"
+        variant="outlined"
+        size="small"
+        fullWidth
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" />
+            </InputAdornment>
+          ),
+        }}
+        sx={{
+          height: 32,
+          width: 220,
+          "& .MuiInputBase-root": { height: 32 },
+        }}
+      />
       <Divider sx={{ width: 220, my: 1 }} />
 
       <List>
-        {/* 즐겨찾기 */}
         {favorites.length > 0 && (
           <>
             <ListItemButton onClick={() => setOpenFind(!openFind)}>
@@ -124,82 +169,92 @@ export default function ListDivider({ onClose }) {
                 <StarBorderIcon />
               </ListItemIcon>
               <ListItemText primary="즐겨찾기" />
-              {openFind ? <ExpandLess /> : <ExpandMore />}
+              {(searchTerm ? hasMatches(favorites) : openFind) ? (
+                <ExpandLess />
+              ) : (
+                <ExpandMore />
+              )}
             </ListItemButton>
-            <Collapse in={openFind} timeout="auto" unmountOnExit>
+            <Collapse
+              in={searchTerm ? hasMatches(favorites) : openFind}
+              timeout="auto"
+              unmountOnExit
+            >
               <List>
-                {favorites.map((item) => (
-                  <ListItemButton
-                    key={item.label}
-                    component={Link}
-                    href={item.href}
-                  >
-                    <ListItemText primary={item.label} />
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleFavorite(item.label, item.href);
-                      }}
-                    >
-                      <StarIcon fontSize="small" />
-                    </IconButton>
-                  </ListItemButton>
-                ))}
+                {favorites
+                  .filter((item) => !searchTerm || matchesSearch(item.label))
+                  .map((item) => renderMenuItem(item.label, item.href))}
               </List>
             </Collapse>
           </>
         )}
 
-        {/* 엔진 */}
         <ListItemButton onClick={() => setOpenEngine(!openEngine)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <ScienceIcon />
           </ListItemIcon>
           <ListItemText primary="엔진" />
-          {openEngine ? <ExpandLess /> : <ExpandMore />}
+          {(searchTerm ? hasMatches(engineMenuItems) : openEngine) ? (
+            <ExpandLess />
+          ) : (
+            <ExpandMore />
+          )}
         </ListItemButton>
-        <Collapse in={openEngine} timeout="auto" unmountOnExit>
+        <Collapse
+          in={searchTerm ? hasMatches(engineMenuItems) : openEngine}
+          timeout="auto"
+          unmountOnExit
+        >
           <List>
-            {renderMenuItem("시나리오 관리", "/scenario")}
-            {renderMenuItem("실행 관리", "/run")}
-            {renderMenuItem("스케줄 관리", "/schedule")}
-            {renderMenuItem("실행 결과", "/result")}
+            {engineMenuItems.map(({ label, href }) =>
+              renderMenuItem(label, href)
+            )}
           </List>
         </Collapse>
 
-        {/* 결과 분석 */}
         <ListItemButton onClick={() => setOpenResult(!openResult)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <QueryStatsIcon />
           </ListItemIcon>
           <ListItemText primary="결과 분석" />
-          {openResult ? <ExpandLess /> : <ExpandMore />}
+          {(searchTerm ? hasMatches(resultMenuItems) : openResult) ? (
+            <ExpandLess />
+          ) : (
+            <ExpandMore />
+          )}
         </ListItemButton>
-        <Collapse in={openResult} timeout="auto" unmountOnExit>
+        <Collapse
+          in={searchTerm ? hasMatches(resultMenuItems) : openResult}
+          timeout="auto"
+          unmountOnExit
+        >
           <List>
-            {renderMenuItem("RTF 현황", "#")}
-            {renderMenuItem("대시보드", "#")}
-            {renderMenuItem("자원 운영 간트", "#")}
-            {renderMenuItem("생산 계획 간트", "#")}
-            {renderMenuItem("설비 가동 현황", "#")}
-            {renderMenuItem("시나리오 비교", "#")}
+            {resultMenuItems.map(({ label, href }) =>
+              renderMenuItem(label, href)
+            )}
           </List>
         </Collapse>
 
-        {/* 관리 */}
         <ListItemButton onClick={() => setOpenManage(!openManage)}>
           <ListItemIcon sx={{ minWidth: 32 }}>
             <SettingsIcon />
           </ListItemIcon>
           <ListItemText primary="관리" />
-          {openManage ? <ExpandLess /> : <ExpandMore />}
+          {(searchTerm ? hasMatches(manageMenuItems) : openManage) ? (
+            <ExpandLess />
+          ) : (
+            <ExpandMore />
+          )}
         </ListItemButton>
-        <Collapse in={openManage} timeout="auto" unmountOnExit>
+        <Collapse
+          in={searchTerm ? hasMatches(manageMenuItems) : openManage}
+          timeout="auto"
+          unmountOnExit
+        >
           <List>
-            {renderMenuItem("사용자 관리", "/admin/users")}
-            {renderMenuItem("권한 관리", "/admin/roles")}
+            {manageMenuItems.map(({ label, href }) =>
+              renderMenuItem(label, href)
+            )}
           </List>
         </Collapse>
       </List>

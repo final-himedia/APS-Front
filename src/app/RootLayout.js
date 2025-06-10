@@ -1,22 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
-import InputDataPanel from "./standard/InputDataPanel";
-import ListDivider from "./standard/ListDivider";
+import { Box, Typography } from "@mui/material";
 
 export default function RootLayout({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isInputSidebarOpen, setInputSidebarOpen] = useState(true);
 
   const sidebarWidth = 250;
-  const inputPanelWidth = 300;
-  const topBarHeight = 40;
+
+  // 현재 시간 상태
+  const [currentTime, setCurrentTime] = useState("");
+
+  // 시간 갱신
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const formattedTime = now.toLocaleString("ko-KR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      setCurrentTime(formattedTime);
+    };
+
+    updateTime(); // 초기 호출
+    const interval = setInterval(updateTime, 60000); // 1분마다 갱신
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      {/* 왼쪽 사이드바 */}
+      {/* 사이드바 */}
       {isSidebarOpen && (
         <div
           style={{
@@ -34,15 +55,8 @@ export default function RootLayout({ children }) {
         </div>
       )}
 
-      {/* 메인 콘텐츠 영역 */}
-      <div
-        style={{
-          marginLeft: isSidebarOpen ? sidebarWidth : 0,
-          marginRight: isInputSidebarOpen ? inputPanelWidth : 0,
-          flex: 1,
-          transition: "margin 0.3s ease-in-out",
-        }}
-      >
+      {/* 메인 컨텐츠 영역 */}
+      <div style={{ marginLeft: isSidebarOpen ? sidebarWidth : 0, flex: 1 }}>
         {/* 상단바 */}
         <div
           style={{
@@ -59,15 +73,34 @@ export default function RootLayout({ children }) {
             zIndex: 1200,
           }}
         >
+          {/* 메뉴 아이콘 */}
           {!isSidebarOpen && (
             <IconButton onClick={() => setSidebarOpen(true)}>
               <MenuIcon />
             </IconButton>
           )}
+
+          {/* 오른쪽 사용자 정보 */}
+          <Box
+            sx={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <div style={{ textAlign: "right" }}>
+              <Typography variant="body2" fontWeight="bold">
+                남주현
+              </Typography>
+              <Typography variant="caption">himedia717@naver.com</Typography>
+            </div>
+            <Typography variant="caption">{currentTime}</Typography>
+          </Box>
         </div>
 
-        {/* 콘텐츠 */}
-        <main style={{ marginTop: topBarHeight, padding: 16 }}>{children}</main>
+        {/* 페이지 내용 */}
+        <main style={{ marginTop: 40, padding: 16 }}>{children}</main>
       </div>
     </div>
   );

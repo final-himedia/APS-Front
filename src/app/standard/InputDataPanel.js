@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -25,6 +26,7 @@ export default function InputDataPanel() {
   const [isOpen, setIsOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
+  const router = useRouter();
 
   const inputDataItems = [
     { label: "Bop", bold: true },
@@ -33,14 +35,34 @@ export default function InputDataPanel() {
     { label: "자재 마스터", indent: true, url: "/scenario/bop/part" },
     { label: "BOM", indent: true, url: "/scenario/bop/bom" },
     { label: "플랜트 마스터", indent: true, url: "/scenario/bop/site" },
-    { label: "공정 순서", indent: true, url: "/scenario/bop/operation-routing" },
+    {
+      label: "공정 순서",
+      indent: true,
+      url: "/scenario/bop/operation-routing",
+    },
     { label: "Config", bold: true },
     { label: "우선순위", indent: true, url: "/scenario/priority" },
     { label: "Resource", bold: true },
-    { label: "작업도구 마스터", indent: true, url: "/scenario/resource/tool-master" },
-    { label: "작업장 마스터", indent: true, url: "/scenario/resource/workcenter" },
-    { label: "생산 라우팅", indent: true, url: "/scenario/resource/workcenter-map" },
-    { label: "작업장-도구 매핑관리", indent: true, url: "/scenario/resource/tool-map" },
+    {
+      label: "작업도구 마스터",
+      indent: true,
+      url: "/scenario/resource/tool-master",
+    },
+    {
+      label: "작업장 마스터",
+      indent: true,
+      url: "/scenario/resource/workcenter",
+    },
+    {
+      label: "생산 라우팅",
+      indent: true,
+      url: "/scenario/resource/workcenter-map",
+    },
+    {
+      label: "작업장-도구 매핑관리",
+      indent: true,
+      url: "/scenario/resource/tool-map",
+    },
     { label: "Target", bold: true },
     { label: "판매오더", indent: true, url: "/scenario/target/demand" },
   ];
@@ -48,6 +70,58 @@ export default function InputDataPanel() {
   const filteredItems = inputDataItems.filter((item) =>
     item.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  function renderAccordion(title, items) {
+    return (
+      <Accordion disableGutters elevation={0} square defaultExpanded>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
+          sx={{
+            backgroundColor: "#e3f2fd",
+            minHeight: "36px",
+            px: 1.5,
+          }}
+        >
+          <Typography
+            sx={{
+              fontWeight: 500,
+              fontSize: "0.85rem",
+              color: "primary.main",
+            }}
+          >
+            {title}
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ p: 0 }}>
+          <List dense disablePadding>
+            {items.map((item, idx) => (
+              <ListItemButton
+                key={idx}
+                sx={{
+                  pl: item.indent ? 4 : 2,
+                  py: 0.5,
+                }}
+                onClick={() => {
+                  if (item.label === "작업도구 마스터") {
+                    router.push("/scenario/resource/mapping"); // ✅ 이 경로로 이동
+                  }
+                }}
+              >
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: item.bold ? "0.875rem" : "0.8125rem",
+                    fontWeight: item.bold ? 600 : 400,
+                    color: item.bold ? "grey.800" : "grey.500",
+                  }}
+                />
+              </ListItemButton>
+            ))}
+          </List>
+        </AccordionDetails>
+      </Accordion>
+    );
+  }
 
   return (
     <>
@@ -68,7 +142,11 @@ export default function InputDataPanel() {
         }}
       >
         {/* 상단 제목 + 닫기 버튼 */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
           <Typography
             variant="h6"
             sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
@@ -172,7 +250,6 @@ export default function InputDataPanel() {
           }}
         >
           <ChevronLeftIcon />
-          
         </IconButton>
       )}
     </>

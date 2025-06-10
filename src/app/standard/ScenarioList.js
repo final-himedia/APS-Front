@@ -12,6 +12,7 @@ import {
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SidebarSearch from "./SidebarSearch";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const scenarioIds = [
   "S010000",
@@ -24,6 +25,12 @@ const scenarioIds = [
 
 export default function ScenarioList({ onClose }) {
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // 검색어에 맞게 필터링
+  const filteredScenarios = scenarioIds.filter((id) =>
+    id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Box
@@ -68,14 +75,18 @@ export default function ScenarioList({ onClose }) {
             </IconButton>
           </Box>
 
-          <SidebarSearch />
+          {/* 검색창에 상태와 변경 함수 넘김 */}
+          <SidebarSearch
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
           <Divider sx={{ width: 220, my: 1 }} />
         </Box>
       </Box>
 
-      {/* 시나리오 항목 클릭 시 이동 */}
+      {/* 필터링된 시나리오 목록 출력 */}
       <List dense>
-        {scenarioIds.map((id) => (
+        {filteredScenarios.map((id) => (
           <ListItemButton
             key={id}
             onClick={() => router.push(`/scenario/${id}`)}
