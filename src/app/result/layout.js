@@ -30,7 +30,6 @@ export default function ResultLayout({ children }) {
             width: 30,
             height: 30,
             borderRadius: 1,
-            border: "1px solid #ccc",
             backgroundColor: "#fff",
             boxShadow: 1,
             "&:hover": {
@@ -47,10 +46,10 @@ export default function ResultLayout({ children }) {
         {children}
       </main>
 
-      {/* 오른쪽 결과 데이터 패널 */}
-      <div style={{ width: 300, borderLeft: "1px solid #ccc" }}>
+      
+     {/* 오른쪽 결과 데이터 패널 */}
         <RightSidebar />
-      </div>
     </div>
+    
   );
 }

@@ -23,7 +23,7 @@ const scenarioIds = [
   "S060000",
 ];
 
-export default function ScenarioList({ listKey, onClose }) {
+export default function ScenarioList({ onClose }) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -90,7 +90,6 @@ export default function ScenarioList({ listKey, onClose }) {
           <ListItemButton
             key={id}
             onClick={() => router.push(`/scenario/${id}`)}
-            disablePadding
           >
             <ListItemText primary={id} sx={{ pl: 0 }} />
           </ListItemButton>

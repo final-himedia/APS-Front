@@ -8,6 +8,8 @@ import { Box, Typography } from "@mui/material";
 
 export default function RootLayout({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isInputSidebarOpen, setInputSidebarOpen] = useState(true);
+
   const sidebarWidth = 250;
 
   // 현재 시간 상태
@@ -39,10 +41,10 @@ export default function RootLayout({ children }) {
       {isSidebarOpen && (
         <div
           style={{
-            width: sidebarWidth,
             position: "fixed",
             top: 0,
             left: 0,
+            width: sidebarWidth,
             height: "100vh",
             backgroundColor: "#fff",
             borderRight: "1px solid #ccc",
@@ -58,10 +60,9 @@ export default function RootLayout({ children }) {
         {/* 상단바 */}
         <div
           style={{
-            height: 40,
+            height: topBarHeight,
             backgroundColor: "#fff",
             borderBottom: "1px solid #ccc",
-            borderLeft: "1px solid #ccc",
             display: "flex",
             alignItems: "center",
             padding: "0 16px",
