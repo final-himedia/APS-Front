@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -23,6 +24,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 export default function InputDataPanel() {
   const [isOpen, setIsOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
   const inputDataItems = [
     { label: "Bop", bold: true },
@@ -77,6 +79,11 @@ export default function InputDataPanel() {
                 sx={{
                   pl: item.indent ? 4 : 2,
                   py: 0.5,
+                }}
+                onClick={() => {
+                  if (item.label === "작업도구 마스터") {
+                    router.push("/scenario/resource/mapping"); // ✅ 이 경로로 이동
+                  }
                 }}
               >
                 <ListItemText
