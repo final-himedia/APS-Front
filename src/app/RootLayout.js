@@ -67,16 +67,8 @@ export default function RootLayout({ children }) {
         </div>
 
         {/* 콘텐츠 */}
-        <main style={{ marginTop: topBarHeight, padding: 16 }}>
-          {children}
-        </main>
+        <main style={{ marginTop: topBarHeight, padding: 16 }}>{children}</main>
       </div>
-
-      {/* 오른쪽 입력 패널 - 무조건 렌더링 */}
-      <InputDataPanel
-        isOpen={isInputSidebarOpen}
-        setIsOpen={setInputSidebarOpen}
-      />
     </div>
   );
 }
