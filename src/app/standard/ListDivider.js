@@ -21,6 +21,7 @@ import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 import { useEffect, useState } from "react";
 
@@ -28,6 +29,7 @@ export default function ListDivider({ onClose }) {
   const [openFind, setOpenFind] = useState(false);
   const [openEngine, setOpenEngine] = useState(false);
   const [openResult, setOpenResult] = useState(false);
+  const [openManage, setOpenManage] = useState(false);
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
@@ -97,7 +99,13 @@ export default function ListDivider({ onClose }) {
           mt: "5px",
         }}
       >
-        <img src="/logo/main-logo.png" alt="로고" style={{ height: 40 }} />
+        <Link href="/" style={{ display: "flex", alignItems: "center" }}>
+          <img
+            src="/logo/main-logo.png"
+            alt="로고"
+            style={{ height: 40, cursor: "pointer" }}
+          />
+        </Link>
         <IconButton onClick={onClose} sx={{ mr: "-10px" }}>
           <KeyboardBackspaceIcon />
         </IconButton>
@@ -177,6 +185,21 @@ export default function ListDivider({ onClose }) {
             {renderMenuItem("생산 계획 간트", "#")}
             {renderMenuItem("설비 가동 현황", "#")}
             {renderMenuItem("시나리오 비교", "#")}
+          </List>
+        </Collapse>
+
+        {/* 관리 */}
+        <ListItemButton onClick={() => setOpenManage(!openManage)}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary="관리" />
+          {openManage ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+        <Collapse in={openManage} timeout="auto" unmountOnExit>
+          <List>
+            {renderMenuItem("사용자 관리", "/admin/users")}
+            {renderMenuItem("권한 관리", "/admin/roles")}
           </List>
         </Collapse>
       </List>
