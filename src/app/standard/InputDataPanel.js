@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -12,79 +12,61 @@ import {
   Box,
   Typography,
   InputAdornment,
+  IconButton,
+  Stack,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SearchIcon from "@mui/icons-material/Search";
-import { useRouter } from "next/navigation";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
 export default function InputDataPanel() {
-  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
- const items = [
-  { label: "Bop", bold: true },
-  { label: "생산 프로세스", indent: true, url: "/scenario/bop" },
-  { label: "공정 마스터", indent: true, url: "/scenario/bop/operation" },
-  { label: "자재 마스터", indent: true, url: "/scenario/bop/material" },
-  { label: "BOM", indent: true, url: "/scenario/bop/bom" },
-  { label: "플랜트 마스터", indent: true, url: "/scenario/bop/plant" },
-  { label: "공정 순서", indent: true, url: "/scenario/bop/sequence" },
+  const inputDataItems = [
+    { label: "Bop", bold: true },
+    { label: "생산 프로세스", indent: true },
+    { label: "공정 마스터", indent: true },
+    { label: "자재 마스터", indent: true },
+    { label: "BOM", indent: true },
+    { label: "플랜트 마스터", indent: true },
+    { label: "공정 순서", indent: true },
+    { label: "Config", bold: true },
+    { label: "우선순위", indent: true },
+    { label: "Resource", bold: true },
+    { label: "작업도구 마스터", indent: true },
+    { label: "작업장 마스터", indent: true },
+    { label: "생산 라우팅", indent: true },
+    { label: "작업장-도구 매핑관리", indent: true },
+    { label: "Target", bold: true },
+    { label: "판매오더", indent: true },
+  ];
 
-  { label: "Config", bold: true },
-  { label: "우선순위", indent: true, url: "/scenario/config" },
+  // ✅ 검색어 필터링 처리
+  const filteredItems = inputDataItems.filter((item) =>
+    item.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  { label: "Resource", bold: true },
-  { label: "작업도구 마스터", indent: true, url: "/scenario/resource/tool" },
-  { label: "작업장 마스터", indent: true, url: "/scenario/resource/workcenter" },
-  { label: "생산 라우팅", indent: true, url: "/scenario/resource/routing" },
-  { label: "작업장-도구 매핑관리", indent: true, url: "/scenario/resource/mapping" },
-
-  { label: "Target", bold: true },
-  { label: "판매오더", indent: true, url: "/scenario/target" },
-];
-
-
-  return (
-    <Box
-      sx={{
-        width: 300,
-        height: "100vh",
-        p: 2,
-        borderLeft: "1px solid #ccc",
-        fontSize: "0.875rem",
-        bgcolor: "white",
-      }}
-    >
-      <Typography
-        variant="h6"
-        gutterBottom
-        sx={{ fontWeight: "bold", color: "primary.main" }}
-      >
-        입력 데이터 목록
-      </Typography>
-
-      <TextField
-        placeholder="검색"
-        variant="outlined"
-        size="small"
-        fullWidth
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon color="action" />
-            </InputAdornment>
-          ),
-        }}
-        sx={{ mb: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}
-      />
-
-      {/* 🎯 아코디언 하나로 단순하게 */}
-      <Accordion disableGutters elevation={0} square>
+  function renderAccordion(title, items) {
+    return (
+      <Accordion disableGutters elevation={0} square defaultExpanded>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
-          sx={{ backgroundColor: "#e3f2fd", minHeight: 36, px: 1.5 }}
+          sx={{
+            backgroundColor: "#e3f2fd",
+            minHeight: "36px",
+            px: 1.5,
+          }}
         >
-          <Typography sx={{ fontWeight: 500, fontSize: "0.85rem", color: "primary.main" }}>
-            Input Data
+          <Typography
+            sx={{
+              fontWeight: 500,
+              fontSize: "0.85rem",
+              color: "primary.main",
+            }}
+          >
+            {title}
           </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ p: 0 }}>
@@ -92,8 +74,10 @@ export default function InputDataPanel() {
             {items.map((item, idx) => (
               <ListItemButton
                 key={idx}
-                sx={{ pl: item.indent ? 4 : 2, py: 0.5 }}
-                onClick={() => item.url && router.push(item.url)}
+                sx={{
+                  pl: item.indent ? 4 : 2,
+                  py: 0.5,
+                }}
               >
                 <ListItemText
                   primary={item.label}
@@ -108,6 +92,93 @@ export default function InputDataPanel() {
           </List>
         </AccordionDetails>
       </Accordion>
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        position: "fixed",
+        right: isOpen ? 0 : -300,
+        top: 0,
+        width: 300,
+        height: "100vh",
+        p: 2,
+        borderLeft: "1px solid #ccc",
+        fontSize: "0.875rem",
+        bgcolor: "white",
+        transition: "right 0.3s ease-in-out",
+        zIndex: 1200,
+        boxShadow: 3,
+      }}
+    >
+      {/* 상단 제목 + 토글 버튼 */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
+        >
+          입력 데이터 목록
+        </Typography>
+        <IconButton
+          size="small"
+          onClick={() => setIsOpen(false)}
+          sx={{
+            border: "1px solid #ccc",
+            backgroundColor: "#fff",
+            "&:hover": { backgroundColor: "#f0f0f0" },
+            ml: 1,
+          }}
+        >
+          <ChevronRightIcon />
+        </IconButton>
+      </Stack>
+
+      {/* 검색 */}
+      <TextField
+        placeholder="검색"
+        variant="outlined"
+        size="small"
+        fullWidth
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
+        }}
+        sx={{
+          mb: 2,
+          backgroundColor: "#f5f5f5",
+          borderRadius: 1,
+        }}
+      />
+
+      {/* Accordion - 필터링된 리스트만 표시 */}
+      {renderAccordion("Input Data", filteredItems)}
+
+      {/* 닫힌 상태일 때만 토글 버튼 보이게 */}
+      {!isOpen && (
+        <IconButton
+          onClick={() => setIsOpen(true)}
+          sx={{
+            position: "fixed",
+            top: 20,
+            right: 0,
+            zIndex: 1300,
+            bgcolor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "50%",
+            width: 32,
+            height: 32,
+            boxShadow: 1,
+          }}
+        >
+          <ChevronLeftIcon />
+        </IconButton>
+      )}
     </Box>
   );
 }
