@@ -145,7 +145,7 @@ export default function ResultDataPanel() {
           onClick={() => setIsOpen(true)}
           sx={{
             position: "fixed",
-            top: 50,
+            top: 20,
             right: 0,
             zIndex: 1300,
             bgcolor: "white",

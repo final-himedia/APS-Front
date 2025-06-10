@@ -46,10 +46,10 @@ export default function ResultLayout({ children }) {
         {children}
       </main>
 
-      {/* 오른쪽 결과 데이터 패널 */}
-      <div style={{ width: 300}}>
+      
+     {/* 오른쪽 결과 데이터 패널 */}
         <RightSidebar />
-      </div>
     </div>
+    
   );
 }
