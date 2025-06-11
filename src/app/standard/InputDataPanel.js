@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
 import {
   Accordion,
   AccordionSummary,
@@ -21,8 +20,9 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useRouter } from "next/navigation";
 
-export default function InputDataPanel() {
-  const [isOpen, setIsOpen] = useState(true);
+import React, { useState } from "react";
+
+export default function InputDataPanel({ isOpen, onOpen, onClose }) {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
 
@@ -69,187 +69,127 @@ export default function InputDataPanel() {
     item.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  function renderAccordion(title, items) {
-    return (
-      <Accordion disableGutters elevation={0} square defaultExpanded>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
-          sx={{
-            backgroundColor: "#e3f2fd",
-            minHeight: "36px",
-            px: 1.5,
-          }}
-        >
-          <Typography
-            sx={{
-              fontWeight: 500,
-              fontSize: "0.85rem",
-              color: "primary.main",
-            }}
-          >
-            {title}
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails sx={{ p: 0 }}>
-          <List dense disablePadding>
-            {items.map((item, idx) => (
-              <ListItemButton
-                key={idx}
-                sx={{
-                  pl: item.indent ? 4 : 2,
-                  py: 0.5,
-                }}
-                onClick={() => {
-                  if (item.label === "작업도구 마스터") {
-                    router.push("/scenario/resource/mapping"); // ✅ 이 경로로 이동
-                  }
-                }}
-              >
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontSize: item.bold ? "0.875rem" : "0.8125rem",
-                    fontWeight: item.bold ? 600 : 400,
-                    color: item.bold ? "grey.800" : "grey.500",
-                  }}
-                />
-              </ListItemButton>
-            ))}
-          </List>
-        </AccordionDetails>
-      </Accordion>
-    );
-  }
-
   return (
-    <>
-      {/* 패널 본체 */}
-      <Box
-        sx={{
-          position: "fixed",
-          right: isOpen ? 0 : -300,
-          top: 40,
-          width: 300,
-          height: "100vh",
-          p: 2,
-          borderLeft: "1px solid #ccc",
-          fontSize: "0.875rem",
-          bgcolor: "white",
-          transition: "right 0.3s ease-in-out",
-          zIndex: 1200,
-        }}
-      >
-        {/* 상단 제목 + 닫기 버튼 */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Typography
-            variant="h6"
-            sx={{ fontWeight: "bold", color: "primary.main", mb: 1 }}
-          >
-            입력 데이터 목록
-          </Typography>
-          <IconButton
-            size="small"
-            onClick={() => setIsOpen(false)}
-            sx={{
-              border: "1px solid #ccc",
-              backgroundColor: "#fff",
-              "&:hover": { backgroundColor: "#f0f0f0" },
-              ml: 1,
-            }}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        </Stack>
-
-        {/* 검색 */}
-        <TextField
-          placeholder="검색"
-          variant="outlined"
-          size="small"
-          fullWidth
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            mb: 2,
-            backgroundColor: "#f5f5f5",
-            borderRadius: 1,
-          }}
-        />
-
-        {/* 목록 */}
-        <Accordion disableGutters elevation={0} square defaultExpanded>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
-            sx={{
-              backgroundColor: "#e3f2fd",
-              minHeight: "36px",
-              px: 1.5,
-            }}
+    <Box
+      sx={{
+        height: "100%",
+        overflowY: "auto", 
+        flexDirection: "column",
+        bgcolor: "white",
+        borderLeft: "1px solid #ccc",
+      }}
+    >
+      {isOpen ? (
+        <>
+          {/* 상단 제목 + 닫기 버튼 */}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ px: 2, pt: 2 }}
           >
             <Typography
-              sx={{
-                fontWeight: 500,
-                fontSize: "0.85rem",
-                color: "primary.main",
-              }}
+              variant="h6"
+              sx={{ fontWeight: "bold", color: "primary.main" }}
             >
-              Input Data
+              입력 데이터 목록
             </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 0 }}>
-            <List dense disablePadding>
-              {filteredItems.map((item, idx) => (
-                <ListItemButton
-                  key={idx}
-                  sx={{ pl: item.indent ? 4 : 2, py: 0.5 }}
-                  onClick={() => item.url && router.push(item.url)}
-                >
-                  <ListItemText
-                    primary={item.label}
-                    primaryTypographyProps={{
-                      fontSize: item.bold ? "0.875rem" : "0.8125rem",
-                      fontWeight: item.bold ? 600 : 400,
-                      color: item.bold ? "grey.800" : "grey.500",
-                    }}
-                  />
-                </ListItemButton>
-              ))}
-            </List>
-          </AccordionDetails>
-        </Accordion>
-      </Box>
+            <IconButton onClick={onClose} size="small">
+              <ChevronRightIcon />
+            </IconButton>
+          </Stack>
 
-      {/* 접힌 상태에서만 열기 버튼 표시 */}
-      {!isOpen && (
-        <IconButton
-          onClick={() => setIsOpen(true)}
+          {/* 검색 */}
+          <Box sx={{ px: 2, pb: 1 }}>
+            <TextField
+              placeholder="검색"
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                mb: 2,
+                backgroundColor: "#f5f5f5",
+                borderRadius: 1,
+              }}
+            />
+          </Box>
+
+          {/* 목록 */}
+          <Accordion
+            disableGutters
+            elevation={0}
+            square
+            defaultExpanded
+            sx={{ px: 2 }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
+              sx={{ backgroundColor: "#e3f2fd", minHeight: "36px", px: 1.5 }}
+            >
+              <Typography
+                sx={{
+                  fontWeight: 500,
+                  fontSize: "0.85rem",
+                  color: "primary.main",
+                }}
+              >
+                Input Data
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ p: 0 }}>
+              <List dense disablePadding>
+                {filteredItems.map((item, idx) => (
+                  <ListItemButton
+                    key={idx}
+                    sx={{ pl: item.indent ? 4 : 2, py: 0.5 }}
+                    onClick={() => item.url && router.push(item.url)}
+                  >
+                    <ListItemText
+                      primary={item.label}
+                      primaryTypographyProps={{
+                        fontSize: item.bold ? "0.875rem" : "0.8125rem",
+                        fontWeight: item.bold ? 600 : 400,
+                        color: item.bold ? "grey.800" : "grey.500",
+                      }}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            </AccordionDetails>
+          </Accordion>
+        </>
+      ) : (
+        <Box
           sx={{
-            position: "fixed",
-            top: 50,
-            right: 0,
-            zIndex: 1300,
-            bgcolor: "white",
-            border: "1px solid #ccc",
-            borderRadius: "50%",
-            width: 32,
-            height: 32,
-            boxShadow: 1,
+            position: "absolute",
+            top: "50%", // 👉 세로 중앙 정렬
+            transform: "translateY(-50%)", // 👉 정확히 가운데로 맞추기
+            right: 0, // 👉 오른쪽 끝에 붙이기
+            zIndex: 1200,
           }}
         >
-          <ChevronLeftIcon />
-        </IconButton>
+          <IconButton
+            onClick={onOpen}
+            sx={{
+              bgcolor: "white",
+              border: "1px solid #ccc",
+              borderRadius: 1,
+              boxShadow: 1,
+            }}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+        </Box>
       )}
-    </>
+    </Box>
   );
 }

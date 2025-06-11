@@ -63,9 +63,25 @@ export default function ListDivider({ onClose }) {
 
   const renderMenuItem = (label, href) => {
     if (searchTerm && !matchesSearch(label)) return null;
+
     return (
-      <ListItemButton component={Link} href={href} key={label}>
-        <ListItemText primary={label} />
+      <ListItemButton
+        component={Link}
+        href={href}
+        key={label}
+        sx={{
+          pl: 4, 
+          py: 0.5,
+        }}
+      >
+        <ListItemText
+          primary={label}
+          primaryTypographyProps={{
+            fontSize: "0.95rem", 
+            fontWeight: 400,
+            color: "grey.800",
+          }}
+        />
         <IconButton
           size="small"
           onClick={(e) => {
@@ -108,13 +124,15 @@ export default function ListDivider({ onClose }) {
     <Box
       sx={{
         width: 240,
+        maxWidth: 240,
+        overflowX: "hidden",
         boxSizing: "border-box",
         backgroundColor: "#fff",
         height: "100vh",
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
-        px: 2,
+        px: 1.5,
       }}
     >
       <Box
@@ -138,7 +156,7 @@ export default function ListDivider({ onClose }) {
         </IconButton>
       </Box>
 
-      <Divider sx={{ width: 220, my: 1 }} />
+      <Divider sx={{ width: "100%", my: 1 }} />
       <TextField
         placeholder="검색"
         variant="outlined"
@@ -159,7 +177,7 @@ export default function ListDivider({ onClose }) {
           "& .MuiInputBase-root": { height: 32 },
         }}
       />
-      <Divider sx={{ width: 220, my: 1 }} />
+      <Divider sx={{ width: "100%", my: 1 }} />
 
       <List>
         {favorites.length > 0 && (
