@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import {
   Accordion,
@@ -25,7 +24,6 @@ import { useRouter } from "next/navigation";
 export default function InputDataPanel() {
   const [isOpen, setIsOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const router = useRouter();
   const router = useRouter();
 
   const inputDataItems = [

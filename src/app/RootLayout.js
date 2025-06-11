@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
         {/* 상단바 */}
         <div
           style={{
-            height: topBarHeight,
+            height: 45,
             backgroundColor: "#fff",
             borderBottom: "1px solid #ccc",
             display: "flex",
