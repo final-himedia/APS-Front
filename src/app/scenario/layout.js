@@ -4,8 +4,10 @@ import { useState } from "react";
 import ScenarioList from "../standard/ScenarioList";
 import InputDataPanel from "../standard/InputDataPanel";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { IconButton, Box } from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
+import { IconButton } from "@mui/material";
+import Toolbar from "../standard/Toolbar"; // ✅ 툴바 import
+
 
 export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
@@ -105,6 +107,11 @@ export default function ScenarioLayout({ children }) {
             left: 0,
             top: 10,
             zIndex: 1300,
+
+            width: 30,
+            height: 30,
+            borderRadius: 1,
+
             backgroundColor: "#fff",
             borderRadius: 1,
             boxShadow: 1,
@@ -115,6 +122,16 @@ export default function ScenarioLayout({ children }) {
           <ArrowForwardIosIcon fontSize="small" />
         </IconButton>
       )}
-    </Box>
+
+
+      {/* 가운데 영역 */}
+      <main style={{ flex: 1, overflowY: "auto" }}>
+        <Toolbar /> {/* ✅ 여기서 툴바 고정 */}
+        {children} {/* ✅ 그 아래는 페이지 별 내용 */}
+      </main>
+
+      <InputDataPanel />
+    </div>
+
   );
 }

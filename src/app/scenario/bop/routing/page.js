@@ -44,7 +44,7 @@ export default function DataGridSection() {
       <Typography variant="h6" gutterBottom>
         생산 라우팅 목록
       </Typography>
-      
+
       <DataGrid
         rows={rows}
         columns={columns}
