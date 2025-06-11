@@ -8,7 +8,6 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { IconButton } from "@mui/material";
 import Toolbar from "../standard/Toolbar"; // ✅ 툴바 import
 
-
 export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
   const [showInputPanel, setShowInputPanel] = useState(true);
@@ -123,7 +122,6 @@ export default function ScenarioLayout({ children }) {
         </IconButton>
       )}
 
-
       {/* 가운데 영역 */}
       <main style={{ flex: 1, overflowY: "auto" }}>
         <Toolbar /> {/* ✅ 여기서 툴바 고정 */}
@@ -131,7 +129,6 @@ export default function ScenarioLayout({ children }) {
       </main>
 
       <InputDataPanel />
-    </div>
-
+    </Box>
   );
 }
