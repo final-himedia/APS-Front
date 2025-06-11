@@ -5,6 +5,7 @@ import ScenarioList from "../standard/ScenarioList";
 import InputDataPanel from "../standard/InputDataPanel";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { IconButton } from "@mui/material";
+import Toolbar from "../standard/Toolbar"; // ✅ 툴바 import
 
 export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
@@ -29,7 +30,7 @@ export default function ScenarioLayout({ children }) {
             zIndex: 1300,
             width: 30,
             height: 30,
-            borderRadius: 1, 
+            borderRadius: 1,
             backgroundColor: "#fff",
             boxShadow: 1,
             "&:hover": {
@@ -42,9 +43,12 @@ export default function ScenarioLayout({ children }) {
       )}
 
       {/* 가운데 영역 */}
-      <main style={{ flex: 1, overflowY: "auto" }}>{children}</main>
+      <main style={{ flex: 1, overflowY: "auto" }}>
+        <Toolbar /> {/* ✅ 여기서 툴바 고정 */}
+        {children} {/* ✅ 그 아래는 페이지 별 내용 */}
+      </main>
 
-      <InputDataPanel/>
+      <InputDataPanel />
     </div>
   );
 }
