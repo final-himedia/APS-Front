@@ -56,7 +56,14 @@ export default function RootLayout({ children }) {
       )}
 
       {/* 메인 컨텐츠 영역 */}
-      <div style={{ marginLeft: isSidebarOpen ? sidebarWidth : 0, flex: 1 }}>
+      <div
+        style={{
+          marginLeft: isSidebarOpen ? sidebarWidth : 0,
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {/* 상단바 */}
         <div
           style={{
@@ -66,10 +73,9 @@ export default function RootLayout({ children }) {
             display: "flex",
             alignItems: "center",
             padding: "0 16px",
-            position: "fixed",
-            top: 0,
+
             left: isSidebarOpen ? sidebarWidth : 0,
-            right: 0,
+
             zIndex: 1200,
           }}
         >
@@ -100,7 +106,9 @@ export default function RootLayout({ children }) {
         </div>
 
         {/* 페이지 내용 */}
-        <main style={{ marginTop: 40, padding: 16 }}>{children}</main>
+        <main style={{ paddingLeft: 16, paddingRight: 16, flex: 1 }}>
+          {children}
+        </main>
       </div>
     </div>
   );
