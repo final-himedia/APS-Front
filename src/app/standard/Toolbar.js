@@ -1,30 +1,63 @@
-import { Button, Menu, MenuItem, Box, Stack } from "@mui/material";
-import { useState } from "react";
+"use client";
+
+import {
+  Button,
+  Menu,
+  MenuItem,
+  Box,
+  Stack,
+  IconButton,
+} from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 export default function Toolbar() {
   const [exportAnchorEl, setExportAnchorEl] = useState(null);
-  const exportOpen = Boolean(exportAnchorEl);
+  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
+  const [wrap, setWrap] = useState(false);
+  const buttonRef = useRef(null);
 
-  const handleExportClick = (e) => {
-    setExportAnchorEl(e.currentTarget);
-  };
-  const handleExportClose = () => {
-    setExportAnchorEl(null);
-  };
+  const exportOpen = Boolean(exportAnchorEl);
+  const moreOpen = Boolean(moreAnchorEl);
+
+  const handleExportClick = (e) => setExportAnchorEl(e.currentTarget);
+  const handleExportClose = () => setExportAnchorEl(null);
+
+  const handleMoreClick = (e) => setMoreAnchorEl(e.currentTarget);
+  const handleMoreClose = () => setMoreAnchorEl(null);
+
+  const actionButtons = [
+    { label: "추가", icon: <AddIcon fontSize="small" />, onClick: () => {} },
+    { label: "삭제", icon: <DeleteIcon fontSize="small" />, onClick: () => {} },
+    { label: "저장", icon: <SaveIcon fontSize="small" />, onClick: () => {}, disabled: true },
+    { label: "새로고침", icon: <RefreshIcon fontSize="small" />, onClick: () => {} },
+  ];
+
+  useEffect(() => {
+    const checkWrap = () => {
+      if (buttonRef.current) {
+        const height = buttonRef.current.clientHeight;
+        setWrap(height > 30); // 한 줄 이상인지 체크
+      }
+    };
+    checkWrap();
+    window.addEventListener("resize", checkWrap);
+    return () => window.removeEventListener("resize", checkWrap);
+  }, []);
 
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "space-between", // 양쪽 정렬
-        alignItems: "center",
-        flexWrap: "wrap", // 줄바꿈 허용
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        flexWrap: "wrap",
         gap: 1,
         p: 1,
         backgroundColor: "#f9f9f9",
@@ -33,7 +66,7 @@ export default function Toolbar() {
         mb: 1,
       }}
     >
-      {/* 왼쪽: 데이터 관련 버튼 */}
+      {/* 왼쪽: 데이터 관련 */}
       <Stack direction="row" spacing={1} flexWrap="wrap">
         <div>
           <Button
@@ -64,53 +97,50 @@ export default function Toolbar() {
         </Button>
       </Stack>
 
-      {/* 오른쪽: 작업 버튼 */}
-      <Stack direction="row" spacing={1} flexWrap="wrap">
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<AddIcon fontSize="small" />}
-        >
-          추가
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<DeleteIcon fontSize="small" />}
-        >
-          삭제
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<SaveIcon fontSize="small" />}
-          disabled
-        >
-          저장
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<SaveIcon fontSize="small" />}
-        >
-          레이아웃 저장
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<DeleteIcon fontSize="small" />}
-          disabled
-        >
-          레이아웃 삭제
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<RefreshIcon fontSize="small" />}
-        >
-          새로고침
-        </Button>
-      </Stack>
+      {/* 오른쪽: 반응형 감지 */}
+      <Box ref={buttonRef}>
+        {wrap ? (
+          <>
+            <IconButton size="small" onClick={handleMoreClick}>
+              <MoreHorizIcon />
+            </IconButton>
+            <Menu
+              anchorEl={moreAnchorEl}
+              open={moreOpen}
+              onClose={handleMoreClose}
+            >
+              {actionButtons.map((btn, idx) => (
+                <MenuItem
+                  key={idx}
+                  onClick={() => {
+                    btn.onClick();
+                    handleMoreClose();
+                  }}
+                  disabled={btn.disabled}
+                >
+                  {btn.icon}
+                  <Box sx={{ ml: 1 }}>{btn.label}</Box>
+                </MenuItem>
+              ))}
+            </Menu>
+          </>
+        ) : (
+          <Stack direction="row" spacing={1}>
+            {actionButtons.map((btn, idx) => (
+              <Button
+                key={idx}
+                size="small"
+                variant="outlined"
+                startIcon={btn.icon}
+                onClick={btn.onClick}
+                disabled={btn.disabled}
+              >
+                {btn.label}
+              </Button>
+            ))}
+          </Stack>
+        )}
+      </Box>
     </Box>
   );
 }
