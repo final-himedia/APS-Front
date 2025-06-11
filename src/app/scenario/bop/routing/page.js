@@ -6,11 +6,11 @@ import { Box, Typography } from "@mui/material";
 
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
-  { field: "scenarioId", headerName: "시나리오", width: 150 },
-  { field: "routingId", headerName: "라우팅 코드", width: 150 },
+  { field: "scenarioId", headerName: "시나리오", width: 120 },
+  { field: "routingId", headerName: "라우팅 코드", width: 130 },
   { field: "siteId", headerName: "플랜트", width: 150 },
   { field: "routingName", headerName: "라우팅명", width: 150 },
-  { field: "routingType", headerName: "라우팅 타입", width: 150 },
+  { field: "routingType", headerName: "라우팅 타입", width: 120 },
 ];
 
 export default function DataGridSection() {
@@ -40,18 +40,22 @@ export default function DataGridSection() {
   }, []);
 
   return (
-    <Box p={2}>
+    <Box p={2} sx={{ width: "fit-content", maxWidth: "100%"}}>
       <Typography variant="h6" gutterBottom>
         생산 라우팅 목록
       </Typography>
-      
+
       <DataGrid
         rows={rows}
         columns={columns}
         initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10]}
+        pageSizeOptions={[5, 10, 20]}
         checkboxSelection
-        sx={{ border: 0 }}
+        autoHeight // ⬅ 높이를 내용에 맞게 자동 조정
+        sx={{
+          border: 0,
+          minWidth: "500px", // 너무 작게 줄어드는 걸 방지
+        }}
         rowHeight={38}
       />
     </Box>

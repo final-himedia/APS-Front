@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { Box, IconButton } from "@mui/material";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
 import ScenarioList from "../standard/ScenarioList";
 import InputDataPanel from "../standard/InputDataPanel";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { IconButton, Box } from "@mui/material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
@@ -19,10 +20,10 @@ export default function ScenarioLayout({ children }) {
       sx={{
         display: "grid",
         gridTemplateColumns: `
-      ${showScenarioList ? `${SCENARIO_WIDTH}px` : "0px"}
-      1fr
-      ${showInputPanel ? `${INPUT_WIDTH}px` : "0px"}
-    `,
+          ${showScenarioList ? `${SCENARIO_WIDTH}px` : "0px"}
+          1fr
+          ${showInputPanel ? `${INPUT_WIDTH}px` : "0px"}
+        `,
         width: "100%",
         maxWidth: "100vw",
         height: "100%",
@@ -31,13 +32,7 @@ export default function ScenarioLayout({ children }) {
       }}
     >
       {/* 왼쪽 패널 (시나리오 목록) */}
-      <Box
-        sx={{
-          width: "100%",
-          height: "100%",
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
         {showScenarioList && (
           <ScenarioList onClose={() => setShowScenarioList(false)} />
         )}
@@ -46,8 +41,9 @@ export default function ScenarioLayout({ children }) {
       {/* 가운데 콘텐츠 (children) */}
       <Box
         sx={{
-          overflow: "auto", // 내용 스크롤
-          minWidth: 0, // 수평 스크롤 방지
+          overflow: "auto",
+          minWidth: 0,
+          px: 2, // 필요 시 제거 가능
         }}
       >
         {children}
@@ -57,9 +53,8 @@ export default function ScenarioLayout({ children }) {
       <Box
         sx={{
           position: "relative",
-          width: showInputPanel ? INPUT_WIDTH : "20px", // 닫힌 상태일 땐 최소 너비 확보
+          width: showInputPanel ? INPUT_WIDTH : "20px",
           height: "100%",
-          right: 0,
           transition: "width 0.3s ease-in-out",
         }}
       >

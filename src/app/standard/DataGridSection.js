@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -25,7 +27,7 @@ const rows = [
 const columns = [
   { field: "itemCode", headerName: "순번", width: 120 },
   { field: "itemName", headerName: "생산 사이트 코드", width: 200 },
-  { field: "customer", headerName: "생산 제품 코드", width: 100 },
+  { field: "customer", headerName: "생산 제품 코드", width: 150 },
   { field: "dueDate", headerName: "공정 코드", width: 150 },
   { field: "orderAmount", headerName: "BOM 범주", width: 100 },
   { field: "priority", headerName: "생산 량", width: 100 },
@@ -33,11 +35,28 @@ const columns = [
 
 export default function DataGridSection() {
   return (
-    <Box p={1} flex={1}>
+    <Box
+      p={2}
+      sx={{
+        width: "100%",
+        maxWidth: "100%",
+      }}
+    >
       <Typography variant="h6" gutterBottom>
         시나리오 관리
       </Typography>
-      <DataGrid rows={rows} columns={columns} autoHeight />
+
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        autoHeight
+        disableRowSelectionOnClick
+        sx={{
+          border: 0,
+        }}
+        rowHeight={38}
+        pageSizeOptions={[5, 10]}
+      />
     </Box>
   );
 }

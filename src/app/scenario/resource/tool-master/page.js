@@ -4,6 +4,7 @@ import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 
+
 const columns = [
   { field: "id", headerName: "순번" },
   { field: "siteId", headerName: "플랜트" },
