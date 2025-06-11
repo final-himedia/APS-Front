@@ -1,16 +1,59 @@
-export default function BopPage() {
+"use client";
+
+import { useEffect, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, Typography } from "@mui/material";
+
+const columns = [
+  { field: "id", headerName: "순번", width: 80 },
+  { field: "scenarioId", headerName: "시나리오", width: 150 },
+  { field: "routingId", headerName: "라우팅 코드", width: 150 },
+  { field: "siteId", headerName: "플랜트", width: 150 },
+  { field: "routingName", headerName: "라우팅명", width: 150 },
+  { field: "routingType", headerName: "라우팅 타입", width: 150 },
+];
+
+export default function DataGridSection() {
+  const [rows, setRows] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/scenarios/bop/routing")
+      .then((res) => res.json())
+      .then((data) => {
+        const list = data.routings || [];
+
+        const formatted = list.map((item, index) => ({
+          id: index + 1,
+          scenarioId: item.scenarioId,
+          routingId: item.routingId?.routingId || "",
+          siteId: item.routingId?.siteId || "",
+          routingName: item.routingName,
+          routingType: item.routingType,
+        }));
+
+        setRows(formatted);
+      });
+  }, []);
+
   return (
-    <div
-      style={{
-        padding: 16,
-        whiteSpace: "normal",     // ✅ 줄바꿈 허용
-        wordBreak: "keep-all",    // ✅ 한글 단어 단위 유지
-        width: "100%",            // ✅ 부모 영역 꽉 채움
-        maxWidth: "100%",         // ✅ 혹시라도 제한 있으면 무시
-      }}
-    >
-      <h2 style={{ marginBottom: 8 }}>생산 프로세스</h2>
-      <p>여기에 생산 프로세스 관련 테이블 넣기</p>
-    </div>
+    <Box p={2}>
+      <Typography variant="h6" gutterBottom>
+        생산 라우팅 목록
+      </Typography>
+      
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{ pagination: { paginationModel } }}
+        pageSizeOptions={[5, 10]}
+        checkboxSelection
+        sx={{ border: 0 }}
+        rowHeight={38}
+      />
+    </Box>
   );
 }
