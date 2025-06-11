@@ -106,7 +106,14 @@ export default function RootLayout({ children }) {
         </div>
 
         {/* 페이지 내용 */}
-        <main style={{ paddingLeft: 16, paddingRight: 16, flex: 1 }}>
+        <main
+          style={{
+            paddingLeft: 16,
+            paddingRight: 16,
+            height: "calc(100vh - 40px)",
+            overflow: "auto",
+          }}
+        >
           {children}
         </main>
       </div>
