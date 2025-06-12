@@ -29,14 +29,46 @@ export default function ResultDataPanel({ isOpen, onOpen, onClose }) {
   const items = [
     { label: "Simulation", bold: true },
     { label: "작업도구 사용 내역", indent: true, url: "/result/simulation" },
-    { label: "제공품 미사용 내역", indent: true, url: "/result/simulation/unused-supplies" },
-    { label: "용액 일지 조회", indent: true, url: "/result/simulation/solution-log" },
-    { label: "계획오더 전송 로그", indent: true, url: "/result/simulation/order-log" },
-    { label: "공정 별 생산 수량 조회", indent: true, url: "/result/simulation/operation-quantity" },
-    { label: "LOT 병합 이력", indent: true, url: "/result/simulation/lot-merge-history" },
-    { label: "계획오더 조회", indent: true, url: "/result/simulation/order-list" },
-    { label: "작업장별 생산 계획", indent: true, url: "/result/simulation/workcenter-plan" },
-    { label: "아직 추가 다 안함.", indent: true, url: "/result/simulation/todo" },
+    {
+      label: "제공품 미사용 내역",
+      indent: true,
+      url: "/result/simulation/unused-supplies",
+    },
+    {
+      label: "용액 일지 조회",
+      indent: true,
+      url: "/result/simulation/solution-log",
+    },
+    {
+      label: "계획오더 전송 로그",
+      indent: true,
+      url: "/result/simulation/order-log",
+    },
+    {
+      label: "공정 별 생산 수량 조회",
+      indent: true,
+      url: "/result/simulation/operation-quantity",
+    },
+    {
+      label: "LOT 병합 이력",
+      indent: true,
+      url: "/result/simulation/lot-merge-history",
+    },
+    {
+      label: "계획오더 조회",
+      indent: true,
+      url: "/result/simulation/order-list",
+    },
+    {
+      label: "작업장별 생산 계획",
+      indent: true,
+      url: "/result/workcenter-plan",
+    },
+    {
+      label: "아직 추가 다 안함.",
+      indent: true,
+      url: "/result/simulation/todo",
+    },
     { label: "TaskAct", bold: true },
   ];
 
