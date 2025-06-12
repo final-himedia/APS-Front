@@ -7,6 +7,10 @@ import {
   Box,
   Stack,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import SaveIcon from "@mui/icons-material/Save";
@@ -17,17 +21,22 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function Toolbar() {
+export default function Toolbar({ upload }) {
   const [exportAnchorEl, setExportAnchorEl] = useState(null);
+  const [importAnchorEl, setImportAnchorEl] = useState(null);
   const [moreAnchorEl, setMoreAnchorEl] = useState(null);
   const [wrap, setWrap] = useState(false);
   const buttonRef = useRef(null);
 
   const exportOpen = Boolean(exportAnchorEl);
+  const importOpen = Boolean(importAnchorEl);
   const moreOpen = Boolean(moreAnchorEl);
 
   const handleExportClick = (e) => setExportAnchorEl(e.currentTarget);
   const handleExportClose = () => setExportAnchorEl(null);
+
+  const handleImportClick = (e) => setImportAnchorEl(e.currentTarget);
+  const handleImportClose = () => setImportAnchorEl(null);
 
   const handleMoreClick = (e) => setMoreAnchorEl(e.currentTarget);
   const handleMoreClose = () => setMoreAnchorEl(null);
@@ -35,8 +44,17 @@ export default function Toolbar() {
   const actionButtons = [
     { label: "추가", icon: <AddIcon fontSize="small" />, onClick: () => {} },
     { label: "삭제", icon: <DeleteIcon fontSize="small" />, onClick: () => {} },
-    { label: "저장", icon: <SaveIcon fontSize="small" />, onClick: () => {}, disabled: true },
-    { label: "새로고침", icon: <RefreshIcon fontSize="small" />, onClick: () => {} },
+    {
+      label: "저장",
+      icon: <SaveIcon fontSize="small" />,
+      onClick: () => {},
+      disabled: true,
+    },
+    {
+      label: "새로고침",
+      icon: <RefreshIcon fontSize="small" />,
+      onClick: () => {},
+    },
   ];
 
   useEffect(() => {
@@ -91,10 +109,19 @@ export default function Toolbar() {
           size="small"
           variant="outlined"
           startIcon={<FileDownloadIcon fontSize="small" />}
+          onClick={handleImportClick}
           sx={{ px: 1.5 }}
         >
           데이터 가져오기
         </Button>
+        <Menu
+          anchorEl={importAnchorEl}
+          open={importOpen}
+          onClose={handleImportClose}
+        >
+          <MenuItem onClick={upload}>Excel 업로드</MenuItem>
+          <MenuItem onClick={handleImportClose}>CSV 업로드</MenuItem>
+        </Menu>
       </Stack>
 
       {/* 오른쪽: 반응형 감지 */}
