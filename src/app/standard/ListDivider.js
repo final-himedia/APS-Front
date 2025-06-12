@@ -114,8 +114,8 @@ export default function ListDivider({ onClose }) {
   ];
 
   const manageMenuItems = [
-    { label: "사용자 관리", href: "/admin/users" },
-    { label: "권한 관리", href: "/admin/roles" },
+    { label: "사용자 관리", href: "/management/user" },
+    { label: "권한 관리", href: "/management/user" },
   ];
 
   const hasMatches = (items) => items.some((item) => matchesSearch(item.label));
