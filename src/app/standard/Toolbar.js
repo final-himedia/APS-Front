@@ -50,7 +50,7 @@ export default function Toolbar() {
  
   useEffect(() => {
     const handleResize = () => {
-      setIsCompact(window.innerWidth < 1500);
+      setIsCompact(window.innerWidth < 1300);
     };
 
     handleResize(); // 초기 체크
