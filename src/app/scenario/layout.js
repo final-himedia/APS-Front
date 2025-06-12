@@ -7,6 +7,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 import ScenarioList from "../standard/ScenarioList";
 import InputDataPanel from "../standard/InputDataPanel";
+import Toolbar from "../standard/Toolbar"; // ✅ 추가
 
 export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
@@ -31,25 +32,34 @@ export default function ScenarioLayout({ children }) {
         position: "relative",
       }}
     >
-      {/* 왼쪽 패널 (시나리오 목록) */}
+      {/* 왼쪽 패널 */}
       <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
         {showScenarioList && (
           <ScenarioList onClose={() => setShowScenarioList(false)} />
         )}
       </Box>
 
-      {/* 가운데 콘텐츠 (children) */}
+      {/* 가운데 콘텐츠 (Toolbar + children) */}
       <Box
         sx={{
           overflow: "auto",
           minWidth: 0,
-          px: 2, // 필요 시 제거 가능
+          px: 2,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
         }}
       >
-        {children}
+        {/* 툴바 상단 고정 */}
+        <Box sx={{ mt: 2, mb: 1 }}>
+          <Toolbar />
+        </Box>
+
+        {/* 실제 콘텐츠 */}
+        <Box sx={{ flex: 1, overflow: "auto" }}>{children}</Box>
       </Box>
 
-      {/* 오른쪽 패널 (입력 데이터 목록) */}
+      {/* 오른쪽 패널 */}
       <Box
         sx={{
           position: "relative",

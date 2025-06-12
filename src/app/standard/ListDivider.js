@@ -70,14 +70,14 @@ export default function ListDivider({ onClose }) {
         href={href}
         key={label}
         sx={{
-          pl: 4, 
+          pl: 4,
           py: 0.5,
         }}
       >
         <ListItemText
           primary={label}
           primaryTypographyProps={{
-            fontSize: "0.95rem", 
+            fontSize: "0.95rem",
             fontWeight: 400,
             color: "grey.800",
           }}
@@ -101,7 +101,7 @@ export default function ListDivider({ onClose }) {
     { label: "시나리오 관리", href: "/scenario" },
     { label: "실행 관리", href: "/run" },
     { label: "스케줄 관리", href: "/schedule" },
-    { label: "실행 결과", href: "/result" },
+    { label: "실행 결과", href: "/result/workcenter-plan" },
   ];
 
   const resultMenuItems = [
@@ -114,8 +114,10 @@ export default function ListDivider({ onClose }) {
   ];
 
   const manageMenuItems = [
-    { label: "사용자 관리", href: "/admin/users" },
-    { label: "권한 관리", href: "/admin/roles" },
+
+    { label: "사용자 관리", href: "/management/user" },
+    { label: "문의 게시판", href: "/management/qna" },
+
   ];
 
   const hasMatches = (items) => items.some((item) => matchesSearch(item.label));

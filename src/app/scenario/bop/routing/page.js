@@ -82,8 +82,8 @@ export default function DataGridSection() {
       else console.error("업로드 실패");
     });
   };
-
   return (
+
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* 툴바 */}
       <Box sx={{ mt: 2 }}>
@@ -150,6 +150,7 @@ export default function DataGridSection() {
           rowHeight={38}
         />
       </Box>
+
     </Box>
   );
 }

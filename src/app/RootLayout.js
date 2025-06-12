@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -7,15 +8,18 @@ import IconButton from "@mui/material/IconButton";
 import { Box, Typography } from "@mui/material";
 
 export default function RootLayout({ children }) {
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isInputSidebarOpen, setInputSidebarOpen] = useState(true);
+  const pathname = usePathname();
 
+  // 로그인 페이지는 고정 레이아웃 없이 바로 렌더링
+  if (pathname === "/login") {
+    return <>{children}</>;
+  }
+
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
   const sidebarWidth = 250;
 
-  // 현재 시간 상태
   const [currentTime, setCurrentTime] = useState("");
 
-  // 시간 갱신
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -29,8 +33,8 @@ export default function RootLayout({ children }) {
       setCurrentTime(formattedTime);
     };
 
-    updateTime(); // 초기 호출
-    const interval = setInterval(updateTime, 60000); // 1분마다 갱신
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -55,7 +59,7 @@ export default function RootLayout({ children }) {
         </div>
       )}
 
-      {/* 메인 컨텐츠 영역 */}
+      {/* 메인 영역 */}
       <div
         style={{
           marginLeft: isSidebarOpen ? sidebarWidth : 0,
@@ -73,20 +77,18 @@ export default function RootLayout({ children }) {
             display: "flex",
             alignItems: "center",
             padding: "0 16px",
-
             left: isSidebarOpen ? sidebarWidth : 0,
-
             zIndex: 1200,
           }}
         >
-          {/* 메뉴 아이콘 */}
+          {/* 사이드바 열기 버튼 */}
           {!isSidebarOpen && (
             <IconButton onClick={() => setSidebarOpen(true)}>
               <MenuIcon />
             </IconButton>
           )}
 
-          {/* 오른쪽 사용자 정보 */}
+          {/* 사용자 정보 */}
           <Box
             sx={{
               marginLeft: "auto",
@@ -105,12 +107,11 @@ export default function RootLayout({ children }) {
           </Box>
         </div>
 
-        {/* 페이지 내용 */}
+        {/* 페이지 콘텐츠 */}
         <main
           style={{
-            paddingLeft: 16,
-            paddingRight: 16,
-            height: "calc(100vh - 40px)",
+            padding: "16px",
+            height: "calc(100vh - 45px)",
             overflow: "auto",
           }}
         >

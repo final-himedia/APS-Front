@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -25,8 +25,7 @@ export default function Toolbar({ upload }) {
   const [exportAnchorEl, setExportAnchorEl] = useState(null);
   const [importAnchorEl, setImportAnchorEl] = useState(null);
   const [moreAnchorEl, setMoreAnchorEl] = useState(null);
-  const [wrap, setWrap] = useState(false);
-  const buttonRef = useRef(null);
+  const [isCompact, setIsCompact] = useState(false);
 
   const exportOpen = Boolean(exportAnchorEl);
   const importOpen = Boolean(importAnchorEl);
@@ -57,16 +56,15 @@ export default function Toolbar({ upload }) {
     },
   ];
 
+ 
   useEffect(() => {
-    const checkWrap = () => {
-      if (buttonRef.current) {
-        const height = buttonRef.current.clientHeight;
-        setWrap(height > 30); // 한 줄 이상인지 체크
-      }
+    const handleResize = () => {
+      setIsCompact(window.innerWidth < 1300);
     };
-    checkWrap();
-    window.addEventListener("resize", checkWrap);
-    return () => window.removeEventListener("resize", checkWrap);
+
+    handleResize(); // 초기 체크
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
@@ -82,6 +80,7 @@ export default function Toolbar({ upload }) {
         border: "1px solid #d0d7e2",
         borderRadius: 1,
         mb: 1,
+        position: "relative",
       }}
     >
       {/* 왼쪽: 데이터 관련 */}
@@ -124,50 +123,48 @@ export default function Toolbar({ upload }) {
         </Menu>
       </Stack>
 
-      {/* 오른쪽: 반응형 감지 */}
-      <Box ref={buttonRef}>
-        {wrap ? (
-          <>
-            <IconButton size="small" onClick={handleMoreClick}>
-              <MoreHorizIcon />
-            </IconButton>
-            <Menu
-              anchorEl={moreAnchorEl}
-              open={moreOpen}
-              onClose={handleMoreClose}
-            >
-              {actionButtons.map((btn, idx) => (
-                <MenuItem
-                  key={idx}
-                  onClick={() => {
-                    btn.onClick();
-                    handleMoreClose();
-                  }}
-                  disabled={btn.disabled}
-                >
-                  {btn.icon}
-                  <Box sx={{ ml: 1 }}>{btn.label}</Box>
-                </MenuItem>
-              ))}
-            </Menu>
-          </>
-        ) : (
-          <Stack direction="row" spacing={1}>
+      {/* 오른쪽: 버튼들 or ... 아이콘 */}
+      {isCompact ? (
+        <>
+          <IconButton size="small" onClick={handleMoreClick}>
+            <MoreHorizIcon />
+          </IconButton>
+          <Menu
+            anchorEl={moreAnchorEl}
+            open={moreOpen}
+            onClose={handleMoreClose}
+          >
             {actionButtons.map((btn, idx) => (
-              <Button
+              <MenuItem
                 key={idx}
-                size="small"
-                variant="outlined"
-                startIcon={btn.icon}
-                onClick={btn.onClick}
+                onClick={() => {
+                  btn.onClick();
+                  handleMoreClose();
+                }}
                 disabled={btn.disabled}
               >
-                {btn.label}
-              </Button>
+                {btn.icon}
+                <Box sx={{ ml: 1 }}>{btn.label}</Box>
+              </MenuItem>
             ))}
-          </Stack>
-        )}
-      </Box>
+          </Menu>
+        </>
+      ) : (
+        <Stack direction="row" spacing={1}>
+          {actionButtons.map((btn, idx) => (
+            <Button
+              key={idx}
+              size="small"
+              variant="outlined"
+              startIcon={btn.icon}
+              onClick={btn.onClick}
+              disabled={btn.disabled}
+            >
+              {btn.label}
+            </Button>
+          ))}
+        </Stack>
+      )}
     </Box>
   );
 }
