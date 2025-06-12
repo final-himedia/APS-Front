@@ -39,7 +39,7 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
       url: "/scenario/bop/operation-routing",
     },
     { label: "Config", bold: true },
-    { label: "우선순위", indent: true, url: "/scenario/priority" },
+    { label: "우선순위", indent: true, url: "/scenario/config/priority" },
     { label: "Resource", bold: true },
     {
       label: "작업도구 마스터",

@@ -1,97 +1,65 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  Box,
-  CircularProgress,
-} from "@mui/material";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import { Box, Typography } from "@mui/material";
 
-function ToolMasterTable({ data }) {
-  return (
-    <TableContainer
-      component={Paper}
-      sx={{ maxHeight: 500, overflowX: "auto", width: "100%" }}
-    >
-      <Table
-        stickyHeader
-        size="small"
-        aria-label="tool master table"
-        sx={{ minWidth: 1000 }}
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell>순번</TableCell>
-            <TableCell>Tool Id</TableCell>
-            <TableCell>Tool Name</TableCell>
-            <TableCell>Site ID</TableCell>
-            <TableCell>Tool State</TableCell>
-            <TableCell>Scenario ID</TableCell>
-            <TableCell>Tool Cavity</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((row, idx) => (
-            <TableRow key={row.toolId}>
-              <TableCell>{idx + 1}</TableCell>
-              <TableCell>{row.toolId}</TableCell>
-              <TableCell>{row.toolName}</TableCell>
-              <TableCell>{row.siteId}</TableCell>
-              <TableCell>{row.toolState}</TableCell>
-              <TableCell>{row.scenarioId || "-"}</TableCell>
-              <TableCell>{row.toolCavity || "-"}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-}
+const columns = [
+  { field: "id", headerName: "순번", width: 80 },
+  { field: "siteId", headerName: "플랜트", width: 100 },
+  { field: "toolSize", headerName: "TOOL 사이즈", width: 100 },
+  { field: "scenarioId", headerName: "시나리오", width: 120 },
+  { field: "partId", headerName: "품목 코드", width: 130 },
+  { field: "toolId", headerName: "ToolId", width: 120 },
+  { field: "partName", headerName: "품목명", width: 180 },
+];
 
-export default function ToolMasterOnly() {
-  const [toolData, setToolData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+export default function DataGridSection() {
+  const [rows, setRows] = useState([]);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
   useEffect(() => {
-    const fetchToolData = async () => {
-      try {
-        const res = await axios.get(
-          "http://127.0.0.1:8080/api/scenarios/resource/tool-master"
-        );
-        setToolData(res.data.toolMasters || []);
-      } catch (err) {
-        console.error("Error fetching tool master data:", err);
-        setError("데이터를 불러오는 중 오류가 발생했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetch("http://localhost:8080/api/scenarios/resource/tool-map")
+      .then((res) => res.json())
+      .then((data) => {
+        const list = data.toolMasters || [];
 
-    fetchToolData();
+        const formatted = list.map((item, index) => ({
+          id: index + 1,
+          siteId: item.siteId,
+          scenarioId: item.scenarioId,
+          toolId: item.toolId,
+          toolSize: item.toolSize,
+          partId: item.partId,
+          partName: item.partName,
+        }));
+
+        setRows(formatted);
+      });
   }, []);
 
   return (
-    <Box sx={{ p: 2, width: "100%", overflowX: "auto" }}>
+    <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
       <Typography variant="h6" gutterBottom>
-        작업도구마스터 데이터
+        작업장-도구 매핑관리
       </Typography>
 
-      {loading ? (
-        <CircularProgress />
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : (
-        <ToolMasterTable data={toolData} />
-      )}
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{ pagination: { paginationModel } }}
+        pageSizeOptions={[5, 10, 20]}
+        checkboxSelection
+        autoHeight
+        sx={{
+          border: 0,
+          minWidth: "500px", // 너무 작게 줄어드는 걸 방지
+        }}
+        rowHeight={38}
+      />
     </Box>
   );
 }
