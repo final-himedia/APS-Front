@@ -7,7 +7,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 import ScenarioList from "../standard/ScenarioList";
 import InputDataPanel from "../standard/InputDataPanel";
-import Toolbar from "../standard/Toolbar"; // ✅ 추가
 
 export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
@@ -50,11 +49,6 @@ export default function ScenarioLayout({ children }) {
           height: "100%",
         }}
       >
-        {/* 툴바 상단 고정 */}
-        <Box sx={{ mt: 2, mb: 1 }}>
-          <Toolbar />
-        </Box>
-
         {/* 실제 콘텐츠 */}
         <Box sx={{ flex: 1, overflow: "auto" }}>{children}</Box>
       </Box>
