@@ -51,7 +51,7 @@ export default function DataGridSection() {
         initialState={{ pagination: { paginationModel } }}
         pageSizeOptions={[5, 10, 20]}
         checkboxSelection
-        autoHeight // ⬅ 높이를 내용에 맞게 자동 조정
+        autoHeight
         sx={{
           border: 0,
           minWidth: "500px", // 너무 작게 줄어드는 걸 방지
