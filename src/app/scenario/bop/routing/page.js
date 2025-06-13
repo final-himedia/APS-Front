@@ -136,6 +136,7 @@ export default function DataGridSection() {
           </DialogActions>
         </Dialog>
       </Box>
+
       <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
         <Typography variant="h6" gutterBottom>
           생산 라우팅 목록
