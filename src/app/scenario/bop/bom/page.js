@@ -15,6 +15,7 @@ import {
 import Toolbar from "@/app/standard/Toolbar";
 import CloseIcon from "@mui/icons-material/Close";
 
+// BOM 테이블 컬럼 정의
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
   { field: "toSiteId", headerName: "생산 사이트 코드", width: 130 },
@@ -37,7 +38,8 @@ const columns = [
   { field: "bomVersion", headerName: "BOM버전", width: 100 },
 ];
 
-export default function DataGridSection() {
+// DataGridSection 컴포넌트
+function DataGridSection() {
   const [rows, setRows] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -113,6 +115,7 @@ export default function DataGridSection() {
   };
 
   return (
+
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* 툴바 */}
       <Box sx={{ mt: 2 }}>
