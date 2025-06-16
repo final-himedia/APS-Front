@@ -67,7 +67,7 @@ export default function LoginPage() {
         }}
       >
         <Typography variant="h5" gutterBottom>
-          로그인
+          로그인 테스트
         </Typography>
 
         <TextField
