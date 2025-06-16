@@ -21,7 +21,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function Toolbar({ upload }) {
+export default function Toolbar({ upload, download }) {
   const [exportAnchorEl, setExportAnchorEl] = useState(null);
   const [importAnchorEl, setImportAnchorEl] = useState(null);
   const [moreAnchorEl, setMoreAnchorEl] = useState(null);
@@ -56,7 +56,6 @@ export default function Toolbar({ upload }) {
     },
   ];
 
- 
   useEffect(() => {
     const handleResize = () => {
       setIsCompact(window.innerWidth < 1300);
@@ -100,7 +99,14 @@ export default function Toolbar({ upload }) {
             open={exportOpen}
             onClose={handleExportClose}
           >
-            <MenuItem onClick={handleExportClose}>Excel 다운로드</MenuItem>
+            <MenuItem
+              onClick={() => {
+                if (typeof download === "function") download();
+                handleExportClose();
+              }}
+            >
+              Excel 다운로드
+            </MenuItem>
             <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
           </Menu>
         </div>

@@ -1,27 +1,14 @@
 "use client";
 
-
-import Box from "@mui/material/Box";
-import Toolbar from "@/app/standard/Toolbar";
-
-export default function BopPage() {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      {/* 툴바 */}
-      <Box sx={{ mt: 2 }}>
-        <Toolbar />
-      </Box>
-
-      {/* 가운데 콘텐츠 (스크롤 영역 포함) */}
-      <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-        <h2>BOM</h2>
-        <p>여기에 BOM 관련 테이블 넣기</p>
-      </Box>
-
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Typography,
+} from "@mui/material";
+import Toolbar from "@/app/standard/Toolbar";
 
+// BOM 테이블 컬럼 정의
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
   { field: "toSiteId", headerName: "생산 사이트 코드", width: 130 },
@@ -44,7 +31,8 @@ const columns = [
   { field: "bomVersion", headerName: "BOM버전", width: 100 },
 ];
 
-export default function DataGridSection() {
+// DataGridSection 컴포넌트
+function DataGridSection() {
   const [rows, setRows] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -98,11 +86,26 @@ export default function DataGridSection() {
         autoHeight
         sx={{
           border: 0,
-          minWidth: "500px", // 너무 작게 줄어드는 걸 방지
+          minWidth: "500px",
         }}
         rowHeight={38}
       />
+    </Box>
+  );
+}
 
+export default function BopPage() {
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      {/* 툴바 */}
+      <Box sx={{ mt: 2 }}>
+        <Toolbar />
+      </Box>
+
+      {/* 가운데 콘텐츠 (스크롤 영역 포함) */}
+      <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+        <DataGridSection />
+      </Box>
     </Box>
   );
 }
