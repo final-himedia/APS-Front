@@ -73,7 +73,7 @@ export default function DataGridSection() {
           toPartName: item.toPartName,
           fromPartName: item.fromPartName,
           zseq: item.bomId?.zseq ?? "",
-          scenarioId: item.scenarioId,
+          scenarioId: item.bomId?.scenarioId,
           bomVersion: item.bomVersion,
         }));
 
