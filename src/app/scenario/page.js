@@ -1,17 +1,34 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import DataGridSection from "../standard/DataGridSection";
+import ScenarioList from "../standard/ScenarioList";
 import Box from "@mui/material/Box";
-import Toolbar from "../standard/Toolbar";
 
 export default function ScenarioPage() {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+  const [selectedScenarioId, setSelectedScenarioId] = useState(null);
+  const [routingData, setRoutingData] = useState([]);
 
-      {/* 가운데 콘텐츠 (스크롤 영역 포함) */}
-      <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-        <DataGridSection />
-      </Box>
+  useEffect(() => {
+    if (!selectedScenarioId) return;
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`/api/production-routing?scenarioId=${selectedScenarioId}`);
+        const data = await res.json();
+        setRoutingData(data);
+      } catch (err) {
+        console.error("데이터 가져오기 실패", err);
+      }
+    };
+
+    fetchData();
+  }, [selectedScenarioId]);
+
+  return (
+    <Box sx={{ display: "flex", height: "100%" }}>
+      {/* 좌측 시나리오 리스트 */}
+      <ScenarioList onScenarioSelect={setSelectedScenarioId} />
     </Box>
   );
 }
