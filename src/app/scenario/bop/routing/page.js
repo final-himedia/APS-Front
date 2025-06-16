@@ -82,12 +82,17 @@ export default function DataGridSection() {
       else console.error("업로드 실패");
     });
   };
-  return (
 
+  const handleDownloadExcel = () => {
+    window.location.href =
+      "http://localhost:8080/api/scenarios/bop/routing-download";
+  };
+
+  return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* 툴바 */}
       <Box sx={{ mt: 2 }}>
-        <Toolbar upload={handleOpenDialog} />
+        <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
 
         {/* 업로드 Dialog */}
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
@@ -131,6 +136,7 @@ export default function DataGridSection() {
           </DialogActions>
         </Dialog>
       </Box>
+
       <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
         <Typography variant="h6" gutterBottom>
           생산 라우팅 목록
@@ -150,7 +156,6 @@ export default function DataGridSection() {
           rowHeight={38}
         />
       </Box>
-
     </Box>
   );
 }

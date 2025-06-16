@@ -99,14 +99,8 @@ export default function Toolbar({ upload, download }) {
             open={exportOpen}
             onClose={handleExportClose}
           >
-            <MenuItem
-              onClick={() => {
-                if (typeof download === "function") download();
-                handleExportClose();
-              }}
-            >
-              Excel 다운로드
-            </MenuItem>
+
+            <MenuItem onClick={download}>Excel 다운로드</MenuItem>
             <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
           </Menu>
         </div>
