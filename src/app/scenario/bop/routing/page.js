@@ -44,7 +44,7 @@ export default function DataGridSection() {
 
         const formatted = list.map((item, index) => ({
           id: index + 1,
-          scenarioId: item.scenarioId,
+          scenarioId: item.routingId?.scenarioId,
           routingId: item.routingId?.routingId || "",
           siteId: item.routingId?.siteId || "",
           routingName: item.routingName,
@@ -136,6 +136,7 @@ export default function DataGridSection() {
           </DialogActions>
         </Dialog>
       </Box>
+
       <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
         <Typography variant="h6" gutterBottom>
           생산 라우팅 목록

@@ -1,27 +1,21 @@
 "use client";
 
-
-import Box from "@mui/material/Box";
-import Toolbar from "@/app/standard/Toolbar";
-
-export default function BopPage() {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      {/* 툴바 */}
-      <Box sx={{ mt: 2 }}>
-        <Toolbar />
-      </Box>
-
-      {/* 가운데 콘텐츠 (스크롤 영역 포함) */}
-      <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
-        <h2>BOM</h2>
-        <p>여기에 BOM 관련 테이블 넣기</p>
-      </Box>
-
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Typography,
+} from "@mui/material";
+import Toolbar from "@/app/standard/Toolbar";
+import CloseIcon from "@mui/icons-material/Close";
 
+// BOM 테이블 컬럼 정의
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
   { field: "toSiteId", headerName: "생산 사이트 코드", width: 130 },
@@ -44,19 +38,25 @@ const columns = [
   { field: "bomVersion", headerName: "BOM버전", width: 100 },
 ];
 
+// DataGridSection 컴포넌트
 export default function DataGridSection() {
   const [rows, setRows] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 10,
+    pageSize: 100,
   });
 
-  useEffect(() => {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelectedFile] = useState(false);
+
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
+
+  const fetchBomData = () => {
     fetch("http://localhost:8080/api/scenarios/bop/bom")
       .then((res) => res.json())
       .then((data) => {
         const list = data.boms || [];
-
         const formatted = list.map((item, index) => ({
           id: index + 1,
           toSiteId: item.bomId?.toSiteId ?? "",
@@ -75,34 +75,111 @@ export default function DataGridSection() {
           toPartName: item.toPartName,
           fromPartName: item.fromPartName,
           zseq: item.bomId?.zseq ?? "",
-          scenarioId: item.scenarioId,
+          scenarioId: item.bomId?.scenarioId,
           bomVersion: item.bomVersion,
         }));
 
         setRows(formatted);
       });
+  };
+
+  useEffect(() => {
+    fetchBomData();
   }, []);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      handleUpload(file);
+      setOpen(false);
+    }
+  };
+
+  const handleUpload = (file) => {
+    console.log("check!!");
+    const formData = new FormData();
+    formData.append("file", file);
+    fetch("http://localhost:8080/api/scenarios/bop/bom-upload", {
+      method: "post",
+      body: formData,
+    }).then((response) => {
+      if (response.status === 200) fetchBomData();
+      else console.error("업로드 실패");
+    });
+  };
+
+  const handleDownloadExcel = () => {
+    window.location.href =
+      "http://localhost:8080/api/scenarios/bop/bom-download";
+  };
+
   return (
-    <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
-      <Typography variant="h6" gutterBottom>
-        BOM
-      </Typography>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      {/* 툴바 */}
+      <Box sx={{ mt: 2 }}>
+        <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
 
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10, 20]}
-        checkboxSelection
-        autoHeight
-        sx={{
-          border: 0,
-          minWidth: "500px", // 너무 작게 줄어드는 걸 방지
-        }}
-        rowHeight={38}
-      />
+        {/* 업로드 Dialog */}
+        <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
+            파일 업로드
+            <IconButton onClick={handleCloseDialog}>
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
 
+          <DialogContent>
+            <Box
+              sx={{
+                border: "2px dashed #ccc",
+                borderRadius: 1,
+                height: 150,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+              onClick={() => document.getElementById("file-input").click()}
+            >
+              <Typography color="text.secondary">
+                등록할 파일을 선택해서 추가하세요.
+              </Typography>
+              <input
+                id="file-input"
+                type="file"
+                accept=".xlsx,.xls"
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
+            </Box>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>취소</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+
+      <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
+        <Typography variant="h6" gutterBottom>
+          BOM
+        </Typography>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: { paginationModel },
+          }}
+          pageSizeOptions={[5, 10, 20, 50, 100]}
+          checkboxSelection
+          autoHeight
+          rowHeight={38}
+          sx={{ border: 0, minWidth: "500px" }}
+        />
+      </Box>
     </Box>
   );
 }
