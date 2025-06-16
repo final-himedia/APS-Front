@@ -11,23 +11,17 @@ import {
 } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SidebarSearch from "./SidebarSearch";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import useScenarioStore from "@/hooks/useScenarioStore"; // 전역 상태 불러오기
 
-const scenarioIds = [
-  "S010000",
-  "S020000",
-  "S030000",
-  "S040000",
-  "S050000",
-  "S060000",
-];
+const scenarioIds = ["S010000", "S020000", "S030000"];
 
 export default function ScenarioList({ onClose }) {
-  const router = useRouter();
+  const setSelectedScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
   const [searchTerm, setSearchTerm] = useState("");
 
-  // 검색어에 맞게 필터링
   const filteredScenarios = scenarioIds.filter((id) =>
     id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -75,7 +69,6 @@ export default function ScenarioList({ onClose }) {
             </IconButton>
           </Box>
 
-          {/* 검색창에 상태와 변경 함수 넘김 */}
           <SidebarSearch
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
@@ -89,7 +82,10 @@ export default function ScenarioList({ onClose }) {
         {filteredScenarios.map((id) => (
           <ListItemButton
             key={id}
-            onClick={() => router.push(`/scenario/${id}`)}
+            onClick={() => {
+              setSelectedScenarioId(id);
+              onClose();
+            }}
           >
             <ListItemText primary={id} sx={{ pl: 0 }} />
           </ListItemButton>
