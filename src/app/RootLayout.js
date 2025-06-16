@@ -1,21 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import { Box, Typography } from "@mui/material";
+import { useState, useEffect } from "react";
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  const [isInputSidebarOpen, setInputSidebarOpen] = useState(true);
-
   const sidebarWidth = 250;
 
-  // 현재 시간 상태
   const [currentTime, setCurrentTime] = useState("");
 
-  // 시간 갱신
+  // localStorage에서 사용자 정보 읽기 (클라이언트 사이드에서만)
+  const userData =
+    typeof window !== "undefined" ? localStorage.getItem("user") : null;
+  const user = userData ? JSON.parse(userData) : null;
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -28,16 +31,19 @@ export default function RootLayout({ children }) {
       });
       setCurrentTime(formattedTime);
     };
-
-    updateTime(); // 초기 호출
-    const interval = setInterval(updateTime, 60000); // 1분마다 갱신
-
+    updateTime();
+    const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
   }, []);
 
+  // 로그인 페이지는 고정 레이아웃 없이 children만 렌더
+  if (pathname === "/login") {
+    return <>{children}</>;
+  }
+
+  // 그 외 페이지는 고정 레이아웃 적용
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      {/* 사이드바 */}
       {isSidebarOpen && (
         <div
           style={{
@@ -54,8 +60,6 @@ export default function RootLayout({ children }) {
           <ListDivider onClose={() => setSidebarOpen(false)} />
         </div>
       )}
-
-      {/* 메인 컨텐츠 영역 */}
       <div
         style={{
           marginLeft: isSidebarOpen ? sidebarWidth : 0,
@@ -64,7 +68,6 @@ export default function RootLayout({ children }) {
           flexDirection: "column",
         }}
       >
-        {/* 상단바 */}
         <div
           style={{
             height: 45,
@@ -73,20 +76,16 @@ export default function RootLayout({ children }) {
             display: "flex",
             alignItems: "center",
             padding: "0 16px",
-
             left: isSidebarOpen ? sidebarWidth : 0,
-
             zIndex: 1200,
           }}
         >
-          {/* 메뉴 아이콘 */}
           {!isSidebarOpen && (
             <IconButton onClick={() => setSidebarOpen(true)}>
               <MenuIcon />
             </IconButton>
           )}
 
-          {/* 오른쪽 사용자 정보 */}
           <Box
             sx={{
               marginLeft: "auto",
@@ -97,15 +96,16 @@ export default function RootLayout({ children }) {
           >
             <div style={{ textAlign: "right" }}>
               <Typography variant="body2" fontWeight="bold">
-                남주현
+                {user?.name || "익명 사용자"}
               </Typography>
-              <Typography variant="caption">himedia717@naver.com</Typography>
+              <Typography variant="caption">
+                {user?.email || "이메일 없음"}
+              </Typography>
             </div>
             <Typography variant="caption">{currentTime}</Typography>
           </Box>
         </div>
 
-        {/* 페이지 내용 */}
         <main
           style={{
             paddingLeft: 16,

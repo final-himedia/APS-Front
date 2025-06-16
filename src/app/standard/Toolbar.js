@@ -41,21 +41,20 @@ export default function Toolbar({ upload, download }) {
   const handleMoreClose = () => setMoreAnchorEl(null);
 
   const actionButtons = [
-    { label: "추가", icon: <AddIcon fontSize="small" />, onClick: () => {} },
-    { label: "삭제", icon: <DeleteIcon fontSize="small" />, onClick: () => {} },
+    { label: "추가", icon: <AddIcon fontSize="small" />, onClick: onAdd },
+    { label: "삭제", icon: <DeleteIcon fontSize="small" />, onClick: onDelete },
     {
       label: "저장",
       icon: <SaveIcon fontSize="small" />,
-      onClick: () => {},
-      disabled: true,
+      onClick: onSave,
+      disabled: false, // 필요하면 true로 변경
     },
     {
       label: "새로고침",
       icon: <RefreshIcon fontSize="small" />,
-      onClick: () => {},
+      onClick: onRefresh,
     },
   ];
-
   useEffect(() => {
     const handleResize = () => {
       setIsCompact(window.innerWidth < 1300);
@@ -99,7 +98,14 @@ export default function Toolbar({ upload, download }) {
             open={exportOpen}
             onClose={handleExportClose}
           >
-            <MenuItem onClick={download}>Excel 다운로드</MenuItem>
+            <MenuItem
+              onClick={() => {
+                download();
+                setExportAnchorEl(null);
+              }}
+            >
+              Excel 다운로드
+            </MenuItem>
             <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
           </Menu>
         </div>
