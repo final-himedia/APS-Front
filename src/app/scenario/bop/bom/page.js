@@ -39,7 +39,7 @@ const columns = [
 ];
 
 // DataGridSection 컴포넌트
-function DataGridSection() {
+export default function DataGridSection() {
   const [rows, setRows] = useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -115,7 +115,6 @@ function DataGridSection() {
   };
 
   return (
-
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* 툴바 */}
       <Box sx={{ mt: 2 }}>
