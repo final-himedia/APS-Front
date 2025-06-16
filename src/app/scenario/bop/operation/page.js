@@ -60,7 +60,7 @@ export default function DataGridSection() {
           operationType: item.operationType,
           waitTimeUom: item.waitTimeUom,
           transferTimeUom: item.transferTimeUom,
-          scenarioId: item.scenarioId,
+          scenarioId: item.operationId?.scenarioId,
           sourcingType: item.sourcingType,
         }));
 

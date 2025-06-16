@@ -19,9 +19,9 @@ const columns = [
   { field: "id", headerName: "순번", width: 80 },
   { field: "siteId", headerName: "플랜트", width: 100 },
   { field: "partId", headerName: "품목 코드", width: 130 },
-  { field: "partType", headerName: "Part 유형", width: 180 },
-  { field: "routingId", headerName: "Routing 코드", width: 100 },
-  { field: "partName", headerName: "품목명", width: 100 },
+  { field: "partType", headerName: "Part 유형", width: 80 },
+  { field: "routingId", headerName: "Routing 코드", width: 130 },
+  { field: "partName", headerName: "품목명", width: 250 },
   { field: "minBatchSize", headerName: "생산 배치 사이즈(최소)", width: 120 },
   { field: "maxBatchSize", headerName: "생산 배치 사이즈(최대)", width: 130 },
   { field: "uom", headerName: "단위", width: 120 },
@@ -57,7 +57,7 @@ export default function DataGridSection() {
           minBatchSize: item.minBatchSize,
           maxBatchSize: item.maxBatchSize,
           uom: item.uom,
-          scenarioId: item.scenarioId,
+          scenarioId: item.partId?.scenarioId,
         }));
 
         setRows(formatted);

@@ -44,7 +44,7 @@ export default function DataGridSection() {
 
         const formatted = list.map((item, index) => ({
           id: index + 1,
-          scenarioId: item.scenarioId,
+          scenarioId: item.routingId?.scenarioId,
           routingId: item.routingId?.routingId || "",
           siteId: item.routingId?.siteId || "",
           routingName: item.routingName,
