@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SidebarSearch from "./SidebarSearch";
-import { useState } from "react";
-import useScenarioStore from "@/hooks/useScenarioStore"; // 전역 상태 불러오기
+import { useState, useEffect } from "react";
+import useScenarioStore from "@/hooks/useScenarioStore";
 
 const scenarioIds = ["S010000", "S020000", "S030000"];
 
@@ -21,6 +21,11 @@ export default function ScenarioList({ onClose }) {
     (state) => state.setSelectedScenarioId
   );
   const [searchTerm, setSearchTerm] = useState("");
+
+  //컴포넌트 최초 마운트 시 기본 시나리오 설정
+  useEffect(() => {
+    setSelectedScenarioId("S010000");
+  }, [setSelectedScenarioId]);
 
   const filteredScenarios = scenarioIds.filter((id) =>
     id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -77,15 +82,12 @@ export default function ScenarioList({ onClose }) {
         </Box>
       </Box>
 
-      {/* 필터링된 시나리오 목록 출력 */}
+      {/* 시나리오 목록 */}
       <List dense>
         {filteredScenarios.map((id) => (
           <ListItemButton
             key={id}
-            onClick={() => {
-              setSelectedScenarioId(id);
-              onClose();
-            }}
+            onClick={() => setSelectedScenarioId(id)}
           >
             <ListItemText primary={id} sx={{ pl: 0 }} />
           </ListItemButton>
