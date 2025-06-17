@@ -1,20 +1,21 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
 import IconButton from "@mui/material/IconButton";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const sidebarWidth = 250;
-
   const [currentTime, setCurrentTime] = useState("");
 
-  // localStorage에서 사용자 정보 읽기 (클라이언트 사이드에서만)
+  // localStorage에서 사용자 정보 읽기
   const userData =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userData ? JSON.parse(userData) : null;
@@ -36,12 +37,18 @@ export default function RootLayout({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  // 로그인 페이지는 고정 레이아웃 없이 children만 렌더
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login"); // 로그인 페이지로 이동
+  };
+
+  // 로그인 페이지는 레이아웃 없이 children만 렌더링
   if (pathname === "/login") {
     return <>{children}</>;
   }
 
-  // 그 외 페이지는 고정 레이아웃 적용
   return (
     <div style={{ display: "flex", height: "100vh" }}>
       {isSidebarOpen && (
@@ -103,6 +110,24 @@ export default function RootLayout({ children }) {
               </Typography>
             </div>
             <Typography variant="caption">{currentTime}</Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<LogoutIcon />}
+              onClick={handleLogout}
+              sx={{
+                color: "#555555", // 연한 진한 회색 텍스트
+                borderColor: "#cccccc", // 옅은 테두리
+                textTransform: "none", // 기본 대문자 변환 해제 (필요 시)
+                "&:hover": {
+                  borderColor: "#999999",
+                  backgroundColor: "#f0f0f0", // 마우스 오버시 연한 회색 배경
+                },
+                minWidth: 80, // 버튼 크기 조절 (필요 시)
+              }}
+            >
+              로그아웃
+            </Button>
           </Box>
         </div>
 
@@ -110,7 +135,7 @@ export default function RootLayout({ children }) {
           style={{
             paddingLeft: 16,
             paddingRight: 16,
-            height: "calc(100vh - 40px)",
+            height: "calc(100vh - 45px)",
             overflow: "auto",
           }}
         >
