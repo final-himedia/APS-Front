@@ -22,7 +22,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault(); // 폼 제출 시 새로고침 방지
     try {
       const response = await fetch("http://127.0.0.1:8080/api/auth/login", {
         method: "POST",
@@ -37,7 +38,7 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
-        router.push("/"); // 대시보드나 홈으로 리다이렉트
+        router.push("/"); // 홈 또는 리다이렉션 경로
       } else {
         setError(result || "로그인 실패");
       }
@@ -58,6 +59,8 @@ export default function LoginPage() {
       }}
     >
       <Box
+        component="form" // 🔹 이 부분이 핵심
+        onSubmit={handleLogin} // 🔹 엔터 또는 버튼 클릭 시 로그인 실행
         sx={{
           width: 400,
           padding: 4,
@@ -92,10 +95,10 @@ export default function LoginPage() {
           </Typography>
         )}
         <Button
+          type="submit" // 🔹 엔터로도 실행되게 함
           fullWidth
           variant="contained"
           sx={{ mt: 2, mb: 1 }}
-          onClick={handleLogin}
         >
           로그인
         </Button>

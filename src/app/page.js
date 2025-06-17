@@ -10,7 +10,7 @@ export default function Home() {
     if (!token) {
       router.replace("/login"); // 로그인 안 되어 있으면 로그인 페이지로
     } else {
-      router.replace("/scenario"); // 로그인 되어 있으면 대시보드로 이동 (대시보드 경로 예시)
+      router.replace("/scenario/target/demand"); // 로그인 되어 있으면 대시보드로 이동 (대시보드 경로 예시)
     }
   }, [router]);
 

@@ -22,6 +22,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const PAGE_SIZE = 10;
 
@@ -169,7 +170,19 @@ export default function QnaPage() {
             paginatedPosts.map((post) => (
               <TableRow key={post.id}>
                 <TableCell>{post.id}</TableCell>
-                <TableCell>{post.title}</TableCell>
+                <TableCell>
+                  <Link href={`/management/qna/${post.id}`} passHref>
+                    <Typography
+                      sx={{
+                        color: "grey",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      {post.title}
+                    </Typography>
+                  </Link>
+                </TableCell>
                 <TableCell>{post.writerId}</TableCell>
                 <TableCell>{post.wroteAt?.slice(0, 10)}</TableCell>
               </TableRow>
