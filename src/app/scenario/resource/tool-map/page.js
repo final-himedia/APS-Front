@@ -14,62 +14,37 @@ import {
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
-  { field: "siteId", headerName: "플랜트", width: 100 },
-  { field: "toolSize", headerName: "TOOL 사이즈", width: 100 },
-  { field: "scenarioId", headerName: "시나리오", width: 120 },
-  { field: "partId", headerName: "품목 코드", width: 130 },
-  { field: "toolId", headerName: "ToolId", width: 120 },
-  { field: "partName", headerName: "품목명", width: 180 },
+  { field: "siteId", headerName: "플랜트", flex: 1 },
+  { field: "toolSize", headerName: "TOOL 사이즈", flex: 1 },
+  { field: "scenarioId", headerName: "시나리오", flex: 1 },
+  { field: "partId", headerName: "품목 코드", flex: 1 },
+  { field: "toolId", headerName: "ToolId", flex: 1 },
+  { field: "partName", headerName: "품목명", flex: 1 },
 ];
 
 export default function ToolMap() {
+  const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
+
   const [rows, setRows] = useState([]);
+  const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
-  const [open, setOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
 
-  // 📥 다운로드
-  const handleDownload = () => {
-    window.open(
-      "http://localhost:8080/api/scenarios/toolmap-download",
-      "_blank"
-    );
-  };
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
 
-  // 📤 업로드 다이얼로그 열기/닫기
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      handleUpload(file);
-      setOpen(false);
-    }
-  };
-
-  const handleUpload = (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    fetch("http://localhost:8080/api/scenarios/toolmap-upload", {
-      method: "POST",
-      body: formData,
-    }).then((res) => {
-      if (res.status === 200) fetchData();
-      else console.error("업로드 실패");
-    });
-  };
-
-  const fetchData = () => {
-    fetch("http://localhost:8080/api/scenarios/resource/tool-map")
+  const fetchData = (id) => {
+    fetch(`http://localhost:8080/api/scenarios/resource/tool-map/${id}`)
       .then((res) => res.json())
       .then((data) => {
         const list = data.toolMasters || [];
@@ -82,21 +57,49 @@ export default function ToolMap() {
           toolId: item.toolMapId?.toolId || "",
           partName: item.partName || "",
         }));
-
         setRows(formatted);
-      });
+      })
+      .catch((err) => console.error("fetchData 오류:", err));
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (scenarioId) fetchData(scenarioId);
+  }, [scenarioId]);
+
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    if (scenarioId) formData.append("scenarioId", scenarioId);
+
+    fetch("http://localhost:8080/api/scenarios/resource/toolmap-upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => {
+        if (res.ok) fetchData(scenarioId);
+        else console.error("업로드 실패");
+      })
+      .finally(() => handleCloseDialog());
+  };
+
+  const handleDownload = () => {
+    window.open(
+      `http://localhost:8080/api/scenarios/resource/toolmap-download?scenarioId=${scenarioId}`,
+      "_blank"
+    );
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ mt: 2 }}>
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
 
-        {/* 업로드 다이얼로그 */}
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
           <DialogTitle
             sx={{ display: "flex", justifyContent: "space-between" }}
@@ -118,7 +121,7 @@ export default function ToolMap() {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => document.getElementById("file-input").click()}
+              onClick={() => document.getElementById("file-input")?.click()}
             >
               <Typography color="text.secondary">
                 등록할 파일을 선택해서 추가하세요.
@@ -139,23 +142,37 @@ export default function ToolMap() {
         </Dialog>
       </Box>
 
-      {/* 테이블 */}
-      <Box sx={{ flex: 1, p: 2, minHeight: 300 }}>
+      <Box
+        sx={{
+          border: "1px solid #e0e0e0",
+          borderRadius: 2,
+          backgroundColor: "#fff",
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+          p: 2,
+          height: "100%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Typography variant="h6" gutterBottom>
           작업장-도구 매핑관리
         </Typography>
 
-        <Box sx={{ height: 500, overflow: "auto" }}>
+        <Box sx={{ flex: 1, overflow: "auto" }}>
           <DataGrid
             rows={rows}
             columns={columns}
-            initialState={{ pagination: { paginationModel } }}
             paginationModel={paginationModel}
-            onPaginationModelChange={(model) => setPaginationModel(model)}
+            onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50, 100]}
             checkboxSelection
+            autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1000px" }}
+            sx={{
+              border: 0,
+              minWidth: "1000px",
+            }}
           />
         </Box>
       </Box>

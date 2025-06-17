@@ -12,8 +12,8 @@ export default function ScenarioLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
   const [showInputPanel, setShowInputPanel] = useState(true);
 
-  const SCENARIO_WIDTH = 260;
-  const INPUT_WIDTH = 280;
+  const SCENARIO_WIDTH = 240;
+  const INPUT_WIDTH = 260;
 
   return (
     <Box
@@ -38,10 +38,10 @@ export default function ScenarioLayout({ children }) {
         )}
       </Box>
 
-      {/* 가운데 콘텐츠 (Toolbar + children) */}
+      {/* 가운데 콘텐츠 */}
       <Box
         sx={{
-          overflow: "auto",
+          overflow: "hidden", // ✅ 여기서 auto → hidden 으로!
           minWidth: 0,
           px: 2,
           display: "flex",
@@ -50,7 +50,15 @@ export default function ScenarioLayout({ children }) {
         }}
       >
         {/* 실제 콘텐츠 */}
-        <Box sx={{ flex: 1, overflow: "auto" }}>{children}</Box>
+        <Box
+          sx={{
+            flex: 1,
+            overflowX: "auto", // ✅ 내부에서만 가로 스크롤!
+            overflowY: "hidden", // (선택) 세로 스크롤 방지
+          }}
+        >
+          {children}
+        </Box>
       </Box>
 
       {/* 오른쪽 패널 */}
