@@ -33,15 +33,25 @@ export default function ListDivider({ onClose }) {
   const [openManage, setOpenManage] = useState(false);
   const [favorites, setFavorites] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("favorites");
+
     if (stored) {
       try {
         setFavorites(JSON.parse(stored));
       } catch (e) {
         console.error("즐겨찾기 파싱 오류:", e);
       }
+    }
+  }, []);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // 저장된 user 정보 불러오기
+      console.log(storedUser);
     }
   }, []);
 
@@ -114,10 +124,8 @@ export default function ListDivider({ onClose }) {
   ];
 
   const manageMenuItems = [
-
     { label: "사용자 관리", href: "/management/user" },
     { label: "문의 게시판", href: "/management/qna" },
-
   ];
 
   const hasMatches = (items) => items.some((item) => matchesSearch(item.label));
@@ -255,28 +263,32 @@ export default function ListDivider({ onClose }) {
           </List>
         </Collapse>
 
-        <ListItemButton onClick={() => setOpenManage(!openManage)}>
-          <ListItemIcon sx={{ minWidth: 32 }}>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary="관리" />
-          {(searchTerm ? hasMatches(manageMenuItems) : openManage) ? (
-            <ExpandLess />
-          ) : (
-            <ExpandMore />
-          )}
-        </ListItemButton>
-        <Collapse
-          in={searchTerm ? hasMatches(manageMenuItems) : openManage}
-          timeout="auto"
-          unmountOnExit
-        >
-          <List>
-            {manageMenuItems.map(({ label, href }) =>
-              renderMenuItem(label, href)
-            )}
-          </List>
-        </Collapse>
+        {user?.role === "Admin" && (
+          <>
+            <ListItemButton onClick={() => setOpenManage(!openManage)}>
+              <ListItemIcon sx={{ minWidth: 32 }}>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="관리" />
+              {(searchTerm ? hasMatches(manageMenuItems) : openManage) ? (
+                <ExpandLess />
+              ) : (
+                <ExpandMore />
+              )}
+            </ListItemButton>
+            <Collapse
+              in={searchTerm ? hasMatches(manageMenuItems) : openManage}
+              timeout="auto"
+              unmountOnExit
+            >
+              <List>
+                {manageMenuItems.map(({ label, href }) =>
+                  renderMenuItem(label, href)
+                )}
+              </List>
+            </Collapse>
+          </>
+        )}
       </List>
     </Box>
   );
