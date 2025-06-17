@@ -14,41 +14,42 @@ import {
 } from "@mui/material";
 import Toolbar from "@/app/standard/Toolbar";
 import CloseIcon from "@mui/icons-material/Close";
+import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
-  { field: "priorityId", headerName: "우선순위 그룹", width: 150 },
-  { field: "factorId", headerName: "우선순위", width: 180 },
-  { field: "factorType", headerName: "FactorType", width: 130 },
-  { field: "orderType", headerName: "주문유형", width: 100 },
-  { field: "sequence", headerName: "우선순위 순서", width: 120, type: "number" },
-  { field: "description", headerName: "설명", width: 250 },
-  { field: "scenarioId", headerName: "시나리오", width: 120 },
+  { field: "priorityId", headerName: "우선순위 그룹", flex: 1 },
+  { field: "factorId", headerName: "우선순위", flex: 1 },
+  { field: "factorType", headerName: "FactorType", flex: 1 },
+  { field: "orderType", headerName: "주문유형", flex: 1 },
+  {
+    field: "sequence",
+    headerName: "우선순위 순서",
+    type: "number",
+    width: 120,
+  },
+  { field: "description", headerName: "설명", flex: 2 },
+  { field: "scenarioId", headerName: "시나리오", flex: 1 },
 ];
 
-export default function DataGridSection() {
+export default function PriorityView() {
+  const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
   const [rows, setRows] = useState([]);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
   const [open, setOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleDownload = () => {
-    window.open("http://localhost:8080/api/scenarios/config/priority-download", "_blank");
-  };
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
 
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => {
-    setOpen(false);
-    setSelectedFile(null);
-  };
-
-  const fetchData = () => {
-    fetch("http://localhost:8080/api/scenarios/config/priority")
+  const fetchData = (id) => {
+    fetch(`http://localhost:8080/api/scenarios/config/priority/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data.prioritys)) return;
-
-        const formatted = data.prioritys.map((item, index) => {
+        const list = data.prioritys || [];
+        const formatted = list.map((item, index) => {
           const pid = item.priorityId || {};
           return {
             id: index + 1,
@@ -61,40 +62,42 @@ export default function DataGridSection() {
             description: item.description || "",
           };
         });
-
         setRows(formatted);
       })
-      .catch((err) => {
-        console.error("우선순위 데이터 불러오기 실패", err);
-      });
+      .catch((err) => console.error("우선순위 fetch 실패:", err));
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (scenarioId) fetchData(scenarioId);
+  }, [scenarioId]);
+
+  const handleDownload = () => {
+    window.open(
+      `http://localhost:8080/api/scenarios/config/priority-download?scenarioId=${scenarioId}`,
+      "_blank"
+    );
+  };
+
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setSelectedFile(file);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("scenarioId", scenarioId);
 
     fetch("http://localhost:8080/api/scenarios/config/priority-upload", {
       method: "POST",
       body: formData,
     })
       .then((res) => {
-        if (res.ok) {
-          fetchData();
-        } else {
-          console.error("업로드 실패");
-        }
+        if (res.ok) fetchData(scenarioId);
+        else console.error("업로드 실패");
       })
-      .finally(() => {
-        handleCloseDialog();
-      });
+      .finally(handleCloseDialog);
   };
 
   return (
@@ -103,7 +106,9 @@ export default function DataGridSection() {
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
 
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             우선순위 파일 업로드
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
@@ -142,22 +147,35 @@ export default function DataGridSection() {
         </Dialog>
       </Box>
 
-      <Box p={2} sx={{ width: "fit-content", maxWidth: "100%" }}>
+      {/* ✅ ToolMaster 스타일 카드 적용 영역 */}
+      <Box
+        sx={{
+          border: "1px solid #e0e0e0",
+          borderRadius: 2,
+          backgroundColor: "#fff",
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+          p: 2,
+          height: "100%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Typography variant="h6" gutterBottom>
           우선순위
         </Typography>
 
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[5, 10, 20]}
-          checkboxSelection
-          autoHeight
-          sx={{ border: 0, minWidth: "500px" }}
-          rowHeight={38}
-        />
+        <Box sx={{ flex: 1, overflow: "auto" }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            checkboxSelection
+            rowHeight={38}
+            autoHeight={false}
+            pageSizeOptions={[5, 10, 20]}
+            sx={{ border: 0, minWidth: "1000px" }}
+          />
+        </Box>
       </Box>
     </Box>
   );

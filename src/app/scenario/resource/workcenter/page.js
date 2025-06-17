@@ -1,6 +1,7 @@
 "use client";
 
-import Toolbar from "@/app/standard/Toolbar";
+import { useEffect, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
 import {
   Box,
   Button,
@@ -11,92 +12,94 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import Toolbar from "@/app/standard/Toolbar";
+import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
-  { field: "siteId", headerName: "플랜트", width: 120 },
-  { field: "workcenterId", headerName: "작업장 코드", width: 150 },
-  { field: "workcenterName", headerName: "호기명", width: 130 },
-  { field: "workcenterGroup", headerName: "호기그룹", width: 130 },
-  { field: "workcenterType", headerName: "호기유형", width: 130 },
-  { field: "priorityId", headerName: "우선순위 그룹", width: 150 },
-  { field: "dispatcherType", headerName: "디스패치 방식", width: 130 },
-  { field: "workcenterState", headerName: "호기 상태", width: 120 },
-  { field: "automation", headerName: "자동화 장비", width: 130 },
-  { field: "scenarioId", headerName: "시나리오", width: 120 },
+  { field: "siteId", headerName: "플랜트", flex: 1 },
+  { field: "workcenterId", headerName: "작업장 코드", flex: 1 },
+  { field: "workcenterName", headerName: "호기명", flex: 1 },
+  { field: "workcenterGroup", headerName: "호기그룹", flex: 1 },
+  { field: "workcenterType", headerName: "호기유형", flex: 1 },
+  { field: "priorityId", headerName: "우선순위 그룹", flex: 1 },
+  { field: "dispatcherType", headerName: "디스패치 방식", flex: 1 },
+  { field: "workcenterState", headerName: "호기 상태", flex: 1 },
+  { field: "automation", headerName: "자동화 장비", flex: 1 },
+  { field: "scenarioId", headerName: "시나리오", flex: 1 },
 ];
 
 export default function WorkCenter() {
+  const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
   const [rows, setRows] = useState([]);
+  const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
-  const [open, setOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
 
-  const handleDownload = () => {
-    window.open(
-      "http://localhost:8080/api/scenarios/workcenter-download",
-      "_blank"
-    );
-  };
-
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      handleUpload(file);
-      setOpen(false);
-    }
-  };
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const handleUpload = (file) => {
     const formData = new FormData();
     formData.append("file", file);
-
-    fetch("http://localhost:8080/api/scenarios/workcenter-upload", {
+    formData.append("scenarioId", scenarioId);
+    fetch("http://localhost:8080/api/scenarios/resource/workcenter-upload", {
       method: "POST",
       body: formData,
-    }).then((res) => {
-      if (res.status === 200) fetchData();
-      else console.error("업로드 실패");
-    });
+    })
+      .then((res) => {
+        if (res.ok) fetchData(scenarioId);
+        else console.error("업로드 실패");
+      })
+      .finally(() => setOpen(false));
   };
 
-  const fetchData = () => {
-    fetch("http://localhost:8080/api/scenarios/resource/workcenter")
+  const fetchData = (id) => {
+    fetch(`http://localhost:8080/api/scenarios/resource/workcenter/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("백엔드에서 받은 데이터 개수:", data.workcenters.length);
         const list = data.workcenters || [];
         const formatted = list.map((item, index) => ({
           id: index + 1,
           siteId: item.workCenterId?.siteId || "",
           workcenterId: item.workCenterId?.workcenterId || "",
           scenarioId: item.workCenterId?.scenarioId || "",
-          workcenterName: item.workcenterName,
-          workcenterGroup: item.workcenterGroup,
-          workcenterType: item.workcenterType,
-          priorityId: item.priorityId,
-          dispatcherType: item.dispatcherType,
-          workcenterState: item.workcenterState,
-          automation: item.automation,
+          workcenterName: item.workcenterName || "",
+          workcenterGroup: item.workcenterGroup || "",
+          workcenterType: item.workcenterType || "",
+          priorityId: item.priorityId || "",
+          dispatcherType: item.dispatcherType || "",
+          workcenterState: item.workcenterState || "",
+          automation: item.automation || "",
         }));
-
         setRows(formatted);
-      });
+      })
+      .catch((err) => console.error("작업장 마스터 fetch 실패:", err));
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (scenarioId) fetchData(scenarioId);
+  }, [scenarioId]);
+
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
+
+  const handleDownload = () => {
+    window.open(
+      `http://localhost:8080/api/scenarios/resource/workcenter-download?scenarioId=${scenarioId}`,
+      "_blank"
+    );
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -124,7 +127,7 @@ export default function WorkCenter() {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => document.getElementById("file-input").click()}
+              onClick={() => document.getElementById("file-input")?.click()}
             >
               <Typography color="text.secondary">
                 등록할 파일을 선택해서 추가하세요.
@@ -145,22 +148,36 @@ export default function WorkCenter() {
         </Dialog>
       </Box>
 
-      <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+      <Box
+        sx={{
+          border: "1px solid #e0e0e0",
+          borderRadius: 2,
+          backgroundColor: "#fff",
+          boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
+          p: 2,
+          height: "100%",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Typography variant="h6" gutterBottom>
           작업장 마스터
         </Typography>
 
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          paginationModel={paginationModel}
-          onPaginationModelChange={(model) => setPaginationModel(model)}
-          pageSizeOptions={[5, 10, 25, 50, 100]}
-          checkboxSelection
-          autoHeight
-          sx={{ border: 0, minWidth: "500px" }}
-          rowHeight={38}
-        />
+        <Box sx={{ flex: 1, overflow: "auto" }}>
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[5, 10, 25, 50, 100]}
+            checkboxSelection
+            autoHeight={false}
+            rowHeight={38}
+            sx={{ border: 0, minWidth: "1100px" }}
+          />
+        </Box>
       </Box>
     </Box>
   );
