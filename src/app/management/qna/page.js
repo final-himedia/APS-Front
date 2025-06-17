@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 export default function QnaPage() {
   const [tab, setTab] = useState(0);
@@ -38,14 +38,16 @@ export default function QnaPage() {
   const [newContent, setNewContent] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/management/qna", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    })
-      .then((res) => res.json())
+    fetch("http://localhost:8080/api/management/qna")
+      .then((res) => {
+        if (!res.ok) throw new Error("서버 오류: " + res.status); // <= 401 같은 오류 잡기
+        return res.json();
+      })
       .then((data) => {
-        console.log("✅ QnA 응답 확인:", data);
+        if (!Array.isArray(data)) {
+          console.error("❌ 서버 응답이 배열이 아님:", data);
+          return;
+        }
         setPosts(data.filter((d) => !d.deleted));
       })
       .catch((err) => console.error("❌ QnA fetch 에러:", err));
@@ -124,7 +126,20 @@ export default function QnaPage() {
           onChange={(e) => setSearchText(e.target.value)}
           sx={{ width: 300 }}
         />
-        <Button variant="contained">검색</Button>
+        <Button
+          variant="text"
+          sx={{
+            backgroundColor: "#e2e6ec",
+            color: "#000000",
+            px: 3,
+            "&:hover": {
+              backgroundColor: "#cfd4db",
+              color: "#000000",
+            },
+          }}
+        >
+          검색
+        </Button>
       </Stack>
 
       {/* 탭 */}
@@ -175,16 +190,17 @@ export default function QnaPage() {
       {/* 글쓰기 버튼 */}
       <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
         <Button
-          variant="outlined"
+          variant="text" // 외곽선 제거
           onClick={() => setOpen(true)}
           sx={{
             px: 3,
             py: 1,
             borderRadius: "12px",
-            backgroundColor: "#f5f5f5",
+            backgroundColor: "#e2e6ec",
+            color: "#000000",
             "&:hover": {
-              backgroundColor: "#e0e0e0",
-              borderColor: "#e0e0e0",
+              backgroundColor: "#cfd4db",
+              color: "#000000",
             },
           }}
         >
