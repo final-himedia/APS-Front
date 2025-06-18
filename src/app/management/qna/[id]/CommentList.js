@@ -7,13 +7,14 @@ export default function CommentList({ postId }) {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 토큰 가져오기
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const fetchComments = () => {
     if (!token) return;
 
-    fetch(`http://127.0.0.1:8080/api/management/qna/${postId}/comment`, {
+    fetch(`http://localhost:8080/api/management/qna/${postId}/comment/list`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
@@ -33,21 +34,36 @@ export default function CommentList({ postId }) {
     fetchComments();
   }, [postId]);
 
-  if (loading) return <CircularProgress size={20} />;
+  if (loading)
+    return (
+      <Box sx={{ mt: 2 }}>
+        <CircularProgress size={20} />
+      </Box>
+    );
+
   if (!comments.length)
-    return <Typography variant="body2">댓글이 없습니다.</Typography>;
+    return (
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          댓글이 없습니다.
+        </Typography>
+      </Box>
+    );
 
   return (
-    <Box mt={4}>
-      <Typography variant="h6" gutterBottom>
-        댓글
+    <Box mt={2}>
+      <Typography variant="subtitle1" gutterBottom>
+        댓글 목록
       </Typography>
       {comments.map((c) => (
-        <Paper key={c.id} sx={{ p: 2, my: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            작성자 ID: {c.writerId} | 작성일: {c.wroteAt?.slice(0, 10)}
+        <Paper key={c.id} sx={{ p: 2, my: 1, backgroundColor: "#f5f5f5" }}>
+          <Typography variant="body2" color="text.secondary" fontWeight="bold">
+            {c.email ?? `작성자 ID: ${c.writerId}`} •{" "}
+            {c.wroteAt?.slice(0, 16).replace("T", " ")}
           </Typography>
-          <Typography variant="body1">{c.content}</Typography>
+          <Typography variant="body1" sx={{ mt: 0.5 }}>
+            {c.content}
+          </Typography>
         </Paper>
       ))}
     </Box>

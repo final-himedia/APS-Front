@@ -34,7 +34,7 @@ export default function QnaDetailPage() {
       return;
     }
 
-    // 게시글 불러오기 (경로에 detail 포함)
+    // 게시글 불러오기
     fetch(`http://localhost:8080/api/management/qna/detail/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -55,8 +55,8 @@ export default function QnaDetailPage() {
         setLoading(false);
       });
 
-    // 댓글 불러오기
-    fetch(`http://localhost:8080/api/management/qna/${id}/comment`, {
+    //댓글 불러오기
+    fetch(`http://localhost:8080/api/management/qna/${id}/comment/list`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
