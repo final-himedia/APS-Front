@@ -35,29 +35,39 @@ export default function ListDivider({ onClose }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("favorites");
-
-    if (stored) {
-      try {
-        setFavorites(JSON.parse(stored));
-      } catch (e) {
-        console.error("즐겨찾기 파싱 오류:", e);
-      }
-    }
-  }, []);
-
+  // user 정보 불러오기 (로컬스토리지에서)
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser)); // 저장된 user 정보 불러오기
-      console.log(storedUser);
+      setUser(JSON.parse(storedUser));
     }
   }, []);
 
+  // user가 변경될 때마다 해당 user id 기반으로 즐겨찾기 불러오기
   useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
+    if (user && user.id) {
+      const stored = localStorage.getItem(`favorites_${user.id}`);
+      if (stored) {
+        try {
+          setFavorites(JSON.parse(stored));
+        } catch (e) {
+          console.error("즐겨찾기 파싱 오류:", e);
+          setFavorites([]);
+        }
+      } else {
+        setFavorites([]); // 해당 사용자의 즐겨찾기 없으면 빈 배열 초기화
+      }
+    } else {
+      setFavorites([]); // user 없으면 빈 배열
+    }
+  }, [user]);
+
+  // favorites가 변경될 때 user id 기반으로 저장
+  useEffect(() => {
+    if (user && user.id) {
+      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites));
+    }
+  }, [favorites, user]);
 
   const toggleFavorite = (label, href) => {
     const exists = favorites.find((item) => item.label === label);
@@ -107,6 +117,7 @@ export default function ListDivider({ onClose }) {
     );
   };
 
+  // 메뉴 항목들 (생략 - 기존과 동일)
   const engineMenuItems = [
     { label: "시나리오 관리", href: "/scenario" },
     { label: "실행 관리", href: "/run" },
@@ -145,6 +156,8 @@ export default function ListDivider({ onClose }) {
         px: 1.5,
       }}
     >
+      {/* 헤더, 검색창 등 기존 UI 동일 */}
+
       <Box
         sx={{
           display: "flex",
