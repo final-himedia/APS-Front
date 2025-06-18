@@ -34,8 +34,8 @@ export default function QnaDetailPage() {
       return;
     }
 
-    // 게시글 불러오기
-    fetch(`http://localhost:8080/api/management/qna/${id}`, {
+    // 게시글 불러오기 (경로에 detail 포함)
+    fetch(`http://localhost:8080/api/management/qna/detail/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
