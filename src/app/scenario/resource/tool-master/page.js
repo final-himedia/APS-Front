@@ -21,7 +21,6 @@ const columns = [
   { field: "siteId", headerName: "플랜트", width: 120 },
   { field: "toolId", headerName: "ToolId", flex: 1 },
   { field: "toolState", headerName: "상태", width: 130 },
-  { field: "toolCavity", headerName: "핀바 보유 수량", width: 130 },
   { field: "scenarioId", headerName: "시나리오", width: 130 },
   { field: "toolName", headerName: "ToolName", flex: 1 },
 ];
@@ -88,7 +87,6 @@ export default function ToolMaster() {
           toolId: item.toolMasterId?.toolId || "",
           scenarioId: item.toolMasterId?.scenarioId || "",
           toolState: item.toolState || "",
-          toolCavity: item.toolCavity || "",
           toolName: item.toolName || "",
         }));
         setRows(formatted);
