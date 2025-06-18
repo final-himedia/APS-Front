@@ -33,15 +33,19 @@ export default function QnaPage() {
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState([]);
 
-  // 다이얼로그 상태
+  // 글쓰기 다이얼로그 상태
   const [open, setOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
 
-  useEffect(() => {
-    fetch("http://localhost:8080/api/management/qna")
+  // QnA 리스트 불러오기 (작성자 이메일 포함)
+  const fetchQnaList = () => {
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:8080/api/management/qna/list", {
+      headers: token ? { Authorization: "Bearer " + token } : {},
+    })
       .then((res) => {
-        if (!res.ok) throw new Error("서버 오류: " + res.status); // <= 401 같은 오류 잡기
+        if (!res.ok) throw new Error("서버 오류: " + res.status);
         return res.json();
       })
       .then((data) => {
@@ -52,14 +56,20 @@ export default function QnaPage() {
         setPosts(data.filter((d) => !d.deleted));
       })
       .catch((err) => console.error("❌ QnA fetch 에러:", err));
+  };
+
+  useEffect(() => {
+    fetchQnaList();
   }, []);
 
+  // 페이지네이션 처리
   const paginatedPosts = posts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  // 새 글 저장
   const handleSave = () => {
     const token = localStorage.getItem("token");
     const writerId = Number(localStorage.getItem("userId")); // 로그인 시 저장되어 있다고 가정
-    const wroteAt = new Date().toISOString(); // 현재 시간
+    const wroteAt = new Date().toISOString();
 
     fetch("http://localhost:8080/api/management/qna", {
       method: "POST",
@@ -81,17 +91,8 @@ export default function QnaPage() {
       })
       .then((result) => {
         console.log("✅ 저장 성공:", result);
-
-        // 새 글 저장 후 목록 다시 가져오기
-        return fetch("http://localhost:8080/api/management/qna", {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        });
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        setPosts(data.filter((d) => !d.deleted));
+        // 저장 후 다시 리스트 가져오기
+        fetchQnaList();
       })
       .catch((err) => {
         console.error("❌ 에러 발생:", err);
@@ -138,6 +139,7 @@ export default function QnaPage() {
               color: "#000000",
             },
           }}
+          // 검색 버튼은 아직 필터 기능 미구현 (필요하면 추가 가능)
         >
           검색
         </Button>
@@ -183,7 +185,7 @@ export default function QnaPage() {
                     </Typography>
                   </Link>
                 </TableCell>
-                <TableCell>{post.writerId}</TableCell>
+                <TableCell>{post.email}</TableCell>
                 <TableCell>{post.wroteAt?.slice(0, 10)}</TableCell>
               </TableRow>
             ))
@@ -203,7 +205,7 @@ export default function QnaPage() {
       {/* 글쓰기 버튼 */}
       <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
         <Button
-          variant="text" // 외곽선 제거
+          variant="text"
           onClick={() => setOpen(true)}
           sx={{
             px: 3,
