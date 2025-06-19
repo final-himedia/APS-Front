@@ -25,6 +25,7 @@ import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SearchIcon from "@mui/icons-material/Search";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 
 export default function ListDivider({ onClose }) {
   const [openFind, setOpenFind] = useState(false);
@@ -80,7 +81,6 @@ export default function ListDivider({ onClose }) {
 
   const matchesSearch = (label) =>
     label.toLowerCase().includes(searchTerm.toLowerCase());
-
   const renderMenuItem = (label, href) => {
     if (searchTerm && !matchesSearch(label)) return null;
 
@@ -102,6 +102,7 @@ export default function ListDivider({ onClose }) {
             color: "grey.800",
           }}
         />
+        {/* 즐겨찾기 토글 버튼 */}
         <IconButton
           size="small"
           onClick={(e) => {
@@ -112,6 +113,20 @@ export default function ListDivider({ onClose }) {
           sx={{ opacity: 0.4, "&:hover": { opacity: 1 } }}
         >
           <StarIcon fontSize="small" />
+        </IconButton>
+
+        {/* 새창 열기 버튼 */}
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.open(href, "_blank", "noopener,noreferrer");
+          }}
+          sx={{ opacity: 0.4, "&:hover": { opacity: 1 }, ml: 0.5 }}
+          aria-label="Open in new tab"
+        >
+          <OpenInNewIcon fontSize="small" />
         </IconButton>
       </ListItemButton>
     );

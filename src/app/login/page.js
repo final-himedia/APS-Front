@@ -9,8 +9,10 @@ import {
   TextField,
   Typography,
   Link,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import RegisterDialog from "./RegisterDialog";
 
@@ -19,11 +21,22 @@ export default function LoginPage() {
   const [openResetPassword, setOpenResetPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // 저장된 이메일 불러오기
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
+
   const handleLogin = async (e) => {
-    e.preventDefault(); // 폼 제출 시 새로고침 방지
+    e.preventDefault();
+
     try {
       const response = await fetch("http://127.0.0.1:8080/api/auth/login", {
         method: "POST",
@@ -36,11 +49,24 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok) {
+        if (rememberEmail) {
+          localStorage.setItem("rememberedEmail", email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
-        router.push("/"); // 홈 또는 리다이렉션 경로
+
+        const lastPath = localStorage.getItem("lastPath");
+        if (lastPath && lastPath !== "/login") {
+          router.push(lastPath);
+          localStorage.removeItem("lastPath");
+        } else {
+          router.push("/");
+        }
       } else {
-        setError(result || "로그인 실패");
+        setError(result?.message || "로그인 실패");
       }
     } catch (err) {
       setError("서버 에러");
@@ -59,8 +85,8 @@ export default function LoginPage() {
       }}
     >
       <Box
-        component="form" // 🔹 이 부분이 핵심
-        onSubmit={handleLogin} // 🔹 엔터 또는 버튼 클릭 시 로그인 실행
+        component="form"
+        onSubmit={handleLogin}
         sx={{
           width: 400,
           padding: 4,
@@ -89,13 +115,25 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={rememberEmail}
+              onChange={(e) => setRememberEmail(e.target.checked)}
+            />
+          }
+          label="아이디 기억하기"
+        />
+
         {error && (
           <Typography color="error" variant="caption">
             {error}
           </Typography>
         )}
+
         <Button
-          type="submit" // 🔹 엔터로도 실행되게 함
+          type="submit"
           fullWidth
           variant="contained"
           sx={{ mt: 2, mb: 1 }}
@@ -103,13 +141,7 @@ export default function LoginPage() {
           로그인
         </Button>
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            mt: 1,
-          }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
           <Link
             href="#"
             underline="hover"
@@ -127,11 +159,13 @@ export default function LoginPage() {
         </Box>
       </Box>
 
+      {/* 회원가입 다이얼로그 */}
       <RegisterDialog
         open={openRegister}
         onClose={() => setOpenRegister(false)}
       />
 
+      {/* 비밀번호 찾기 다이얼로그 */}
       <Dialog
         open={openResetPassword}
         onClose={() => setOpenResetPassword(false)}
