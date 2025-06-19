@@ -73,7 +73,7 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
     <Box
       sx={{
         height: "100%",
-        overflowY: "auto", 
+        overflowY: "auto",
         flexDirection: "column",
         bgcolor: "white",
         borderLeft: "1px solid #ccc",
@@ -123,7 +123,7 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
             />
           </Box>
 
-          {/* 목록 */}
+          {/* 목록.*/}
           <Accordion
             disableGutters
             elevation={0}
