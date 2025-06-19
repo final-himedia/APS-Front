@@ -65,10 +65,13 @@ export default function LoginPage() {
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
 
-        const lastPath = localStorage.getItem("lastPath");
+        // 유저별 lastPath 불러오기
+        const lastPath = localStorage.getItem(`lastPath_${result.user.id}`);
+
         if (lastPath && lastPath !== "/login") {
           router.push(lastPath);
-          localStorage.removeItem("lastPath");
+          // 이동 후 유저별 lastPath 삭제 (선택사항)
+          localStorage.removeItem(`lastPath_${result.user.id}`);
         } else {
           router.push("/");
         }
