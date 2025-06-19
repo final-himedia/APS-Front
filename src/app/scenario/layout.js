@@ -41,20 +41,22 @@ export default function ScenarioLayout({ children }) {
       {/* 가운데 콘텐츠 */}
       <Box
         sx={{
-          overflow: "hidden", // ✅ 여기서 auto → hidden 으로!
+          overflow: "hidden",
           minWidth: 0,
           px: 2,
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          backgroundColor: "#f5f5f5",
         }}
       >
         {/* 실제 콘텐츠 */}
         <Box
           sx={{
             flex: 1,
-            overflowX: "auto", // ✅ 내부에서만 가로 스크롤!
-            overflowY: "hidden", // (선택) 세로 스크롤 방지
+            overflowX: "auto", //내부 가로 스크롤
+            overflowY: "hidden",
+            pb: 1,
           }}
         >
           {children}
@@ -109,7 +111,7 @@ export default function ScenarioLayout({ children }) {
           onClick={() => setShowScenarioList(true)}
           sx={{
             position: "absolute",
-            left: 0,
+            left: 10,
             top: 10,
             zIndex: 1300,
             backgroundColor: "#fff",

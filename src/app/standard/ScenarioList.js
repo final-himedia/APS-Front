@@ -20,9 +20,13 @@ export default function ScenarioList({ onClose }) {
   const setSelectedScenarioId = useScenarioStore(
     (state) => state.setSelectedScenarioId
   );
+  const selectedScenarioId = useScenarioStore(
+    (state) => state.selectedScenarioId
+  ); // ✅ 현재 선택된 시나리오 추적
+
   const [searchTerm, setSearchTerm] = useState("");
 
-  //컴포넌트 최초 마운트 시 기본 시나리오 설정
+  // 컴포넌트 최초 마운트 시 기본 시나리오 설정
   useEffect(() => {
     setSelectedScenarioId("S010000");
   }, [setSelectedScenarioId]);
@@ -35,11 +39,13 @@ export default function ScenarioList({ onClose }) {
     <Box
       sx={{
         width: 240,
-        borderRight: "1px solid #ccc",
         height: "100vh",
         boxSizing: "border-box",
         overflowY: "auto",
         overflowX: "hidden",
+        backgroundColor: "#f2e8e8",
+        pl: 2,
+        pr: 1,
       }}
     >
       {/* 상단: 제목 + 검색 + 접기 버튼 */}
@@ -62,8 +68,10 @@ export default function ScenarioList({ onClose }) {
               pr: 2,
             }}
           >
-            <Typography variant="h6">시나리오 목록</Typography>
-            <IconButton onClick={onClose} size="small">
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              시나리오 목록
+            </Typography>
+            <IconButton onClick={onClose} size="small" sx={{ mr: -1 }}>
               <ArrowForwardIosIcon
                 fontSize="small"
                 sx={{
@@ -88,6 +96,20 @@ export default function ScenarioList({ onClose }) {
           <ListItemButton
             key={id}
             onClick={() => setSelectedScenarioId(id)}
+            selected={selectedScenarioId === id}
+            sx={{
+              "&.Mui-selected": {
+                backgroundColor: "#f5f5f5",
+                borderRadius: "20px 0 0 20px",
+                marginRight: "-12px",
+                paddingRight: "24px",
+                zIndex: 2,
+                position: "relative",
+              },
+              "&.Mui-selected:hover": {
+                backgroundColor: "#f5f5f5",
+              },
+            }}
           >
             <ListItemText primary={id} sx={{ pl: 0 }} />
           </ListItemButton>

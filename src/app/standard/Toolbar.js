@@ -75,7 +75,7 @@ export default function Toolbar({ upload, download }) {
         flexWrap: "wrap",
         gap: 1,
         p: 1,
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "#f2e8e8",
         border: "1px solid #d0d7e2",
         borderRadius: 1,
         mb: 1,
@@ -90,7 +90,11 @@ export default function Toolbar({ upload, download }) {
             variant="outlined"
             startIcon={<FileUploadIcon fontSize="small" />}
             onClick={handleExportClick}
-            sx={{ px: 1.5 }}
+            sx={{
+              px: 1.5,
+              color: "#3f3f3f", // 글자색
+              borderColor: "#3f3f3f",
+            }}
           >
             데이터 내보내기
           </Button>
@@ -99,7 +103,6 @@ export default function Toolbar({ upload, download }) {
             open={exportOpen}
             onClose={handleExportClose}
           >
-
             <MenuItem onClick={download}>Excel 다운로드</MenuItem>
             <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
           </Menu>
@@ -109,7 +112,11 @@ export default function Toolbar({ upload, download }) {
           variant="outlined"
           startIcon={<FileDownloadIcon fontSize="small" />}
           onClick={handleImportClick}
-          sx={{ px: 1.5 }}
+          sx={{
+            px: 1.5,
+            color: "#3f3f3f", // 글자색
+            borderColor: "#3f3f3f",
+          }}
         >
           데이터 가져오기
         </Button>
@@ -159,6 +166,9 @@ export default function Toolbar({ upload, download }) {
               startIcon={btn.icon}
               onClick={btn.onClick}
               disabled={btn.disabled}
+              sx={{
+            color: "#3f3f3f", // 글자색
+            borderColor: "#3f3f3f",}}
             >
               {btn.label}
             </Button>
