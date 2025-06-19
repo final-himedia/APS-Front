@@ -49,6 +49,13 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok) {
+        // 이전 사용자 관련 localStorage 데이터 초기화
+        Object.keys(localStorage).forEach((key) => {
+          if (key.startsWith("favorites_") || key === "lastPath") {
+            localStorage.removeItem(key);
+          }
+        });
+
         if (rememberEmail) {
           localStorage.setItem("rememberedEmail", email);
         } else {
