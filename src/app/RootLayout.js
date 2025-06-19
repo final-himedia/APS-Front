@@ -20,12 +20,12 @@ export default function RootLayout({ children }) {
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userData ? JSON.parse(userData) : null;
 
-  // 🟡 1. 마지막 경로 저장 useEffect 추가
+  // 1. 현재 경로가 로그인 페이지가 아니면 유저별 lastPath 저장
   useEffect(() => {
-    if (pathname && pathname !== "/login") {
-      localStorage.setItem("lastPath", pathname);
+    if (user?.id && pathname && pathname !== "/login") {
+      localStorage.setItem(`lastPath_${user.id}`, pathname);
     }
-  }, [pathname]);
+  }, [pathname, user]);
 
   // 시간 갱신
   useEffect(() => {
@@ -45,15 +45,15 @@ export default function RootLayout({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  // 로그아웃 핸들러
+  // 로그아웃 핸들러 - 로그아웃 전에 유저별 lastPath 저장, 그리고 토큰, 유저 정보 삭제
   const handleLogout = () => {
-    // 🟡 2. 로그아웃 직전 마지막 경로 저장
-    if (pathname !== "/login") {
-      localStorage.setItem("lastPath", pathname);
+    if (user?.id && pathname && pathname !== "/login") {
+      localStorage.setItem(`lastPath_${user.id}`, pathname);
     }
 
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     router.push("/login"); // 로그인 페이지로 이동
   };
 
