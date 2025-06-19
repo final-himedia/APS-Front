@@ -20,14 +20,7 @@ export default function RootLayout({ children }) {
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userData ? JSON.parse(userData) : null;
 
-  // 🟡 1. 마지막 경로 저장 useEffect 추가
-  useEffect(() => {
-    if (pathname && pathname !== "/login") {
-      localStorage.setItem("lastPath", pathname);
-    }
-  }, [pathname]);
-
-  // 시간 갱신
+  // 현재 시간 업데이트
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -45,15 +38,19 @@ export default function RootLayout({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  // 로그아웃 핸들러
+  // 로그아웃 핸들러 수정: 관련 localStorage 전부 삭제
   const handleLogout = () => {
-    // 🟡 2. 로그아웃 직전 마지막 경로 저장
-    if (pathname !== "/login") {
-      localStorage.setItem("lastPath", pathname);
-    }
+    Object.keys(localStorage).forEach((key) => {
+      if (
+        key.startsWith("favorites_") ||
+        key === "user" ||
+        key === "token" ||
+        key === "lastPath"
+      ) {
+        localStorage.removeItem(key);
+      }
+    });
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     router.push("/login"); // 로그인 페이지로 이동
   };
 
