@@ -8,11 +8,13 @@ import {
   IconButton,
   Box,
   Divider,
+  Fab,
 } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import SidebarSearch from "./SidebarSearch";
 import { useState, useEffect } from "react";
 import useScenarioStore from "@/hooks/useScenarioStore";
+import AddIcon from "@mui/icons-material/Add";
 
 const scenarioIds = ["S010000", "S020000", "S030000"];
 
@@ -35,61 +37,54 @@ export default function ScenarioList({ onClose }) {
     <Box
       sx={{
         width: 240,
-        borderRight: "1px solid #ccc",
         height: "100vh",
+        borderRight: "1px solid #ccc",
         boxSizing: "border-box",
-        overflowY: "auto",
-        overflowX: "hidden",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      {/* 상단: 제목 + 검색 + 접기 버튼 */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 0,
-          height: 100,
-        }}
-      >
-        <Box sx={{ width: "100%" }}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 0.7,
-              pr: 2,
-            }}
-          >
-            <Typography variant="h6">시나리오 목록</Typography>
-            <IconButton onClick={onClose} size="small">
-              <ArrowForwardIosIcon
-                fontSize="small"
-                sx={{
-                  transform: "rotate(180deg)",
-                  transition: "transform 0.3s",
-                }}
-              />
-            </IconButton>
-          </Box>
+      <Box sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: 1,
+          }}
+        >
+          <Typography variant="h6">시나리오 목록</Typography>
+          <IconButton onClick={onClose} size="small">
+            <ArrowForwardIosIcon
+              fontSize="small"
+              sx={{ transform: "rotate(180deg)" }}
+            />
+          </IconButton>
+        </Box>
 
-          <SidebarSearch
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-          />
-          <Divider sx={{ width: 220, my: 1 }} />
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <SidebarSearch
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+            />
+          </Box>
+          <IconButton
+            size="small"
+            color="info"
+            onClick={() => alert("Fab 눌림")}
+          >
+            <AddIcon fontSize="small" />
+          </IconButton>
         </Box>
       </Box>
 
-      {/* 시나리오 목록 */}
+      <Divider />
+
       <List dense>
         {filteredScenarios.map((id) => (
-          <ListItemButton
-            key={id}
-            onClick={() => setSelectedScenarioId(id)}
-          >
-            <ListItemText primary={id} sx={{ pl: 0 }} />
+          <ListItemButton key={id} onClick={() => setSelectedScenarioId(id)}>
+            <ListItemText primary={id} />
           </ListItemButton>
         ))}
       </List>
