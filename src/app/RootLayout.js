@@ -20,6 +20,14 @@ export default function RootLayout({ children }) {
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userData ? JSON.parse(userData) : null;
 
+  // 🟡 1. 마지막 경로 저장 useEffect 추가
+  useEffect(() => {
+    if (pathname && pathname !== "/login") {
+      localStorage.setItem("lastPath", pathname);
+    }
+  }, [pathname]);
+
+  // 시간 갱신
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -39,6 +47,11 @@ export default function RootLayout({ children }) {
 
   // 로그아웃 핸들러
   const handleLogout = () => {
+    // 🟡 2. 로그아웃 직전 마지막 경로 저장
+    if (pathname !== "/login") {
+      localStorage.setItem("lastPath", pathname);
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login"); // 로그인 페이지로 이동
@@ -116,14 +129,14 @@ export default function RootLayout({ children }) {
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
               sx={{
-                color: "#555555", // 연한 진한 회색 텍스트
-                borderColor: "#cccccc", // 옅은 테두리
-                textTransform: "none", // 기본 대문자 변환 해제 (필요 시)
+                color: "#555555",
+                borderColor: "#cccccc",
+                textTransform: "none",
                 "&:hover": {
                   borderColor: "#999999",
-                  backgroundColor: "#f0f0f0", // 마우스 오버시 연한 회색 배경
+                  backgroundColor: "#f0f0f0",
                 },
-                minWidth: 80, // 버튼 크기 조절 (필요 시)
+                minWidth: 80,
               }}
             >
               로그아웃
