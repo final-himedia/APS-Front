@@ -18,10 +18,10 @@ import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
   { field: "id", headerName: "순번", flex: 1 },
-  { field: "toSiteId", headerName: "생산 사이트 코드", flex: 1 },
-  { field: "toPartId", headerName: "생산 제품 코드", width: 100 },
+  { field: "toSiteId", headerName: "생산 사이트 코드", width: 80 },
+  { field: "toPartId", headerName: "생산 제품 코드", width: 80 },
   { field: "operationId", headerName: "공정 코드", width: 80 },
-  { field: "bomCategory", headerName: "BOM 범주", width: 50 },
+  { field: "bomCategory", headerName: "BOM 범주", width: 70 },
   { field: "outQty", headerName: "생산 량", width: 60, type: "number" },
   { field: "outUom", headerName: "생산 량 단위", width: 70 },
   { field: "fromSiteId", headerName: "투입 사이트 코드", flex: 1 },
@@ -31,15 +31,19 @@ const columns = [
   { field: "createDatetime", headerName: "생성일자", width: 80 },
   { field: "effStartDate", headerName: "BOM 유효 시작일", flex: 1 },
   { field: "createBy", headerName: "생성자", width: 60 },
-  { field: "toPartName", headerName: "생산 제품명", width: 200 },
-  { field: "fromPartName", headerName: "투입 제품명", width: 200 },
+  { field: "toPartName", headerName: "생산 제품명", width: 80 },
+  { field: "fromPartName", headerName: "투입 제품명", width: 80 },
   { field: "zseq", headerName: "순서", flex: 1 },
-  { field: "scenarioId", headerName: "시나리오", width: 100 },
-  { field: "bomVersion", headerName: "BOM버전", width: 50 },
+  { field: "scenarioId", headerName: "시나리오", width: 70 },
+  { field: "bomVersion", headerName: "BOM버전", width: 70 },
 ];
 
 export default function BomView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -47,10 +51,22 @@ export default function BomView() {
     pageSize: 10,
   });
 
-  const fetchBomData = () => {
-    if (!scenarioId) return;
-    const url = `http://localhost:8080/api/scenarios/bop/bom/${scenarioId}`;
-    fetch(url)
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
+
+  const fetchData = (token, scenarioId) => {
+    if (!token || !scenarioId) return;
+    fetch(`http://localhost:8080/api/scenarios/bop/bom/${scenarioId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.boms || [];
@@ -72,7 +88,7 @@ export default function BomView() {
           toPartName: item.toPartName,
           fromPartName: item.fromPartName,
           zseq: item.bomId?.zseq ?? "",
-          scenarioId: item.bomId?.scenarioId,
+          scenarioId: item.bomId?.scenarioId ?? "",
           bomVersion: item.bomVersion,
         }));
         setRows(formatted);
@@ -81,22 +97,39 @@ export default function BomView() {
   };
 
   useEffect(() => {
-    fetchBomData();
-  }, [scenarioId]);
+    if (token && scenarioId) fetchData(token, scenarioId);
+  }, [token, scenarioId]);
 
   const handleDownload = () => {
-    window.open(
+    if (!token || !scenarioId) return;
+    fetch(
       `http://localhost:8080/api/scenarios/bop/bom-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "bom.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
   };
-
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
@@ -104,9 +137,12 @@ export default function BomView() {
     fetch("http://localhost:8080/api/scenarios/bop/bom-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) fetchBomData();
+        if (res.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(() => setOpen(false));
@@ -114,15 +150,19 @@ export default function BomView() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      {/* 상단 툴바 */}
       <Box sx={{ mt: 2 }}>
-        <Toolbar upload={handleOpenDialog} download={handleDownload} />
-        <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <Toolbar upload={() => setOpen(true)} download={handleDownload} />
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          fullWidth
+          maxWidth="sm"
+        >
           <DialogTitle
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
             BOM 파일 업로드
-            <IconButton onClick={handleCloseDialog}>
+            <IconButton onClick={() => setOpen(false)}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -152,12 +192,11 @@ export default function BomView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog}>취소</Button>
+            <Button onClick={() => setOpen(false)}>취소</Button>
           </DialogActions>
         </Dialog>
       </Box>
 
-      {/* ToolMaster 스타일 카드 박스 */}
       <Box
         sx={{
           border: "1px solid #e0e0e0",
@@ -175,20 +214,27 @@ export default function BomView() {
           BOM
         </Typography>
 
-        {/*내부에서만 가로 스크롤 허용 */}
-        <Box sx={{ flex: 1, overflowX: "auto", overflowY: "hidden" }}>
+        <Box sx={{ flex: 1, overflow: "auto" }}>
           <DataGrid
             rows={rows}
             columns={columns}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[5, 10, 20]}
+            pageSizeOptions={[5, 10, 20, 50]}
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
             sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
               border: 0,
-              minWidth: "1300px",
+              minWidth: "1400px",
             }}
           />
         </Box>

@@ -25,6 +25,7 @@ const columns = [
 
 export default function PlantMasterView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -32,9 +33,19 @@ export default function PlantMasterView() {
     pageSize: 10,
   });
 
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
   const fetchSiteData = () => {
-    const url = `http://localhost:8080/api/scenarios/bop/site/${scenarioId}`;
-    fetch(url)
+    if (!token || !scenarioId) return;
+
+    fetch(`http://localhost:8080/api/scenarios/bop/site/${scenarioId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.sites || [];
@@ -50,14 +61,36 @@ export default function PlantMasterView() {
   };
 
   useEffect(() => {
-    fetchSiteData();
-  }, [scenarioId]);
+    if (token && scenarioId) {
+      fetchSiteData();
+    }
+  }, [token, scenarioId]);
 
   const handleDownload = () => {
-    window.open(
+    if (!token || !scenarioId) return;
+
+    fetch(
       `http://localhost:8080/api/scenarios/bop/site-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "site.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 중 오류:", err));
   };
 
   const handleOpenDialog = () => setOpen(true);
@@ -65,14 +98,18 @@ export default function PlantMasterView() {
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
+
     const formData = new FormData();
     formData.append("file", file);
-    if (scenarioId) formData.append("scenarioId", scenarioId);
+    formData.append("scenarioId", scenarioId);
 
     fetch("http://localhost:8080/api/scenarios/bop/site-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((response) => {
         if (response.ok) fetchSiteData();
@@ -125,7 +162,6 @@ export default function PlantMasterView() {
         </Dialog>
       </Box>
 
-      {/* ToolMaster 스타일 Box */}
       <Box
         sx={{
           border: "1px solid #e0e0e0",
@@ -153,7 +189,21 @@ export default function PlantMasterView() {
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "800px" }}
+            sx={{
+              border: 0,
+              minWidth: "800px",
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-columnHeaderCheckbox": {
+                backgroundColor: "#f2e8e8",
+              },
+            }}
           />
         </Box>
       </Box>

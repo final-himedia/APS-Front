@@ -32,9 +32,9 @@ const columns = [
 
 export default function WorkCenter() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
-  const setScenarioId = useScenarioStore(
-    (state) => state.setSelectedScenarioId
-  );
+  const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
+
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -43,29 +43,22 @@ export default function WorkCenter() {
   });
 
   useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("scenarioId", scenarioId);
-    fetch("http://localhost:8080/api/scenarios/resource/workcenter-upload", {
-      method: "POST",
-      body: formData,
+    fetch(`http://localhost:8080/api/scenarios/resource/workcenter/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then((res) => {
-        if (res.ok) fetchData(scenarioId);
-        else console.error("업로드 실패");
-      })
-      .finally(() => setOpen(false));
-  };
-
-  const fetchData = (id) => {
-    fetch(`http://localhost:8080/api/scenarios/resource/workcenter/${id}`)
       .then((res) => res.json())
       .then((data) => {
         const list = data.workcenters || [];
@@ -88,17 +81,58 @@ export default function WorkCenter() {
   };
 
   useEffect(() => {
-    if (scenarioId) fetchData(scenarioId);
-  }, [scenarioId]);
+    if (scenarioId && token) {
+      fetchData(token, scenarioId);
+    }
+  }, [scenarioId, token]);
 
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !token || !scenarioId) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("scenarioId", scenarioId);
+
+    fetch("http://localhost:8080/api/scenarios/resource/workcenter-upload", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) fetchData(token, scenarioId);
+        else console.error("업로드 실패");
+      })
+      .finally(() => setOpen(false));
+  };
+
   const handleDownload = () => {
-    window.open(
-      `http://localhost:8080/api/scenarios/resource/workcenter-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+    if (!token || !scenarioId) return;
+
+    fetch(`http://localhost:8080/api/scenarios/resource/workcenter-download?scenarioId=${scenarioId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "workcenter.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
   };
 
   return (
@@ -107,9 +141,7 @@ export default function WorkCenter() {
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
 
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
+          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
             작업장 마스터 파일 업로드
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
@@ -175,7 +207,18 @@ export default function WorkCenter() {
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1100px" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              border: 0,
+              minWidth: "1100px",
+            }}
           />
         </Box>
       </Box>

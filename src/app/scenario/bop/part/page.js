@@ -22,28 +22,37 @@ const columns = [
   { field: "partId", headerName: "품목 코드", width: 80 },
   { field: "partType", headerName: "Part 유형", width: 80 },
   { field: "routingId", headerName: "Routing 코드", width: 100 },
-  { field: "partName", headerName: "품목명", flex :1 },
-  { field: "minBatchSize", headerName: "생산 배치 사이즈(최소)", flex :1 },
-  { field: "maxBatchSize", headerName: "생산 배치 사이즈(최대)", flex :1 },
+  { field: "partName", headerName: "품목명", flex: 1 },
+  { field: "minBatchSize", headerName: "생산 배치 사이즈(최소)", flex: 1 },
+  { field: "maxBatchSize", headerName: "생산 배치 사이즈(최대)", flex: 1 },
   { field: "uom", headerName: "단위", width: 40 },
   { field: "scenarioId", headerName: "시나리오", width: 80 },
 ];
 
 export default function PartMasterView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
   useEffect(() => {
-    if (scenarioId) fetchPartData(scenarioId);
-  }, [scenarioId]);
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
 
-  const fetchPartData = (id) => {
-    fetch(`http://localhost:8080/api/scenarios/bop/part/${id}`)
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
+
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
+    fetch(`http://localhost:8080/api/scenarios/bop/part/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.parts || [];
@@ -64,38 +73,60 @@ export default function PartMasterView() {
       .catch((err) => console.error("자재 마스터 데이터 실패:", err));
   };
 
+  useEffect(() => {
+    if (token && scenarioId) fetchData(token, scenarioId);
+  }, [token, scenarioId]);
+
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
     fetch("http://localhost:8080/api/scenarios/bop/part-upload", {
-      method: "post",
+      method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((response) => {
-        if (response.ok) fetchPartData(scenarioId);
+        if (response.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(() => setOpen(false));
   };
 
   const handleDownloadExcel = () => {
-    console.log("📦 다운로드 요청 시나리오 ID:", scenarioId);
-    window.open(
-      `http://localhost:8080/api/scenarios/bop/part-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+    if (!token || !scenarioId) return;
+    fetch(`http://localhost:8080/api/scenarios/bop/part-download?scenarioId=${scenarioId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "part-master.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
   };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      {/* 상단 툴바 */}
       <Box sx={{ mt: 2 }}>
         <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
@@ -136,7 +167,6 @@ export default function PartMasterView() {
         </Dialog>
       </Box>
 
-      {/* 카드형 테이블 박스 */}
       <Box
         sx={{
           border: "1px solid #e0e0e0",
@@ -160,11 +190,22 @@ export default function PartMasterView() {
             columns={columns}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[5, 10, 20]}
+            pageSizeOptions={[5, 10, 20, 50]}
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1000px" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              border: 0,
+              minWidth: "1100px",
+            }}
           />
         </Box>
       </Box>
