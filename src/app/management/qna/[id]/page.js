@@ -221,7 +221,7 @@ export default function QnaDetailPage() {
           {post.title}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          작성자: {post.writerId} | 작성일: {post.wroteAt?.slice(0, 10)}
+          작성자: {post.name} | 작성일: {post.wroteAt?.slice(0, 10)}
         </Typography>
         <Typography variant="body1" sx={{ whiteSpace: "pre-line", mt: 2 }}>
           {post.content}
