@@ -78,7 +78,7 @@ export default function RootLayout({ children }) {
         <div
           style={{
             height: 45,
-            backgroundColor: "#fff",
+            backgroundColor: "#939393",
             borderBottom: "1px solid #ccc",
             display: "flex",
             alignItems: "center",

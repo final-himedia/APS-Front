@@ -21,9 +21,11 @@ export default function SidebarSearch({ searchTerm, onSearchChange }) {
       }}
       sx={{
         height: 32,
-        width: 220,
+        width: 210,
         "& .MuiInputBase-root": {
           height: 32,
+          backgroundColor: "#f5f5f5",
+          
         },
       }}
     />

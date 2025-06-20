@@ -54,7 +54,7 @@ export default function ScenarioLayout({ children }) {
         <Box
           sx={{
             flex: 1,
-            overflowX: "auto", //내부 가로 스크롤
+            overflowX: "auto",
             overflowY: "hidden",
             pb: 1,
           }}

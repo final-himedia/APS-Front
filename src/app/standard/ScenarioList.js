@@ -22,7 +22,7 @@ export default function ScenarioList({ onClose }) {
   );
   const selectedScenarioId = useScenarioStore(
     (state) => state.selectedScenarioId
-  ); // ✅ 현재 선택된 시나리오 추적
+  ); // 현재 선택된 시나리오 추적
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -46,6 +46,7 @@ export default function ScenarioList({ onClose }) {
         backgroundColor: "#f2e8e8",
         pl: 2,
         pr: 1,
+  
       }}
     >
       {/* 상단: 제목 + 검색 + 접기 버튼 */}
@@ -65,7 +66,7 @@ export default function ScenarioList({ onClose }) {
               justifyContent: "space-between",
               alignItems: "center",
               mb: 0.7,
-              pr: 2,
+              
             }}
           >
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -86,7 +87,7 @@ export default function ScenarioList({ onClose }) {
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
           />
-          <Divider sx={{ width: 220, my: 1 }} />
+          <Divider sx={{ width: 220, my: 1,}} />
         </Box>
       </Box>
 

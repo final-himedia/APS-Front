@@ -99,7 +99,7 @@ export default function LoginPage() {
           size="small"
           InputProps={{
             sx: {
-              fontSize: "14px", 
+              fontSize: "14px",
               padding: "6px 10px",
             },
           }}
@@ -114,8 +114,8 @@ export default function LoginPage() {
           size="small"
           InputProps={{
             sx: {
-              fontSize: "14px", 
-              padding: "6px 10px", 
+              fontSize: "14px",
+              padding: "6px 10px",
             },
           }}
         />
@@ -185,10 +185,64 @@ export default function LoginPage() {
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle>비밀번호 찾기</DialogTitle>
-        <DialogContent>
-          <TextField fullWidth label="가입한 이메일" margin="normal" />
-          <Button variant="contained" fullWidth sx={{ mt: 2 }}>
+        <DialogContent
+          sx={{
+            pt: 8, // ← 상단 여백 넉넉하게
+            pb: 3,
+            position: "relative",
+            textAlign: "center",
+          }}
+        >
+          {/* 로고 이미지 */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: "10px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 160,
+              height: "auto",
+            }}
+          >
+            <img
+              src="/logo/main-logo.png"
+              alt="로고"
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+              }}
+            />
+          </Box>
+
+          {/* 설명 문구 */}
+          <Typography variant="body1" sx={{ mb: 2, mt: 1, fontWeight: "bold" }}>
+            비밀번호를 찾을 이메일을 입력해주세요.
+          </Typography>
+
+          {/* 이메일 입력 필드 */}
+          <TextField
+            fullWidth
+            placeholder="가입한 이메일"
+            variant="outlined"
+            margin="normal"
+            size="small"
+          />
+
+          {/* 전송 버튼 */}
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: "#d50000",
+              "&:hover": {
+                backgroundColor: "#b71c1c",
+              },
+              color: "#fff",
+              borderRadius: "8px",
+            }}
+          >
             비밀번호 재설정 링크 보내기
           </Button>
         </DialogContent>

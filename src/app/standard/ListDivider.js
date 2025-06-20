@@ -145,7 +145,7 @@ export default function ListDivider({ onClose }) {
     <Box
       sx={{
         width: 240,
-        maxWidth: 240,
+        maxWidth: 250,
         overflowX: "hidden",
         boxSizing: "border-box",
         backgroundColor: "#fff",
@@ -153,7 +153,8 @@ export default function ListDivider({ onClose }) {
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
-        px: 1.5,
+        px: 1,
+        pl: 2,
       }}
     >
       {/* 헤더, 검색창 등 기존 UI 동일 */}
@@ -174,7 +175,7 @@ export default function ListDivider({ onClose }) {
             style={{ height: 40, cursor: "pointer" }}
           />
         </Link>
-        <IconButton onClick={onClose} sx={{ mr: "-10px" }}>
+        <IconButton onClick={onClose} sx={{ mr: "-8px" }}>
           <KeyboardBackspaceIcon />
         </IconButton>
       </Box>
