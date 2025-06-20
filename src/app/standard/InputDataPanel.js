@@ -123,7 +123,7 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
             />
           </Box>
 
-          {/* 목록 */}
+          {/* 목록.*/}
           <Accordion
             disableGutters
             elevation={0}

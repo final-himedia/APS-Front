@@ -20,6 +20,15 @@ export default function RootLayout({ children }) {
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userData ? JSON.parse(userData) : null;
 
+  // 1. 현재 경로가 로그인 페이지가 아니면 유저별 lastPath 저장
+  useEffect(() => {
+    if (user?.id && pathname && pathname !== "/login") {
+      localStorage.setItem(`lastPath_${user.id}`, pathname);
+    }
+  }, [pathname, user]);
+
+  // 시간 갱신
+
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -37,10 +46,15 @@ export default function RootLayout({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  // 로그아웃 핸들러
+  // 로그아웃 핸들러 - 로그아웃 전에 유저별 lastPath 저장, 그리고 토큰, 유저 정보 삭제
   const handleLogout = () => {
+    if (user?.id && pathname && pathname !== "/login") {
+      localStorage.setItem(`lastPath_${user.id}`, pathname);
+    }
+
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     router.push("/login"); // 로그인 페이지로 이동
   };
 
@@ -103,11 +117,9 @@ export default function RootLayout({ children }) {
           >
             <div style={{ textAlign: "right" }}>
               <Typography variant="body2" fontWeight="bold">
-                {user?.name || "익명 사용자"}
+                {user?.name}
               </Typography>
-              <Typography variant="caption">
-                {user?.email || "이메일 없음"}
-              </Typography>
+              <Typography variant="caption">{user?.email}</Typography>
             </div>
             <Typography variant="caption">{currentTime}</Typography>
             <Button
@@ -116,14 +128,14 @@ export default function RootLayout({ children }) {
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
               sx={{
-                color: "#555555", // 연한 진한 회색 텍스트
-                borderColor: "#cccccc", // 옅은 테두리
-                textTransform: "none", // 기본 대문자 변환 해제 (필요 시)
+                color: "#555555",
+                borderColor: "#cccccc",
+                textTransform: "none",
                 "&:hover": {
                   borderColor: "#999999",
-                  backgroundColor: "#f0f0f0", // 마우스 오버시 연한 회색 배경
+                  backgroundColor: "#f0f0f0",
                 },
-                minWidth: 80, // 버튼 크기 조절 (필요 시)
+                minWidth: 80,
               }}
             >
               로그아웃
