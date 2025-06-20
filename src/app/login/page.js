@@ -79,7 +79,7 @@ export default function LoginPage() {
         setError(result?.message || "로그인 실패");
       }
     } catch (err) {
-      setError("서버 에러");
+      setError("비밀번호를 정확히 입력해 주세요");
     }
   };
 
@@ -156,7 +156,6 @@ export default function LoginPage() {
           }}
         />
 
-
         <FormControlLabel
           control={
             <Checkbox
@@ -197,7 +196,6 @@ export default function LoginPage() {
             px: 0.5,
           }}
         >
-
           <Link
             href="#"
             underline="hover"
@@ -223,7 +221,6 @@ export default function LoginPage() {
         open={openRegister}
         onClose={() => setOpenRegister(false)}
       />
-
 
       {/* 비밀번호 찾기 다이얼로그 */}
 

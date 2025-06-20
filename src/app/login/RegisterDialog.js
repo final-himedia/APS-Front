@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,22 @@ export default function RegisterDialog({ open, onClose }) {
   const [error, setError] = useState("");
 
   const handleRegister = async () => {
+    // ✅ 프론트 유효성 검사
+    if (!email || !name || !password || !confirm) {
+      setError("모든 항목을 입력해주세요.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setError("올바른 이메일 형식이 아닙니다.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("비밀번호는 최소 6자 이상이어야 합니다.");
+      return;
+    }
+
     if (password !== confirm) {
       setError("비밀번호가 일치하지 않습니다.");
       return;
@@ -70,18 +88,17 @@ export default function RegisterDialog({ open, onClose }) {
         }}
       >
         {/* 상단 로고 */}
-        <Box sx={{ textAlign: "left", mb: 3 , ml: -1}}>
+        <Box sx={{ textAlign: "left", mb: 3, ml: -1 }}>
           <img
             src="/logo/main-logo.png"
             alt="MAIDAY 로고"
-            style={{ height: "50px" }} // ← 로고 크기 키움
+            style={{ height: "50px" }}
           />
         </Box>
 
         {/* 입력 필드들 */}
         <TextField
           fullWidth
-          
           placeholder="이메일주소"
           margin="dense"
           value={email}
@@ -97,7 +114,6 @@ export default function RegisterDialog({ open, onClose }) {
 
         <TextField
           fullWidth
-          
           placeholder="이름"
           margin="dense"
           value={name}
@@ -113,7 +129,6 @@ export default function RegisterDialog({ open, onClose }) {
 
         <TextField
           fullWidth
-          
           placeholder="비밀번호"
           type="password"
           margin="dense"
@@ -130,7 +145,6 @@ export default function RegisterDialog({ open, onClose }) {
 
         <TextField
           fullWidth
-          
           placeholder="비밀번호 확인"
           type="password"
           margin="dense"
@@ -157,11 +171,11 @@ export default function RegisterDialog({ open, onClose }) {
             width: 190,
             position: "absolute",
             right: 12,
-            bottom: 49, // 캐릭터는 버튼 위로 살짝 떠 있게
+            bottom: 49,
           }}
         />
 
-        {/* 가입 버튼 (가장 아래로) */}
+        {/* 가입 버튼 */}
         <Box sx={{ mt: "auto" }}>
           <Button
             variant="contained"
