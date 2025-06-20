@@ -85,10 +85,12 @@ export default function OperationRoutingView() {
     fetch("http://localhost:8080/api/scenarios/bop/operation-routing-upload", {
       method: "POST",
       body: formData,
-    }).then((res) => {
-      if (res.ok) fetchData();
-      else console.error("업로드 실패");
-    }).finally(() => setOpen(false));
+    })
+      .then((res) => {
+        if (res.ok) fetchData();
+        else console.error("업로드 실패");
+      })
+      .finally(() => setOpen(false));
   };
 
   return (
@@ -96,7 +98,9 @@ export default function OperationRoutingView() {
       <Box sx={{ mt: 2 }}>
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             공정 순서 파일 업로드
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
