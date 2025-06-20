@@ -32,6 +32,7 @@ export default function ToolMap() {
     (state) => state.setSelectedScenarioId
   );
 
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -40,11 +41,20 @@ export default function ToolMap() {
   });
 
   useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const fetchData = (id) => {
-    fetch(`http://localhost:8080/api/scenarios/resource/tool-map/${id}`)
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
+
+    fetch(`http://localhost:8080/api/scenarios/resource/tool-map/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.toolMasters || [];
@@ -63,36 +73,61 @@ export default function ToolMap() {
   };
 
   useEffect(() => {
-    if (scenarioId) fetchData(scenarioId);
-  }, [scenarioId]);
+    if (scenarioId && token) {
+      fetchData(token, scenarioId);
+    }
+  }, [scenarioId, token]);
 
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
 
     const formData = new FormData();
     formData.append("file", file);
-    if (scenarioId) formData.append("scenarioId", scenarioId);
+    formData.append("scenarioId", scenarioId);
 
     fetch("http://localhost:8080/api/scenarios/resource/toolmap-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) fetchData(scenarioId);
+        if (res.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(() => handleCloseDialog());
   };
 
   const handleDownload = () => {
-    window.open(
+    if (!token || !scenarioId) return;
+
+    fetch(
       `http://localhost:8080/api/scenarios/resource/toolmap-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "toolmap.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 중 오류:", err));
   };
 
   return (
@@ -170,6 +205,14 @@ export default function ToolMap() {
             autoHeight={false}
             rowHeight={38}
             sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
               border: 0,
               minWidth: "1000px",
             }}

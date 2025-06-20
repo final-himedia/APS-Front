@@ -51,9 +51,7 @@ export default function Demand() {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    if (storedToken) setToken(storedToken);
   }, []);
 
   useEffect(() => {
@@ -61,11 +59,9 @@ export default function Demand() {
   }, [scenarioId, setScenarioId]);
 
   const fetchData = (token, id) => {
-    if (!token) return;
+    if (!token || !id) return;
 
-    const url = `http://localhost:8080/api/scenarios/target/demand/${id}`;
-    fetch(url, {
-      method: "GET",
+    fetch(`http://localhost:8080/api/scenarios/target/demand/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -91,7 +87,6 @@ export default function Demand() {
           headerCreationDate: item.headerCreationDate || "",
           hasOverActQty: item.hasOverActQty || "",
         }));
-
         setRows(formatted);
       })
       .catch((err) => console.error("fetchData 오류:", err));
@@ -106,12 +101,10 @@ export default function Demand() {
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
-  // 파일 업로드 요청
-  const fetchDemandData = (token, id) => {
+  const fetchDemandData = (formData) => {
     if (!token) return;
 
-    const url = "http://localhost:8080/api/scenarios/target/demand-upload";
-    fetch(url, {
+    fetch("http://localhost:8080/api/scenarios/target/demand-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -119,11 +112,8 @@ export default function Demand() {
       },
     })
       .then((res) => {
-        if (res.ok) {
-          fetchData(scenarioId);
-        } else {
-          console.error("업로드 실패");
-        }
+        if (res.ok) fetchData(token, scenarioId);
+        else console.error("업로드 실패");
       })
       .finally(() => handleCloseDialog());
   };
@@ -134,18 +124,36 @@ export default function Demand() {
 
     const formData = new FormData();
     formData.append("file", file);
-    if (scenarioId) {
-      formData.append("scenarioId", scenarioId);
-    }
+    formData.append("scenarioId", scenarioId);
 
     fetchDemandData(formData);
   };
 
   const handleDownload = () => {
-    window.open(
+    if (!token || !scenarioId) return;
+
+    fetch(
       `http://localhost:8080/api/scenarios/target/demand-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "demand.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 중 오류:", err));
   };
 
   return (
@@ -223,18 +231,14 @@ export default function Demand() {
             autoHeight={false}
             rowHeight={38}
             sx={{
-              // 헤더 전체 행 배경(임시)
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f2e8e8",
               },
-
-              // 각 헤더 셀에 배경, 텍스트색 적용
               "& .MuiDataGrid-columnHeader": {
                 backgroundColor: "#f2e8e8",
-                color: "#000", // 글자 색
-                fontWeight: "bold", // 글자 두껍게
+                color: "#000",
+                fontWeight: "bold",
               },
-
               border: 0,
               minWidth: "1200px",
             }}
