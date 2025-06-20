@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-
 import {
   Box,
   IconButton,
@@ -15,7 +14,6 @@ import {
   TextField,
   InputAdornment,
 } from "@mui/material";
-
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ScienceIcon from "@mui/icons-material/Science";
@@ -36,7 +34,6 @@ export default function ListDivider({ onClose }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useState(null);
 
-  // user 정보 불러오기 (로컬스토리지에서)
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -44,7 +41,6 @@ export default function ListDivider({ onClose }) {
     }
   }, []);
 
-  // user가 변경될 때마다 해당 user id 기반으로 즐겨찾기 불러오기
   useEffect(() => {
     if (user && user.id) {
       const stored = localStorage.getItem(`favorites_${user.id}`);
@@ -56,14 +52,13 @@ export default function ListDivider({ onClose }) {
           setFavorites([]);
         }
       } else {
-        setFavorites([]); // 해당 사용자의 즐겨찾기 없으면 빈 배열 초기화
+        setFavorites([]);
       }
     } else {
-      setFavorites([]); // user 없으면 빈 배열
+      setFavorites([]);
     }
   }, [user]);
 
-  // favorites가 변경될 때 user id 기반으로 저장
   useEffect(() => {
     if (user && user.id) {
       localStorage.setItem(`favorites_${user.id}`, JSON.stringify(favorites));
@@ -81,18 +76,17 @@ export default function ListDivider({ onClose }) {
 
   const matchesSearch = (label) =>
     label.toLowerCase().includes(searchTerm.toLowerCase());
+
   const renderMenuItem = (label, href) => {
     if (searchTerm && !matchesSearch(label)) return null;
+    const isFavorite = favorites.some((item) => item.label === label);
 
     return (
       <ListItemButton
         component={Link}
         href={href}
         key={label}
-        sx={{
-          pl: 4,
-          py: 0.5,
-        }}
+        sx={{ pl: 4, py: 0.5 }}
       >
         <ListItemText
           primary={label}
@@ -102,7 +96,6 @@ export default function ListDivider({ onClose }) {
             color: "grey.800",
           }}
         />
-        {/* 즐겨찾기 토글 버튼 */}
         <IconButton
           size="small"
           onClick={(e) => {
@@ -112,10 +105,12 @@ export default function ListDivider({ onClose }) {
           }}
           sx={{ opacity: 0.4, "&:hover": { opacity: 1 } }}
         >
-          <StarIcon fontSize="small" />
+          {isFavorite ? (
+            <StarIcon fontSize="small" sx={{ color: "#dd0000" }} />
+          ) : (
+            <StarBorderIcon fontSize="small" sx={{ color: "#B0B0B0" }} />
+          )}
         </IconButton>
-
-        {/* 새창 열기 버튼 */}
         <IconButton
           size="small"
           onClick={(e) => {
@@ -132,7 +127,6 @@ export default function ListDivider({ onClose }) {
     );
   };
 
-  // 메뉴 항목들 (생략 - 기존과 동일)
   const engineMenuItems = [
     { label: "시나리오 관리", href: "/scenario" },
     { label: "실행 관리", href: "/run" },
@@ -161,8 +155,6 @@ export default function ListDivider({ onClose }) {
       sx={{
         width: 240,
         maxWidth: 240,
-        overflowX: "hidden",
-        boxSizing: "border-box",
         backgroundColor: "#fff",
         height: "100vh",
         overflowY: "auto",
@@ -171,8 +163,6 @@ export default function ListDivider({ onClose }) {
         px: 1.5,
       }}
     >
-      {/* 헤더, 검색창 등 기존 UI 동일 */}
-
       <Box
         sx={{
           display: "flex",
@@ -195,6 +185,7 @@ export default function ListDivider({ onClose }) {
       </Box>
 
       <Divider sx={{ width: "100%", my: 1 }} />
+
       <TextField
         placeholder="검색"
         variant="outlined"
@@ -209,12 +200,9 @@ export default function ListDivider({ onClose }) {
             </InputAdornment>
           ),
         }}
-        sx={{
-          height: 32,
-          width: 220,
-          "& .MuiInputBase-root": { height: 32 },
-        }}
+        sx={{ height: 32, width: 220, "& .MuiInputBase-root": { height: 32 } }}
       />
+
       <Divider sx={{ width: "100%", my: 1 }} />
 
       <List>
