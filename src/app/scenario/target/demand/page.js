@@ -41,6 +41,7 @@ export default function Demand() {
     (state) => state.setSelectedScenarioId
   );
 
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -49,12 +50,26 @@ export default function Demand() {
   });
 
   useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  useEffect(() => {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const fetchData = (id) => {
+  const fetchData = (token, id) => {
+    if (!token) return;
+
     const url = `http://localhost:8080/api/scenarios/target/demand/${id}`;
-    fetch(url)
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.demands || [];
@@ -83,23 +98,25 @@ export default function Demand() {
   };
 
   useEffect(() => {
-    if (scenarioId) fetchData(scenarioId);
-  }, [scenarioId]);
+    if (scenarioId && token) {
+      fetchData(token, scenarioId);
+    }
+  }, [token, scenarioId]);
 
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // 파일 업로드 요청
+  const fetchDemandData = (token, id) => {
+    if (!token) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
-    if (scenarioId) formData.append("scenarioId", scenarioId);
-
-    fetch("http://localhost:8080/api/scenarios/target/demand-upload", {
+    const url = "http://localhost:8080/api/scenarios/target/demand-upload";
+    fetch(url, {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
         if (res.ok) {
@@ -109,6 +126,19 @@ export default function Demand() {
         }
       })
       .finally(() => handleCloseDialog());
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    if (scenarioId) {
+      formData.append("scenarioId", scenarioId);
+    }
+
+    fetchDemandData(formData);
   };
 
   const handleDownload = () => {
