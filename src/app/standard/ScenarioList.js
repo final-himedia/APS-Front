@@ -70,14 +70,13 @@ export default function ScenarioList({ onClose }) {
       sx={{
         width: 240,
         height: "100vh",
-        borderRight: "1px solid #ccc",
         boxSizing: "border-box",
-
         overflowY: "auto",
         overflowX: "hidden",
         backgroundColor: "#f2e8e8",
         pl: 2,
         pr: 1,
+        pt: 1,
       }}
     >
       {/* 상단: 제목 + 검색 + 접기 버튼 */}
@@ -102,7 +101,7 @@ export default function ScenarioList({ onClose }) {
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               시나리오 목록
             </Typography>
-            <IconButton onClick={onClose} size="small" sx={{ mr: -1 }}>
+            <IconButton onClick={onClose} size="small" sx={{ mr: 1 }}>
               <ArrowForwardIosIcon
                 fontSize="small"
                 sx={{
@@ -113,15 +112,35 @@ export default function ScenarioList({ onClose }) {
             </IconButton>
           </Box>
           <Divider sx={{ width: 210, my: 1 }} />
-          <SidebarSearch
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-          />
+
+          {/* 검색창 + FAB 버튼 */}
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center", mb: 1 }}>
+            <Box sx={{ flexGrow: 1, maxWidth: "175px"  }}>
+              <SidebarSearch
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+              />
+            </Box>
+            <IconButton
+              size="small"
+              onClick={() => alert("Fab 눌림")}
+              sx={{
+                color: "#6f6a6a",
+                mr: 0, 
+                borderRadius: 1,
+                width: 32,
+                height: 32,
+              }}
+            >
+              <AddIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          <Divider sx={{ width: 210, my: 1 }} />
         </Box>
       </Box>
 
-      <Divider sx={{ width: 210 }} />
-
+      {/* 시나리오 리스트 */}
       <List dense>
         {filteredScenarios.map((scenario) => (
           <ListItemButton

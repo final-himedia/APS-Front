@@ -74,7 +74,7 @@ export default function RegisterDialog({ open, onClose }) {
           <img
             src="/logo/main-logo.png"
             alt="MAIDAY 로고"
-            style={{ height: "50px" }} // ← 로고 크기 키움
+            style={{ height: "50px" }} 
           />
         </Box>
 

@@ -20,19 +20,23 @@ const columns = [
   { field: "id", headerName: "순번", width: 50 },
   { field: "siteId", headerName: "플랜트", width: 60 },
   { field: "operationId", headerName: "공정 코드", width: 80 },
-  { field: "operationName", headerName: "공정 명", flex :1 },
-  { field: "runTime", headerName: "공정 실행 시간", flex :1 },
+  { field: "operationName", headerName: "공정 명", flex: 1 },
+  { field: "runTime", headerName: "공정 실행 시간", flex: 1 },
   { field: "yield", headerName: "공정 수율", width: 80 },
-  { field: "runTimeUom", headerName: "실행 시간 단위", flex :1 },
+  { field: "runTimeUom", headerName: "실행 시간 단위", flex: 1 },
   { field: "operationType", headerName: "공정 유형", width: 80 },
-  { field: "waitTimeUom", headerName: "대기시간 단위", flex :1 },
-  { field: "transferTimeUom", headerName: "이동시간 단위", flex :1 },
+  { field: "waitTimeUom", headerName: "대기시간 단위", flex: 1 },
+  { field: "transferTimeUom", headerName: "이동시간 단위", flex: 1 },
   { field: "scenarioId", headerName: "시나리오", width: 80 },
-  { field: "sourcingType", headerName: "sourcingType", flex :1 },
+  { field: "sourcingType", headerName: "sourcingType", flex: 1 },
 ];
 
 export default function OperationMasterView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -41,11 +45,22 @@ export default function OperationMasterView() {
   });
 
   useEffect(() => {
-    if (scenarioId) fetchOperationData(scenarioId);
-  }, [scenarioId]);
+    const storedToken = localStorage.getItem("token");
+    console.log("토큰:", storedToken);
+    if (storedToken) setToken(storedToken);
+  }, []);
 
-  const fetchOperationData = (id) => {
-    fetch(`http://localhost:8080/api/scenarios/bop/operation/${id}`)
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
+
+  const fetchOperationData = (token, id) => {
+    if (!token || !id) return;
+    fetch(`http://localhost:8080/api/scenarios/bop/operation/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.operations || [];
@@ -68,12 +83,16 @@ export default function OperationMasterView() {
       .catch((err) => console.error("공정 데이터 가져오기 실패:", err));
   };
 
+  useEffect(() => {
+    if (scenarioId && token) fetchOperationData(token, scenarioId);
+  }, [scenarioId, token]);
+
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
     const formData = new FormData();
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
@@ -81,20 +100,41 @@ export default function OperationMasterView() {
     fetch("http://localhost:8080/api/scenarios/bop/operation-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) fetchOperationData(scenarioId);
+        if (res.ok) fetchOperationData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(() => setOpen(false));
   };
 
   const handleDownloadExcel = () => {
-    console.log("📦 다운로드 요청 시나리오 ID:", scenarioId);
-    window.open(
+    if (!token || !scenarioId) return;
+    fetch(
       `http://localhost:8080/api/scenarios/bop/operation-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "operation-master.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
   };
 
   return (
@@ -157,7 +197,6 @@ export default function OperationMasterView() {
         <Typography variant="h6" gutterBottom>
           공정 마스터
         </Typography>
-
         <Box sx={{ flex: 1, overflow: "auto" }}>
           <DataGrid
             rows={rows}
@@ -168,7 +207,18 @@ export default function OperationMasterView() {
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1000px" }}
+            sx={{
+              border: 0,
+              minWidth: "1000px",
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+            }}
           />
         </Box>
       </Box>

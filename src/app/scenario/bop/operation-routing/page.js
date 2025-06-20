@@ -31,6 +31,8 @@ const columns = [
 
 export default function OperationRoutingView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -38,21 +40,23 @@ export default function OperationRoutingView() {
     pageSize: 10,
   });
 
-  const handleDownload = () => {
-    window.open(
-      `http://localhost:8080/api/scenarios/bop/operation-routing-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
-  };
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    console.log("토큰:", storedToken);
+    if (storedToken) setToken(storedToken);
+  }, []);
 
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
 
-  const fetchData = () => {
-    if (!scenarioId) return;
-    fetch(
-      `http://localhost:8080/api/scenarios/bop/operationRouting/${scenarioId}`
-    )
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
+    fetch(`http://localhost:8080/api/scenarios/bop/operationRouting/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.operationRoutings || [];
@@ -69,38 +73,71 @@ export default function OperationRoutingView() {
           updateDatetime: item.updateDatetime,
         }));
         setRows(formatted);
-      });
+      })
+      .catch((err) => console.error("fetchData 오류:", err));
   };
 
   useEffect(() => {
-    fetchData();
-  }, [scenarioId]);
+    if (scenarioId && token) {
+      fetchData(token, scenarioId);
+    }
+  }, [scenarioId, token]);
+
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
     const formData = new FormData();
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
+
     fetch("http://localhost:8080/api/scenarios/bop/operation-routing-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) fetchData();
+        if (res.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
       })
-      .finally(() => setOpen(false));
+      .finally(() => handleCloseDialog());
+  };
+
+  const handleDownload = () => {
+    if (!token || !scenarioId) return;
+
+    fetch(`http://localhost:8080/api/scenarios/bop/operation-routing-download?scenarioId=${scenarioId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "operation-routing.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 중 오류:", err));
   };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ mt: 2 }}>
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
+
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
+          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
             공정 순서 파일 업로드
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
@@ -164,7 +201,18 @@ export default function OperationRoutingView() {
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1000px" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              border: 0,
+              minWidth: "1100px",
+            }}
           />
         </Box>
       </Box>
