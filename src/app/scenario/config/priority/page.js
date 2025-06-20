@@ -12,8 +12,8 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import Toolbar from "@/app/standard/Toolbar";
 import CloseIcon from "@mui/icons-material/Close";
+import Toolbar from "@/app/standard/Toolbar";
 import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
@@ -37,15 +37,26 @@ export default function PriorityView() {
   const setScenarioId = useScenarioStore(
     (state) => state.setSelectedScenarioId
   );
+
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
 
   useEffect(() => {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const fetchData = (id) => {
-    fetch(`http://localhost:8080/api/scenarios/config/priority/${id}`)
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
+
+    fetch(`http://localhost:8080/api/scenarios/config/priority/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.prioritys || [];
@@ -68,22 +79,15 @@ export default function PriorityView() {
   };
 
   useEffect(() => {
-    if (scenarioId) fetchData(scenarioId);
-  }, [scenarioId]);
-
-  const handleDownload = () => {
-    window.open(
-      `http://localhost:8080/api/scenarios/config/priority-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
-  };
+    if (scenarioId && token) fetchData(token, scenarioId);
+  }, [scenarioId, token]);
 
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -92,12 +96,42 @@ export default function PriorityView() {
     fetch("http://localhost:8080/api/scenarios/config/priority-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) fetchData(scenarioId);
+        if (res.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(handleCloseDialog);
+  };
+
+  const handleDownload = () => {
+    if (!token || !scenarioId) return;
+
+    fetch(
+      `http://localhost:8080/api/scenarios/config/priority-download?scenarioId=${scenarioId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "priority.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
   };
 
   return (
@@ -147,7 +181,6 @@ export default function PriorityView() {
         </Dialog>
       </Box>
 
-      {/* ✅ ToolMaster 스타일 카드 적용 영역 */}
       <Box
         sx={{
           border: "1px solid #e0e0e0",
@@ -172,8 +205,19 @@ export default function PriorityView() {
             checkboxSelection
             rowHeight={38}
             autoHeight={false}
-            pageSizeOptions={[5, 10, 20]}
-            sx={{ border: 0, minWidth: "1000px" }}
+            pageSizeOptions={[5, 10, 20, 50]}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              border: 0,
+              minWidth: "1000px",
+            }}
           />
         </Box>
       </Box>

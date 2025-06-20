@@ -12,48 +12,34 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import Toolbar from "@/app/standard/Toolbar";
+import CloseIcon from "@mui/icons-material/Close";
 import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
-  { field: "id", headerName: "순번", width: 20 },
-  { field: "demandId", headerName: "판매오더번호", width: 90 },
-  { field: "siteId", headerName: "플랜트", width: 60 },
-  { field: "partId", headerName: "품목코드", width: 70 },
-  { field: "partName", headerName: "품목명", flex: 1 },
-  { field: "customerId", headerName: "고객사", flex: 1 },
-  { field: "dueDate", headerName: "납기일", flex: 1 },
-  { field: "demandQty", headerName: "주문수량", width: 70 },
-  { field: "priority", headerName: "우선순위", width: 70 },
-  { field: "uom", headerName: "단위", width: 20 },
-  { field: "orderType", headerName: "주문유형", width: 70 },
-  { field: "orderTypeName", headerName: "주문유형내역", width: 90 },
-  { field: "exceptYn", headerName: "제외주문", width: 70 },
-  { field: "headerCreationDate", headerName: "오더생성일", width: 90 },
-  { field: "hasOverActQty", headerName: "초과실적보유주문FLAG", flex: 1 },
-  { field: "scenarioId", headerName: "시나리오", width: 70 },
+  { field: "id", headerName: "순번", width: 80 },
+  { field: "siteId", headerName: "플랜트", flex: 1 },
+  { field: "routingId", headerName: "ROUTING 코드", flex: 1 },
+  { field: "operationId", headerName: "공정 코드", flex: 1 },
+  { field: "operationName", headerName: "공정명", flex: 1 },
+  { field: "operationSeq", headerName: "공정 순서", width: 120 },
+  { field: "operationType", headerName: "공정 유형", flex: 1 },
+  { field: "createDatetime", headerName: "생성일자", flex: 1 },
+  { field: "updateDatetime", headerName: "수정일자", flex: 1 },
+  { field: "scenarioId", headerName: "시나리오", flex: 1 },
 ];
 
-export default function Demand() {
+export default function OperationRoutingView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
-  const setScenarioId = useScenarioStore(
-    (state) => state.setSelectedScenarioId
-  );
-
+  const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
   const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  });
+  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    if (storedToken) setToken(storedToken);
   }, []);
 
   useEffect(() => {
@@ -61,37 +47,26 @@ export default function Demand() {
   }, [scenarioId, setScenarioId]);
 
   const fetchData = (token, id) => {
-    if (!token) return;
+    if (!token || !id) return;
 
-    const url = `http://localhost:8080/api/scenarios/target/demand/${id}`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    fetch(`http://localhost:8080/api/scenarios/bop/operationRouting/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
-        const list = data.demands || [];
+        const list = data.operationRoutings || [];
         const formatted = list.map((item, index) => ({
           id: index + 1,
-          demandId: item.demandId?.demandId || "",
-          siteId: item.demandId?.siteId || "",
-          partId: item.demandId?.partId || "",
-          scenarioId: item.demandId?.scenarioId || "",
-          partName: item.partName || "",
-          customerId: item.customerId || "",
-          dueDate: item.dueDate || "",
-          demandQty: item.demandQty || "",
-          priority: item.priority || "",
-          uom: item.uom || "",
-          orderType: item.orderType || "",
-          orderTypeName: item.orderTypeName || "",
-          exceptYn: item.exceptYn || "",
-          headerCreationDate: item.headerCreationDate || "",
-          hasOverActQty: item.hasOverActQty || "",
+          siteId: item.operationRoutingId?.siteId ?? "",
+          routingId: item.operationRoutingId?.routingId ?? "",
+          operationId: item.operationRoutingId?.operationId ?? "",
+          operationSeq: item.operationRoutingId?.operationSeq ?? "",
+          operationName: item.operationName,
+          operationType: item.operationType,
+          scenarioId: item.operationRoutingId?.scenarioId ?? "",
+          createDatetime: item.createDatetime,
+          updateDatetime: item.updateDatetime,
         }));
-
         setRows(formatted);
       })
       .catch((err) => console.error("fetchData 오류:", err));
@@ -101,51 +76,52 @@ export default function Demand() {
     if (scenarioId && token) {
       fetchData(token, scenarioId);
     }
-  }, [token, scenarioId]);
+  }, [scenarioId, token]);
 
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
-  // 파일 업로드 요청
-  const fetchDemandData = (token, id) => {
-    if (!token) return;
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !token || !scenarioId) return;
 
-    const url = "http://localhost:8080/api/scenarios/target/demand-upload";
-    fetch(url, {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("scenarioId", scenarioId);
+
+    fetch("http://localhost:8080/api/scenarios/bop/operation-routing-upload", {
       method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
       body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     })
       .then((res) => {
-        if (res.ok) {
-          fetchData(scenarioId);
-        } else {
-          console.error("업로드 실패");
-        }
+        if (res.ok) fetchData(token, scenarioId);
+        else console.error("업로드 실패");
       })
       .finally(() => handleCloseDialog());
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    if (scenarioId) {
-      formData.append("scenarioId", scenarioId);
-    }
-
-    fetchDemandData(formData);
-  };
-
   const handleDownload = () => {
-    window.open(
-      `http://localhost:8080/api/scenarios/target/demand-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+    if (!token || !scenarioId) return;
+
+    fetch(
+      `http://localhost:8080/api/scenarios/bop/operation-routing-download?scenarioId=${scenarioId}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "operation-routing.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 중 오류:", err));
   };
 
   return (
@@ -154,15 +130,10 @@ export default function Demand() {
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
 
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
-            판매오더 파일 업로드
-            <IconButton onClick={handleCloseDialog}>
-              <CloseIcon />
-            </IconButton>
+          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+            공정 순서 파일 업로드
+            <IconButton onClick={handleCloseDialog}><CloseIcon /></IconButton>
           </DialogTitle>
-
           <DialogContent>
             <Box
               sx={{
@@ -188,7 +159,6 @@ export default function Demand() {
               />
             </Box>
           </DialogContent>
-
           <DialogActions>
             <Button onClick={handleCloseDialog}>취소</Button>
           </DialogActions>
@@ -209,7 +179,7 @@ export default function Demand() {
         }}
       >
         <Typography variant="h6" gutterBottom>
-          판매 오더
+          공정 순서
         </Typography>
 
         <Box sx={{ flex: 1, overflow: "auto" }}>
@@ -218,25 +188,19 @@ export default function Demand() {
             columns={columns}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[5, 10, 25, 50, 100]}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
             sx={{
-              // 헤더 전체 행 배경(임시)
-              "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f2e8e8",
-              },
-
-              // 각 헤더 셀에 배경, 텍스트색 적용
+              "& .MuiDataGrid-columnHeaders": { backgroundColor: "#f2e8e8" },
               "& .MuiDataGrid-columnHeader": {
                 backgroundColor: "#f2e8e8",
-                color: "#000", // 글자 색
-                fontWeight: "bold", // 글자 두껍게
+                color: "#000",
+                fontWeight: "bold",
               },
-
               border: 0,
-              minWidth: "1200px",
+              minWidth: "1100px",
             }}
           />
         </Box>

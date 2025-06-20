@@ -29,6 +29,7 @@ export default function ToolMaster() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
   const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
 
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -37,47 +38,22 @@ export default function ToolMaster() {
   });
 
   useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
 
-  const handleDownload = () => {
-    window.open(
-      `http://localhost:8080/api/scenarios/resource/tool-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("scenarioId", scenarioId);
-
-    fetch("http://localhost:8080/api/scenarios/resource/tool-upload", {
-      method: "POST",
-      body: formData,
+    fetch(`http://localhost:8080/api/scenarios/resource/tool-master/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then((res) => {
-        if (res.ok) {
-          fetchData(scenarioId);
-        } else {
-          console.error("업로드 실패");
-        }
-      })
-      .finally(() => handleCloseDialog());
-  };
-
-  const fetchData = (id) => {
-    const url = id
-      ? `http://localhost:8080/api/scenarios/resource/tool-master/${id}`
-      : `http://localhost:8080/api/scenarios/resource/tool-master`;
-
-    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         const list = data.toolMasters || [];
@@ -97,8 +73,59 @@ export default function ToolMaster() {
   };
 
   useEffect(() => {
-    if (scenarioId) fetchData(scenarioId);
-  }, [scenarioId]);
+    if (scenarioId && token) {
+      fetchData(token, scenarioId);
+    }
+  }, [scenarioId, token]);
+
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !token || !scenarioId) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("scenarioId", scenarioId);
+
+    fetch("http://localhost:8080/api/scenarios/resource/tool-upload", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (res.ok) fetchData(token, scenarioId);
+        else console.error("업로드 실패");
+      })
+      .finally(() => setOpen(false));
+  };
+
+  const handleDownload = () => {
+    if (!token || !scenarioId) return;
+
+    fetch(`http://localhost:8080/api/scenarios/resource/tool-download?scenarioId=${scenarioId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "toolmaster.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -124,7 +151,7 @@ export default function ToolMaster() {
                 alignItems: "center",
                 cursor: "pointer",
               }}
-              onClick={() => document.getElementById("file-input").click()}
+              onClick={() => document.getElementById("file-input")?.click()}
             >
               <Typography color="text.secondary">
                 등록할 파일을 선택해서 추가하세요.
@@ -172,7 +199,18 @@ export default function ToolMaster() {
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1000px" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              border: 0,
+              minWidth: "1000px",
+            }}
           />
         </Box>
       </Box>

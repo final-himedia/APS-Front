@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import {
   Box,
   Button,
@@ -12,21 +11,26 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import Toolbar from "@/app/standard/Toolbar";
+import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
+import Toolbar from "@/app/standard/Toolbar";
 import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
-  { field: "id", headerName: "순번", width: 40 },
-  { field: "scenarioId", headerName: "시나리오", width: 80 },
-  { field: "routingId", headerName: "라우팅 코드", width: 130 },
-  { field: "siteId", headerName: "플랜트", width: 60 },
-  { field: "routingName", headerName: "라우팅명", width: 150 },
-  { field: "routingType", headerName: "라우팅 타입", width: 120 },
+  { field: "id", headerName: "순번", width: 80 },
+  { field: "scenarioId", headerName: "시나리오", flex: 1 },
+  { field: "routingId", headerName: "라우팅 코드", flex: 1 },
+  { field: "siteId", headerName: "플랜트", flex: 1 },
+  { field: "routingName", headerName: "라우팅명", flex: 1 },
+  { field: "routingType", headerName: "라우팅 타입", flex: 1 },
 ];
 
 export default function RoutingMasterView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -35,12 +39,21 @@ export default function RoutingMasterView() {
   });
 
   useEffect(() => {
-    if (scenarioId) fetchRoutingData(scenarioId);
-  }, [scenarioId]);
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
 
-  const fetchRoutingData = (id) => {
-    const url = `http://localhost:8080/api/scenarios/bop/routing/${id}`;
-    fetch(url)
+  useEffect(() => {
+    if (!scenarioId) setScenarioId("S010000");
+  }, [scenarioId, setScenarioId]);
+
+  const fetchRoutingData = (token, id) => {
+    if (!token || !id) return;
+    fetch(`http://localhost:8080/api/scenarios/bop/routing/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.routings || [];
@@ -54,15 +67,25 @@ export default function RoutingMasterView() {
         }));
         setRows(formatted);
       })
-      .catch((err) => console.error("라우팅 데이터 가져오기 실패:", err));
+      .catch((err) => console.error("라우팅 데이터 불러오기 실패:", err));
   };
 
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
+  useEffect(() => {
+    if (token && scenarioId) fetchRoutingData(token, scenarioId);
+  }, [token, scenarioId]);
+
+  const handleDownloadExcel = () => {
+    if (!token || !scenarioId) return;
+    window.open(
+      `http://localhost:8080/api/scenarios/bop/routing-download?scenarioId=${scenarioId}`,
+      "_blank"
+    );
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
@@ -70,33 +93,32 @@ export default function RoutingMasterView() {
     fetch("http://localhost:8080/api/scenarios/bop/routing-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) fetchRoutingData(scenarioId);
+        if (res.ok) fetchRoutingData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(() => setOpen(false));
   };
 
-  const handleDownloadExcel = () => {
-    console.log("📦 다운로드 요청 시나리오 ID:", scenarioId);
-    window.open(
-      `http://localhost:8080/api/scenarios/bop/routing-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
-  };
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      {/* 상단 툴바 */}
       <Box sx={{ mt: 2 }}>
-        <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
-        <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <Toolbar upload={() => setOpen(true)} download={handleDownloadExcel} />
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          fullWidth
+          maxWidth="sm"
+        >
           <DialogTitle
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
             라우팅 파일 업로드
-            <IconButton onClick={handleCloseDialog}>
+            <IconButton onClick={() => setOpen(false)}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -126,12 +148,11 @@ export default function RoutingMasterView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog}>취소</Button>
+            <Button onClick={() => setOpen(false)}>취소</Button>
           </DialogActions>
         </Dialog>
       </Box>
 
-      {/* 카드형 테이블 박스 */}
       <Box
         sx={{
           border: "1px solid #e0e0e0",
@@ -140,9 +161,9 @@ export default function RoutingMasterView() {
           boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
           p: 2,
           height: "100%",
-          overflow: "hidden",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -159,7 +180,21 @@ export default function RoutingMasterView() {
             checkboxSelection
             autoHeight={false}
             rowHeight={38}
-            sx={{ border: 0, minWidth: "1000px" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeadersInner": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
+              border: 0,
+              minWidth: "1000px",
+            }}
           />
         </Box>
       </Box>
