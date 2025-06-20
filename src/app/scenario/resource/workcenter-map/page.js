@@ -38,6 +38,7 @@ export default function WorkCenterMap() {
     (state) => state.setSelectedScenarioId
   );
 
+  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -46,15 +47,22 @@ export default function WorkCenterMap() {
   });
 
   useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) setToken(storedToken);
+  }, []);
+
+  useEffect(() => {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const fetchData = (id) => {
-    const url = id
-      ? `http://localhost:8080/api/scenarios/resource/workcentermap/${id}`
-      : `http://localhost:8080/api/scenarios/resource/workcentermap`;
+  const fetchData = (token, id) => {
+    if (!token || !id) return;
 
-    fetch(url)
+    fetch(`http://localhost:8080/api/scenarios/resource/workcentermap/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         const list = data.workcenterMaps || [];
@@ -79,39 +87,61 @@ export default function WorkCenterMap() {
   };
 
   useEffect(() => {
-    if (scenarioId) fetchData(scenarioId);
-  }, [scenarioId]);
+    if (scenarioId && token) {
+      fetchData(token, scenarioId);
+    }
+  }, [scenarioId, token]);
 
   const handleOpenDialog = () => setOpen(true);
   const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !token || !scenarioId) return;
 
     const formData = new FormData();
     formData.append("file", file);
-    if (scenarioId) formData.append("scenarioId", scenarioId);
+    formData.append("scenarioId", scenarioId);
 
     fetch("http://localhost:8080/api/scenarios/resource/workcentermap-upload", {
       method: "POST",
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => {
-        if (res.ok) {
-          fetchData(scenarioId);
-        } else {
-          console.error("업로드 실패");
-        }
+        if (res.ok) fetchData(token, scenarioId);
+        else console.error("업로드 실패");
       })
       .finally(() => handleCloseDialog());
   };
 
   const handleDownload = () => {
-    window.open(
+    if (!token || !scenarioId) return;
+
+    fetch(
       `http://localhost:8080/api/scenarios/resource/workcentermap-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "workcentermap.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 중 오류:", err));
   };
 
   return (
@@ -178,7 +208,6 @@ export default function WorkCenterMap() {
           생산 라우팅
         </Typography>
 
-        {/* 안쪽 스크롤 전용 */}
         <Box sx={{ flex: 1, overflow: "auto" }}>
           <DataGrid
             rows={rows}
@@ -190,6 +219,14 @@ export default function WorkCenterMap() {
             autoHeight={false}
             rowHeight={38}
             sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000",
+                fontWeight: "bold",
+              },
               border: 0,
               minWidth: "1100px",
             }}
