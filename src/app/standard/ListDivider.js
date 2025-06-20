@@ -153,14 +153,18 @@ export default function ListDivider({ onClose }) {
   return (
     <Box
       sx={{
-        width: 240,
-        maxWidth: 240,
+        width: 250,
+        maxWidth: 250,
+        overflowX: "hidden",
+        boxSizing: "border-box",
+
         backgroundColor: "#fff",
         height: "100vh",
         overflowY: "auto",
         display: "flex",
         flexDirection: "column",
-        px: 1.5,
+        px: 1,
+        pl: 2,
       }}
     >
       <Box
@@ -179,7 +183,7 @@ export default function ListDivider({ onClose }) {
             style={{ height: 40, cursor: "pointer" }}
           />
         </Link>
-        <IconButton onClick={onClose} sx={{ mr: "-10px" }}>
+        <IconButton onClick={onClose} sx={{ mr: "-8px" }}>
           <KeyboardBackspaceIcon />
         </IconButton>
       </Box>

@@ -90,7 +90,7 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
           >
             <Typography
               variant="h6"
-              sx={{ fontWeight: "bold", color: "primary.main" }}
+              sx={{ fontWeight: "bold", color: "black" }}
             >
               입력 데이터 목록
             </Typography>
@@ -133,13 +133,13 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon sx={{ color: "primary.main" }} />}
-              sx={{ backgroundColor: "#e3f2fd", minHeight: "36px", px: 1.5 }}
+              sx={{ backgroundColor: "#f2e8e8", minHeight: "36px", px: 1.5 }}
             >
               <Typography
                 sx={{
                   fontWeight: 500,
                   fontSize: "0.85rem",
-                  color: "primary.main",
+                  color: "black",
                 }}
               >
                 Input Data

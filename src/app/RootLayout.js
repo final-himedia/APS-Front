@@ -92,7 +92,7 @@ export default function RootLayout({ children }) {
         <div
           style={{
             height: 45,
-            backgroundColor: "#fff",
+            backgroundColor: "#939393",
             borderBottom: "1px solid #ccc",
             display: "flex",
             alignItems: "center",
@@ -145,7 +145,7 @@ export default function RootLayout({ children }) {
 
         <main
           style={{
-            paddingLeft: 16,
+            paddingLeft: 0,
             paddingRight: 16,
             height: "calc(100vh - 45px)",
             overflow: "auto",

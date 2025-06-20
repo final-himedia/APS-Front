@@ -99,16 +99,32 @@ export default function LoginPage() {
         onSubmit={handleLogin}
         sx={{
           width: 400,
-          padding: 4,
-          borderRadius: 2,
+          p: 4,
+          borderRadius: 3,
           bgcolor: "white",
-          boxShadow: 3,
+          boxShadow: "0px 4px 12px rgba(0,0,0,0.1)",
         }}
       >
-        <Typography variant="h5" gutterBottom>
-          로그인 테스트
+        {/* 로고 */}
+        <Box sx={{ textAlign: "center", mb: 2 }}>
+          <img
+            src="/logo/login-logo.png"
+            alt="MAIDAY 로그인"
+            style={{ maxWidth: "170px", height: "auto", marginBottom: "12px" }}
+          />
+        </Box>
+
+        {/* 제목 */}
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          sx={{ mt: -4, mb: 4, fontSize: "24px" }}
+        >
+          로그인
         </Typography>
 
+        {/* 이메일/비밀번호 입력 */}
         <TextField
           fullWidth
           margin="normal"
@@ -116,6 +132,13 @@ export default function LoginPage() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          size="small"
+          InputProps={{
+            sx: {
+              fontSize: "14px",
+              padding: "6px 10px",
+            },
+          }}
         />
         <TextField
           fullWidth
@@ -124,7 +147,15 @@ export default function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          size="small"
+          InputProps={{
+            sx: {
+              fontSize: "14px",
+              padding: "6px 10px",
+            },
+          }}
         />
+
 
         <FormControlLabel
           control={
@@ -146,15 +177,31 @@ export default function LoginPage() {
           type="submit"
           fullWidth
           variant="contained"
-          sx={{ mt: 2, mb: 1 }}
+          sx={{
+            mt: 3,
+            mb: 2,
+            backgroundColor: "#d50000",
+            "&:hover": { backgroundColor: "#b71c1c" },
+            borderRadius: "8px",
+          }}
         >
           로그인
         </Button>
 
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
+        {/* 링크: 비번찾기 / 회원가입 */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mt: 1,
+            px: 0.5,
+          }}
+        >
+
           <Link
             href="#"
             underline="hover"
+            sx={{ fontSize: "0.9rem", color: "#616161" }}
             onClick={() => setOpenResetPassword(true)}
           >
             비밀번호 찾기
@@ -162,7 +209,9 @@ export default function LoginPage() {
           <Link
             href="#"
             underline="hover"
+            sx={{ fontSize: "0.9rem", color: "#616161" }}
             onClick={() => setOpenRegister(true)}
+            sx={{ color: "#dd0000", fontSize: "0.9rem" }}
           >
             회원가입
           </Link>
@@ -175,17 +224,73 @@ export default function LoginPage() {
         onClose={() => setOpenRegister(false)}
       />
 
+
       {/* 비밀번호 찾기 다이얼로그 */}
+
       <Dialog
         open={openResetPassword}
         onClose={() => setOpenResetPassword(false)}
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle>비밀번호 찾기</DialogTitle>
-        <DialogContent>
-          <TextField fullWidth label="가입한 이메일" margin="normal" />
-          <Button variant="contained" fullWidth sx={{ mt: 2 }}>
+        <DialogContent
+          sx={{
+            pt: 8, // ← 상단 여백 넉넉하게
+            pb: 3,
+            position: "relative",
+            textAlign: "center",
+          }}
+        >
+          {/* 로고 이미지 */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: "10px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              width: 160,
+              height: "auto",
+            }}
+          >
+            <img
+              src="/logo/main-logo.png"
+              alt="로고"
+              style={{
+                width: "100%",
+                height: "auto",
+                display: "block",
+              }}
+            />
+          </Box>
+
+          {/* 설명 문구 */}
+          <Typography variant="body1" sx={{ mb: 2, mt: 1, fontWeight: "bold" }}>
+            비밀번호를 찾을 이메일을 입력해주세요.
+          </Typography>
+
+          {/* 이메일 입력 필드 */}
+          <TextField
+            fullWidth
+            placeholder="가입한 이메일"
+            variant="outlined"
+            margin="normal"
+            size="small"
+          />
+
+          {/* 전송 버튼 */}
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              mt: 2,
+              backgroundColor: "#d50000",
+              "&:hover": {
+                backgroundColor: "#b71c1c",
+              },
+              color: "#fff",
+              borderRadius: "8px",
+            }}
+          >
             비밀번호 재설정 링크 보내기
           </Button>
         </DialogContent>

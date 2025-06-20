@@ -25,7 +25,12 @@ export default function ScenarioList({ onClose }) {
   const setSelectedScenarioId = useScenarioStore(
     (state) => state.setSelectedScenarioId
   );
+  const selectedScenarioId = useScenarioStore(
+    (state) => state.selectedScenarioId
+  ); // 현재 선택된 시나리오 추적
+
   const [searchTerm, setSearchTerm] = useState("");
+
 
   const fetchScenarioData = (token) => {
     const url = `http://localhost:8080/api/scenarios/list`;
@@ -68,42 +73,54 @@ export default function ScenarioList({ onClose }) {
         height: "100vh",
         borderRight: "1px solid #ccc",
         boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
+
+        overflowY: "auto",
+        overflowX: "hidden",
+        backgroundColor: "#f2e8e8",
+        pl: 2,
+        pr: 1,
+  
       }}
     >
-      <Box sx={{ p: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 1,
-          }}
-        >
-          <Typography variant="h6">시나리오 목록</Typography>
-          <IconButton onClick={onClose} size="small">
-            <ArrowForwardIosIcon
-              fontSize="small"
-              sx={{ transform: "rotate(180deg)" }}
-            />
-          </IconButton>
-        </Box>
-
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Box sx={{ flexGrow: 1 }}>
-            <SidebarSearch
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-            />
-          </Box>
-          <IconButton
-            size="small"
-            color="info"
-            onClick={() => alert("Fab 눌림")}
+      {/* 상단: 제목 + 검색 + 접기 버튼 */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 0,
+          height: 100,
+        }}
+      >
+        <Box sx={{ width: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 0.7,
+              
+            }}
           >
-            <AddIcon fontSize="small" />
-          </IconButton>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              시나리오 목록
+            </Typography>
+            <IconButton onClick={onClose} size="small" sx={{ mr: -1 }}>
+              <ArrowForwardIosIcon
+                fontSize="small"
+                sx={{
+                  transform: "rotate(180deg)",
+                  transition: "transform 0.3s",
+                }}
+              />
+            </IconButton>
+          </Box>
+
+          <SidebarSearch
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
+          <Divider sx={{ width: 220, my: 1,}} />
         </Box>
       </Box>
 
@@ -114,8 +131,22 @@ export default function ScenarioList({ onClose }) {
           <ListItemButton
             key={scenario.scenarioId}
             onClick={() => setSelectedScenarioId(scenario.scenarioId)}
+            selected={selectedScenarioId === scenario.scenarioId}
+            sx={{
+              "&.Mui-selected": {
+                backgroundColor: "#f5f5f5",
+                borderRadius: "20px 0 0 20px",
+                marginRight: "-12px",
+                paddingRight: "24px",
+                zIndex: 2,
+                position: "relative",
+              },
+              "&.Mui-selected:hover": {
+                backgroundColor: "#f5f5f5",
+              },
+            }}
           >
-            <ListItemText primary={scenario.scenarioId} />
+            <ListItemText primary={scenario.scenarioId} sx={{ pl: 0 }} />
           </ListItemButton>
         ))}
       </List>

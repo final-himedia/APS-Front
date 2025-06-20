@@ -223,6 +223,18 @@ export default function Demand() {
             autoHeight={false}
             rowHeight={38}
             sx={{
+              // 헤더 전체 행 배경(임시)
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#f2e8e8",
+              },
+
+              // 각 헤더 셀에 배경, 텍스트색 적용
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#f2e8e8",
+                color: "#000", // 글자 색
+                fontWeight: "bold", // 글자 두껍게
+              },
+
               border: 0,
               minWidth: "1200px",
             }}
