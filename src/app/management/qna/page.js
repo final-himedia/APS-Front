@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Divider,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -37,6 +38,8 @@ export default function QnaPage() {
   const [open, setOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
+  const [titleError, setTitleError] = useState(false);
+  const [contentError, setContentError] = useState(false);
 
   // QnA 리스트 불러오기 (작성자 이메일 포함)
   const fetchQnaList = () => {
@@ -67,8 +70,30 @@ export default function QnaPage() {
 
   // 새 글 저장
   const handleSave = () => {
+    let hasError = false;
+
+    // 유효성 검사
+    if (!newTitle.trim()) {
+      setTitleError(true);
+      hasError = true;
+    } else {
+      setTitleError(false);
+    }
+
+    if (!newContent.trim()) {
+      setContentError(true);
+      hasError = true;
+    } else {
+      setContentError(false);
+    }
+
+    if (hasError) {
+      return; // 에러가 있으면 저장 요청 안 보냄
+    }
+
+    // 저장 요청
     const token = localStorage.getItem("token");
-    const writerId = Number(localStorage.getItem("userId")); // 로그인 시 저장되어 있다고 가정
+    const writerId = Number(localStorage.getItem("userId"));
     const wroteAt = new Date().toISOString();
 
     fetch("http://localhost:8080/api/management/qna", {
@@ -91,7 +116,6 @@ export default function QnaPage() {
       })
       .then((result) => {
         console.log("✅ 저장 성공:", result);
-        // 저장 후 다시 리스트 가져오기
         fetchQnaList();
       })
       .catch((err) => {
@@ -131,11 +155,11 @@ export default function QnaPage() {
         <Button
           variant="text"
           sx={{
-            backgroundColor: "#e2e6ec",
+            backgroundColor: "#f2e8e8",
             color: "#000000",
             px: 3,
             "&:hover": {
-              backgroundColor: "#cfd4db",
+              backgroundColor: "#f5d2d2",
               color: "#000000",
             },
           }}
@@ -199,6 +223,15 @@ export default function QnaPage() {
           count={Math.ceil(posts.length / PAGE_SIZE)}
           page={page}
           onChange={(e, val) => setPage(val)}
+          sx={{
+            "& .Mui-selected": {
+              backgroundColor: "#f2e8e8",
+              color: "#fff",
+            },
+            "& .MuiPaginationItem-root": {
+              color: "#333",
+            },
+          }}
         />
       </Box>
 
@@ -211,10 +244,10 @@ export default function QnaPage() {
             px: 3,
             py: 1,
             borderRadius: "12px",
-            backgroundColor: "#e2e6ec",
+            backgroundColor: "#f2e8e8",
             color: "#000000",
             "&:hover": {
-              backgroundColor: "#cfd4db",
+              backgroundColor: "#f5d2d2",
               color: "#000000",
             },
           }}
@@ -229,8 +262,23 @@ export default function QnaPage() {
         onClose={() => setOpen(false)}
         fullWidth
         maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: 1, // 둥근 테두리 줄이기
+          },
+        }}
       >
-        <DialogTitle>새 글 작성</DialogTitle>
+        <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+          게시판 글쓰기
+        </DialogTitle>
+        <Divider
+          sx={{
+            borderBottomWidth: 2,
+            borderColor: "#808080",
+            width: "95%",
+            mx: "auto",
+          }}
+        />
         <DialogContent>
           <TextField
             label="제목"
@@ -238,20 +286,38 @@ export default function QnaPage() {
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             margin="normal"
+            error={titleError}
+            helperText={titleError ? "제목을 입력해주세요" : ""}
           />
+
           <TextField
             label="내용"
             fullWidth
             multiline
-            rows={4}
+            rows={5}
             value={newContent}
             onChange={(e) => setNewContent(e.target.value)}
             margin="normal"
+            error={contentError}
+            helperText={contentError ? "내용을 입력해주세요" : ""}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>취소</Button>
-          <Button variant="contained" onClick={handleSave}>
+
+        <DialogActions sx={{ justifyContent: "flex-end", px: 3, pb: 2 }}>
+          <Button onClick={() => setOpen(false)} sx={{ color: "#808080" }}>
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            sx={{
+              backgroundColor: "#dd0000",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#aa0000",
+              },
+            }}
+          >
             저장
           </Button>
         </DialogActions>

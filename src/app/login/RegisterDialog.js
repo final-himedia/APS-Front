@@ -22,7 +22,6 @@ export default function RegisterDialog({ open, onClose }) {
   const [error, setError] = useState("");
 
   const handleRegister = async () => {
-    // ✅ 프론트 유효성 검사
     if (!email || !name || !password || !confirm) {
       setError("모든 항목을 입력해주세요.");
       return;
@@ -60,6 +59,11 @@ export default function RegisterDialog({ open, onClose }) {
         throw new Error(data.message || "회원가입 실패");
       }
 
+      const data = await res.json();
+    
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.user.id);
+
       alert("회원가입이 완료되었습니다!");
       onClose();
       setEmail("");
@@ -92,9 +96,7 @@ export default function RegisterDialog({ open, onClose }) {
           <img
             src="/logo/main-logo.png"
             alt="MAIDAY 로고"
-
             style={{ height: "50px" }}
-
           />
         </Box>
 

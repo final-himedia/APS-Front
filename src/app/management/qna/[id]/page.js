@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Box,
   Typography,
   CircularProgress,
@@ -18,14 +22,101 @@ export default function QnaDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [comments, setComments] = useState([]); // 댓글 목록
-  const [commentInput, setCommentInput] = useState(""); // 새 댓글 입력
+  const [comments, setComments] = useState([]);
+  const [commentInput, setCommentInput] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState(null);
 
-  // 댓글 수정 상태
+  // ✅ 수정된 부분: myUserId useState + useEffect
+  const [myUserId, setMyUserId] = useState(null);
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (userId) setMyUserId(Number(userId));
+  }, []);
+
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
+
+  const handleDeletePost = () => {
+    if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    fetch(`http://localhost:8080/api/management/qna/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("삭제 실패");
+        alert("삭제되었습니다.");
+        window.location.href = "/management/qna";
+      })
+      .catch((err) => {
+        console.error("❌ 게시글 삭제 실패:", err);
+        alert("삭제 중 오류가 발생했습니다.");
+      });
+  };
+
+  const startEdit = () => {
+    setEditTitle(post.title);
+    setEditContent(post.content);
+    setEditing(true);
+  };
+
+  const handleUpdatePost = async () => {
+    if (!editTitle.trim() || !editContent.trim()) {
+      alert("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/management/qna/${post.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: editTitle,
+            content: editContent,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || "수정 실패");
+      }
+
+      const updatedPost = await res.json();
+      updatedPost.name = post.name;
+      setPost(updatedPost);
+      setEditing(false);
+      alert("수정되었습니다.");
+      setOpenEditDialog(false);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,7 +125,6 @@ export default function QnaDetailPage() {
       return;
     }
 
-    // 게시글 불러오기
     fetch(`http://localhost:8080/api/management/qna/detail/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -55,7 +145,6 @@ export default function QnaDetailPage() {
         setLoading(false);
       });
 
-    //댓글 불러오기
     fetch(`http://localhost:8080/api/management/qna/${id}/comment/list`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -73,7 +162,6 @@ export default function QnaDetailPage() {
       });
   }, [id]);
 
-  // 새 댓글 등록
   const handleCommentSubmit = () => {
     if (!commentInput.trim()) {
       alert("댓글을 입력하세요.");
@@ -114,19 +202,16 @@ export default function QnaDetailPage() {
       });
   };
 
-  // 댓글 수정 시작
   const startEditing = (comment) => {
     setEditingCommentId(comment.id);
     setEditingContent(comment.content);
   };
 
-  // 댓글 수정 취소
   const cancelEditing = () => {
     setEditingCommentId(null);
     setEditingContent("");
   };
 
-  // 댓글 수정 저장
   const saveEditing = (commentId) => {
     if (!editingContent.trim()) {
       alert("댓글 내용을 입력하세요.");
@@ -172,7 +257,6 @@ export default function QnaDetailPage() {
       });
   };
 
-  // 댓글 삭제
   const deleteComment = (commentId) => {
     if (!confirm("정말로 이 댓글을 삭제하시겠습니까?")) return;
 
@@ -196,7 +280,6 @@ export default function QnaDetailPage() {
     )
       .then((res) => {
         if (!res.ok) throw new Error("댓글 삭제 실패");
-        // 보통 삭제는 204 No Content 리턴
         setComments((prev) => prev.filter((c) => c.id !== commentId));
       })
       .catch((err) => {
@@ -210,23 +293,103 @@ export default function QnaDetailPage() {
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (!post) return null;
+  if (!post || myUserId === null) return null;
 
   const visibleComments = comments.filter((c) => !c.deleted);
 
   return (
     <Box sx={{ p: 4, maxWidth: "800px", mx: "auto" }}>
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          {post.title}
-        </Typography>
+        {/* 제목 + 수정/삭제 버튼 한 줄 정렬 */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h5">{post.title}</Typography>
+
+          {post.writerId === myUserId && (
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  startEdit(); // 기존 글 제목/내용 입력 필드에 넣어줌
+                  setOpenEditDialog(true); // 다이얼로그 열기
+                }}
+              >
+                수정
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                onClick={handleDeletePost}
+              >
+                삭제
+              </Button>
+            </Box>
+          )}
+        </Box>
+
+        {/* 작성자 정보 */}
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           작성자: {post.name} | 작성일: {post.wroteAt?.slice(0, 10)}
         </Typography>
+
+        {/* 본문 내용 */}
         <Typography variant="body1" sx={{ whiteSpace: "pre-line", mt: 2 }}>
           {post.content}
         </Typography>
       </Paper>
+
+      {/* 게시글 수정 다이얼로그 */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>게시글 수정</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="제목"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            margin="normal" 
+          />
+
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            label="내용"
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            margin="normal" 
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button
+            onClick={() => setOpenEditDialog(false)}
+            sx={{ color: "#dd0000" }}
+          >
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleUpdatePost}
+            sx={{
+              backgroundColor: "#dd0000",
+              "&:hover": {
+                backgroundColor: "#bb0000",
+                boxShadow: "none",
+              },
+            }}
+          >
+            저장
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" gutterBottom>
@@ -243,8 +406,7 @@ export default function QnaDetailPage() {
             sx={{ mb: 2, borderBottom: "1px solid #eee", pb: 1 }}
           >
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              작성자: {comment.writerId} | 작성일:{" "}
-              {comment.wroteAt?.slice(0, 10)}
+              작성자: {comment.name} | 작성일: {comment.wroteAt?.slice(0, 10)}
             </Typography>
 
             {editingCommentId === comment.id ? (
@@ -304,28 +466,32 @@ export default function QnaDetailPage() {
           </Box>
         ))}
 
-        <Stack spacing={1} mt={2}>
+        <Box mt={2}>
           <TextField
             label="댓글 작성"
             multiline
             minRows={3}
             value={commentInput}
             onChange={(e) => setCommentInput(e.target.value)}
-            disabled={commentLoading}
+            fullWidth
           />
-          {commentError && editingCommentId === null && (
-            <Typography color="error" variant="body2">
-              {commentError}
-            </Typography>
-          )}
-          <Button
-            variant="contained"
-            onClick={handleCommentSubmit}
-            disabled={commentLoading}
-          >
-            {commentLoading ? "등록 중..." : "댓글 등록"}
-          </Button>
-        </Stack>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Button
+              variant="contained"
+              onClick={handleCommentSubmit}
+              disabled={commentLoading}
+              sx={{
+                backgroundColor: "#dd0000",
+                "&:hover": {
+                  backgroundColor: "#bb0000",
+                  boxShadow: "none",
+                },
+              }}
+            >
+              등록
+            </Button>
+          </Box>
+        </Box>
       </Paper>
     </Box>
   );
