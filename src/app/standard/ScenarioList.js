@@ -15,6 +15,8 @@ import SidebarSearch from "./SidebarSearch";
 import { useState, useEffect } from "react";
 import useScenarioStore from "@/hooks/useScenarioStore";
 import AddIcon from "@mui/icons-material/Add";
+import ScenarioAddDialog from "./ScenarioAddDialog";
+import { Description } from "@mui/icons-material";
 
 const scenarioIds = [
   { field: "scenarioId", headerName: "시나리오", width: 100 },
@@ -28,6 +30,37 @@ export default function ScenarioList({ onClose }) {
   const selectedScenarioId = useScenarioStore(
     (state) => state.selectedScenarioId
   ); // 현재 선택된 시나리오 추적
+
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  const handleAddScenario = ({ scenarioId, scenarioName }) => {
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8080/api/scenarios", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        scenarioId: scenarioId,
+        name: scenarioName,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("추가 실패");
+        return res.json();
+      })
+      .then(() => {
+        alert("시나리오가 추가 되었습니다");
+        setAddDialogOpen(false);
+        fetchScenarioData(token);
+      })
+      .catch((err) => {
+        console.err(err);
+        alert("시나리오 추가 실패했습니다.");
+      });
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -115,7 +148,7 @@ export default function ScenarioList({ onClose }) {
 
           {/* 검색창 + FAB 버튼 */}
           <Box sx={{ display: "flex", gap: 1, alignItems: "center", mb: 1 }}>
-            <Box sx={{ flexGrow: 1, maxWidth: "175px"  }}>
+            <Box sx={{ flexGrow: 1, maxWidth: "175px" }}>
               <SidebarSearch
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
@@ -123,10 +156,10 @@ export default function ScenarioList({ onClose }) {
             </Box>
             <IconButton
               size="small"
-              onClick={() => alert("Fab 눌림")}
+              onClick={() => setAddDialogOpen(true)}
               sx={{
                 color: "#6f6a6a",
-                mr: 0, 
+                mr: 0,
                 borderRadius: 1,
                 width: 32,
                 height: 32,
@@ -165,6 +198,11 @@ export default function ScenarioList({ onClose }) {
           </ListItemButton>
         ))}
       </List>
+      <ScenarioAddDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onSubmit={handleAddScenario}
+      />
     </Box>
   );
 }
