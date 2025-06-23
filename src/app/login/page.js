@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Dialog,
-  DialogTitle,
   DialogContent,
   TextField,
   Typography,
@@ -49,9 +48,9 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok) {
-        // 이전 사용자 관련 localStorage 데이터 초기화
+        // ✅ 더 이상 즐겨찾기를 삭제하지 않음
         Object.keys(localStorage).forEach((key) => {
-          if (key.startsWith("favorites_") || key === "lastPath") {
+          if (key === "lastPath") {
             localStorage.removeItem(key);
           }
         });
@@ -70,7 +69,6 @@ export default function LoginPage() {
 
         if (lastPath && lastPath !== "/login") {
           router.push(lastPath);
-          // 이동 후 유저별 lastPath 삭제 (선택사항)
           localStorage.removeItem(`lastPath_${result.user.id}`);
         } else {
           router.push("/");
@@ -207,9 +205,8 @@ export default function LoginPage() {
           <Link
             href="#"
             underline="hover"
-            sx={{ fontSize: "0.9rem", color: "#616161" }}
+            sx={{ fontSize: "0.9rem", color: "#dd0000" }}
             onClick={() => setOpenRegister(true)}
-            sx={{ color: "#dd0000", fontSize: "0.9rem" }}
           >
             회원가입
           </Link>
@@ -223,7 +220,6 @@ export default function LoginPage() {
       />
 
       {/* 비밀번호 찾기 다이얼로그 */}
-
       <Dialog
         open={openResetPassword}
         onClose={() => setOpenResetPassword(false)}
@@ -232,13 +228,13 @@ export default function LoginPage() {
       >
         <DialogContent
           sx={{
-            pt: 8, // ← 상단 여백 넉넉하게
+            pt: 8,
             pb: 3,
             position: "relative",
             textAlign: "center",
           }}
         >
-          {/* 로고 이미지 */}
+          {/* 로고 */}
           <Box
             sx={{
               position: "absolute",
@@ -260,12 +256,10 @@ export default function LoginPage() {
             />
           </Box>
 
-          {/* 설명 문구 */}
           <Typography variant="body1" sx={{ mb: 2, mt: 1, fontWeight: "bold" }}>
             비밀번호를 찾을 이메일을 입력해주세요.
           </Typography>
 
-          {/* 이메일 입력 필드 */}
           <TextField
             fullWidth
             placeholder="가입한 이메일"
@@ -274,7 +268,6 @@ export default function LoginPage() {
             size="small"
           />
 
-          {/* 전송 버튼 */}
           <Button
             variant="contained"
             fullWidth
