@@ -41,6 +41,9 @@ export default function QnaPage() {
   const [titleError, setTitleError] = useState(false);
   const [contentError, setContentError] = useState(false);
 
+  // 검색
+  const [allPosts, setAllPosts] = useState([]);
+
   // QnA 리스트 불러오기 (작성자 이메일 포함)
   const fetchQnaList = () => {
     const token = localStorage.getItem("token");
@@ -56,7 +59,9 @@ export default function QnaPage() {
           console.error("❌ 서버 응답이 배열이 아님:", data);
           return;
         }
-        setPosts(data.filter((d) => !d.deleted));
+        const filtered = data.filter((d) => !d.deleted);
+        setPosts(filtered); // 화면에 보여줄 데이터
+        setAllPosts(filtered); // 전체 데이터 저장 (검색용)
       })
       .catch((err) => console.error("❌ QnA fetch 에러:", err));
   };
@@ -145,13 +150,33 @@ export default function QnaPage() {
           <MenuItem value="title">제목</MenuItem>
           <MenuItem value="writer">작성자</MenuItem>
         </Select>
+
         <TextField
           size="small"
           placeholder="검색어를 입력하세요"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              const keyword = searchText.toLowerCase();
+              const filtered = allPosts.filter((post) => {
+                if (searchType === "title") {
+                  return post.title.toLowerCase().includes(keyword);
+                } else if (searchType === "writer") {
+                  return (
+                    post.name?.toLowerCase().includes(keyword) ||
+                    post.email?.toLowerCase().includes(keyword)
+                  );
+                }
+                return true;
+              });
+              setPosts(filtered);
+              setPage(1);
+            }
+          }}
           sx={{ width: 300 }}
         />
+
         <Button
           variant="text"
           sx={{
@@ -163,16 +188,74 @@ export default function QnaPage() {
               color: "#000000",
             },
           }}
-          // 검색 버튼은 아직 필터 기능 미구현 (필요하면 추가 가능)
+          onClick={() => {
+            const keyword = searchText.toLowerCase();
+
+            const filtered = allPosts.filter((post) => {
+              if (searchType === "title") {
+                return post.title.toLowerCase().includes(keyword);
+              } else if (searchType === "writer") {
+                return (
+                  post.name?.toLowerCase().includes(keyword) ||
+                  post.email?.toLowerCase().includes(keyword)
+                );
+              }
+              return true;
+            });
+
+            setPosts(filtered);
+            setPage(1); // 첫 페이지로 리셋
+          }}
         >
           검색
         </Button>
       </Stack>
 
       {/* 탭 */}
-      <Tabs value={tab} onChange={(e, v) => setTab(v)} sx={{ mb: 2 }}>
-        <Tab label="전체" />
-        <Tab label="공지" />
+      <Tabs
+        value={tab}
+        onChange={(e, v) => setTab(v)}
+        sx={{ mb: 2 }}
+        TabIndicatorProps={{ style: { display: "none" } }} // 기본 밑줄 제거
+      >
+        <Tab
+          label="전체"
+          sx={{
+            color: "#666666",
+            position: "relative",
+            "&.Mui-selected": {
+              color: "#666666",
+            },
+            "&.Mui-selected::after": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "2px",
+              backgroundColor: "#666666",
+            },
+          }}
+        />
+        <Tab
+          label="공지"
+          sx={{
+            color: "#dd0000",
+            position: "relative",
+            "&.Mui-selected": {
+              color: "#dd0000",
+            },
+            "&.Mui-selected::after": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "2px",
+              backgroundColor: "#dd0000",
+            },
+          }}
+        />
       </Tabs>
 
       {/* 게시판 테이블 */}
