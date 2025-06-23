@@ -65,9 +65,9 @@ export default function ResultDataPanel({ isOpen, onOpen, onClose }) {
       url: "/result/workcenter-plan",
     },
     {
-      label: "아직 추가 다 안함.",
+      label: "작업장 가동 현황",
       indent: true,
-      url: "/result/simulation/todo",
+      url: "/result/load-stat",
     },
     { label: "TaskAct", bold: true },
   ];
