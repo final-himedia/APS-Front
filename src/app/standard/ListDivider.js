@@ -138,7 +138,7 @@ export default function ListDivider({ onClose }) {
     { label: "RTF 현황", href: "#" },
     { label: "대시보드", href: "#" },
     { label: "자원 운영 간트", href: "#" },
-    { label: "생산 계획 간트", href: "#" },
+    { label: "생산 계획 간트", href: "/analysis/production-gantt" },
     { label: "설비 가동 현황", href: "#" },
     { label: "시나리오 비교", href: "#" },
   ];
