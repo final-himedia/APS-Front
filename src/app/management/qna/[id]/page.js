@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation"; // ✅ useRouter 추가
 import {
   Dialog,
   DialogTitle,
@@ -17,7 +17,9 @@ import {
 } from "@mui/material";
 
 export default function QnaDetailPage() {
-  const { id } = useParams(); // URL에서 id 추출
+  const { id } = useParams();
+  const router = useRouter(); // ✅ 뒤로가기 위해 추가
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +29,6 @@ export default function QnaDetailPage() {
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState(null);
 
-  // ✅ 수정된 부분: myUserId useState + useEffect
   const [myUserId, setMyUserId] = useState(null);
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -53,9 +54,7 @@ export default function QnaDetailPage() {
 
     fetch(`http://localhost:8080/api/management/qna/${id}`, {
       method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("삭제 실패");
@@ -102,10 +101,7 @@ export default function QnaDetailPage() {
         }
       );
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "수정 실패");
-      }
+      if (!res.ok) throw new Error("수정 실패");
 
       const updatedPost = await res.json();
       updatedPost.name = post.name;
@@ -126,9 +122,7 @@ export default function QnaDetailPage() {
     }
 
     fetch(`http://localhost:8080/api/management/qna/detail/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("불러오기 실패");
@@ -146,9 +140,7 @@ export default function QnaDetailPage() {
       });
 
     fetch(`http://localhost:8080/api/management/qna/${id}/comment/list`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error("댓글 불러오기 실패");
@@ -273,9 +265,7 @@ export default function QnaDetailPage() {
       `http://localhost:8080/api/management/qna/${id}/comment/${commentId}`,
       {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       }
     )
       .then((res) => {
@@ -299,8 +289,54 @@ export default function QnaDetailPage() {
 
   return (
     <Box sx={{ p: 4, maxWidth: "800px", mx: "auto" }}>
+      {/* 🔙 뒤로가기 버튼 */}
+      <Box sx={{ mb: 2 }}>
+        <Button
+          variant="text"
+          onClick={() => router.back()}
+          sx={{
+            textTransform: "none",
+            color: "#444",
+            "&:hover": {
+              backgroundColor: "#f0f0f0",
+            },
+          }}
+        >
+          뒤로가기
+        </Button>
+      </Box>
+
+      {/* ✍ 댓글 작성 입력창 (게시글보다 위) */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <TextField
+          label="댓글 작성"
+          multiline
+          minRows={3}
+          value={commentInput}
+          onChange={(e) => setCommentInput(e.target.value)}
+          fullWidth
+        />
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+          <Button
+            variant="contained"
+            onClick={handleCommentSubmit}
+            disabled={commentLoading}
+            sx={{
+              backgroundColor: "#dd0000",
+              "&:hover": {
+                backgroundColor: "#bb0000",
+                boxShadow: "none",
+              },
+            }}
+          >
+            등록
+          </Button>
+        </Box>
+      </Paper>
+
+      {/* 📰 게시글 본문 */}
       <Paper sx={{ p: 3, mb: 3 }}>
-        {/* 제목 + 수정/삭제 버튼 한 줄 정렬 */}
+        {/* 제목 + 수정/삭제 */}
         <Box
           sx={{
             display: "flex",
@@ -309,15 +345,14 @@ export default function QnaDetailPage() {
           }}
         >
           <Typography variant="h5">{post.title}</Typography>
-
           {post.writerId === myUserId && (
             <Box sx={{ display: "flex", gap: 1 }}>
               <Button
                 variant="outlined"
                 size="small"
                 onClick={() => {
-                  startEdit(); // 기존 글 제목/내용 입력 필드에 넣어줌
-                  setOpenEditDialog(true); // 다이얼로그 열기
+                  startEdit();
+                  setOpenEditDialog(true);
                 }}
               >
                 수정
@@ -333,72 +368,19 @@ export default function QnaDetailPage() {
             </Box>
           )}
         </Box>
-
-        {/* 작성자 정보 */}
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           작성자: {post.name} | 작성일: {post.wroteAt?.slice(0, 10)}
         </Typography>
-
-        {/* 본문 내용 */}
         <Typography variant="body1" sx={{ whiteSpace: "pre-line", mt: 2 }}>
           {post.content}
         </Typography>
       </Paper>
 
-      {/* 게시글 수정 다이얼로그 */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle>게시글 수정</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="제목"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            margin="normal" 
-          />
-
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            label="내용"
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            margin="normal" 
-          />
-        </DialogContent>
-
-        <DialogActions>
-          <Button
-            onClick={() => setOpenEditDialog(false)}
-            sx={{ color: "#dd0000" }}
-          >
-            취소
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleUpdatePost}
-            sx={{
-              backgroundColor: "#dd0000",
-              "&:hover": {
-                backgroundColor: "#bb0000",
-                boxShadow: "none",
-              },
-            }}
-          >
-            저장
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+      {/* 🗨 댓글 리스트는 그 아래 */}
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" gutterBottom>
           댓글 ({visibleComments.length})
         </Typography>
-
-        {visibleComments.length === 0 && (
-          <Typography color="text.secondary">댓글이 없습니다.</Typography>
-        )}
 
         {visibleComments.map((comment) => (
           <Box
@@ -408,7 +390,6 @@ export default function QnaDetailPage() {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
               작성자: {comment.name} | 작성일: {comment.wroteAt?.slice(0, 10)}
             </Typography>
-
             {editingCommentId === comment.id ? (
               <>
                 <TextField
@@ -419,11 +400,6 @@ export default function QnaDetailPage() {
                   onChange={(e) => setEditingContent(e.target.value)}
                   disabled={commentLoading}
                 />
-                {commentError && (
-                  <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                    {commentError}
-                  </Typography>
-                )}
                 <Stack direction="row" spacing={1} mt={1}>
                   <Button
                     variant="contained"
@@ -431,7 +407,7 @@ export default function QnaDetailPage() {
                     onClick={() => saveEditing(comment.id)}
                     disabled={commentLoading}
                   >
-                    {commentLoading ? "저장 중..." : "저장"}
+                    저장
                   </Button>
                   <Button
                     variant="outlined"
@@ -465,33 +441,6 @@ export default function QnaDetailPage() {
             )}
           </Box>
         ))}
-
-        <Box mt={2}>
-          <TextField
-            label="댓글 작성"
-            multiline
-            minRows={3}
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-            fullWidth
-          />
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-            <Button
-              variant="contained"
-              onClick={handleCommentSubmit}
-              disabled={commentLoading}
-              sx={{
-                backgroundColor: "#dd0000",
-                "&:hover": {
-                  backgroundColor: "#bb0000",
-                  boxShadow: "none",
-                },
-              }}
-            >
-              등록
-            </Button>
-          </Box>
-        </Box>
       </Paper>
     </Box>
   );
