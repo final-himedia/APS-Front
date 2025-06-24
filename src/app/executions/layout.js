@@ -1,18 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import ScenarioList from "../standard/ScenarioList";
-import ResultDataPanel from "../standard/ResultDataPanel";
 import { IconButton, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ScenarioList from "../standard/ScenarioList"; // ← 왼쪽 패널로 사용됨
 
-export default function ResultLayout({ children }) {
+export default function ExecutionLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
-  const [showResultPanel, setShowResultPanel] = useState(true);
 
   const SCENARIO_WIDTH = 240;
-  const RESULT_WIDTH = 260;
 
   return (
     <Box
@@ -21,7 +18,6 @@ export default function ResultLayout({ children }) {
         gridTemplateColumns: `
           ${showScenarioList ? `${SCENARIO_WIDTH}px` : "0px"}
           1fr
-          ${showResultPanel ? `${RESULT_WIDTH}px` : "0px"}
         `,
         width: "100%",
         maxWidth: "100vw",
@@ -30,14 +26,14 @@ export default function ResultLayout({ children }) {
         position: "relative",
       }}
     >
-      {/* 왼쪽 시나리오 목록 패널 */}
+      {/* 왼쪽 시나리오 패널 */}
       <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
         {showScenarioList && (
           <ScenarioList onClose={() => setShowScenarioList(false)} />
         )}
       </Box>
 
-      {/* 가운데 콘텐츠 */}
+      {/* 중앙 콘텐츠 */}
       <Box
         sx={{
           overflow: "hidden",
@@ -61,50 +57,7 @@ export default function ResultLayout({ children }) {
         </Box>
       </Box>
 
-      {/* 오른쪽 결과 데이터 패널 */}
-      <Box
-        sx={{
-          position: "relative",
-          width: showResultPanel ? RESULT_WIDTH : "20px",
-          height: "100%",
-          right: 0,
-          transition: "width 0.3s ease-in-out",
-        }}
-      >
-        {showResultPanel ? (
-          <ResultDataPanel
-            isOpen={true}
-            onOpen={() => setShowResultPanel(true)}
-            onClose={() => setShowResultPanel(false)}
-          />
-        ) : (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 20,
-              right: 25,
-              transform: "translateY(-50%)",
-              zIndex: 1200,
-            }}
-          >
-            <IconButton
-              onClick={() => setShowResultPanel(true)}
-              sx={{
-                bgcolor: "white",
-                border: "1px solid #ccc",
-                borderRadius: 1,
-                boxShadow: 1,
-                width: 30,
-                height: 30,
-              }}
-            >
-              <ChevronLeftIcon />
-            </IconButton>
-          </Box>
-        )}
-      </Box>
-
-      {/* 왼쪽 열기 버튼 */}
+      {/* 왼쪽 열기 버튼 (닫혔을 때만 표시) */}
       {!showScenarioList && (
         <IconButton
           onClick={() => setShowScenarioList(true)}

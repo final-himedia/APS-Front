@@ -129,7 +129,7 @@ export default function ListDivider({ onClose }) {
 
   const engineMenuItems = [
     { label: "시나리오 관리", href: "/scenario" },
-    { label: "실행 관리", href: "/run" },
+    { label: "실행 관리", href: "/executions" },
     { label: "스케줄 관리", href: "/schedule" },
     { label: "실행 결과", href: "/result/workcenter-plan" },
   ];

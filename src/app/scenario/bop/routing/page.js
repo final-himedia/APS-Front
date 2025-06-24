@@ -11,8 +11,8 @@ import {
   IconButton,
   Typography,
 } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
+import { DataGrid } from "@mui/x-data-grid";
 import Toolbar from "@/app/standard/Toolbar";
 import useScenarioStore from "@/hooks/useScenarioStore";
 
@@ -30,6 +30,7 @@ export default function RoutingMasterView() {
   const setScenarioId = useScenarioStore(
     (state) => state.setSelectedScenarioId
   );
+
   const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
@@ -47,12 +48,10 @@ export default function RoutingMasterView() {
     if (!scenarioId) setScenarioId("S010000");
   }, [scenarioId, setScenarioId]);
 
-  const fetchRoutingData = (token, id) => {
+  const fetchData = (token, id) => {
     if (!token || !id) return;
     fetch(`http://localhost:8080/api/scenarios/bop/routing/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -71,16 +70,11 @@ export default function RoutingMasterView() {
   };
 
   useEffect(() => {
-    if (token && scenarioId) fetchRoutingData(token, scenarioId);
+    if (token && scenarioId) fetchData(token, scenarioId);
   }, [token, scenarioId]);
 
-  const handleDownloadExcel = () => {
-    if (!token || !scenarioId) return;
-    window.open(
-      `http://localhost:8080/api/scenarios/bop/routing-download?scenarioId=${scenarioId}`,
-      "_blank"
-    );
-  };
+  const handleOpenDialog = () => setOpen(true);
+  const handleCloseDialog = () => setOpen(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -98,27 +92,46 @@ export default function RoutingMasterView() {
       },
     })
       .then((res) => {
-        if (res.ok) fetchRoutingData(token, scenarioId);
+        if (res.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
       })
       .finally(() => setOpen(false));
   };
 
+  const handleDownloadExcel = () => {
+    if (!token || !scenarioId) return;
+    fetch(
+      `http://localhost:8080/api/scenarios/bop/routing-download?scenarioId=${scenarioId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error("다운로드 실패");
+        return res.blob();
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "routing-master.xlsx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch((err) => console.error("다운로드 오류:", err));
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ mt: 2 }}>
-        <Toolbar upload={() => setOpen(true)} download={handleDownloadExcel} />
-        <Dialog
-          open={open}
-          onClose={() => setOpen(false)}
-          fullWidth
-          maxWidth="sm"
-        >
+        <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
+        <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
           <DialogTitle
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            라우팅 파일 업로드
-            <IconButton onClick={() => setOpen(false)}>
+            라우팅 마스터 업로드
+            <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
@@ -148,7 +161,7 @@ export default function RoutingMasterView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>취소</Button>
+            <Button onClick={handleCloseDialog}>취소</Button>
           </DialogActions>
         </Dialog>
       </Box>
@@ -161,9 +174,9 @@ export default function RoutingMasterView() {
           boxShadow: "0px 2px 8px rgba(0,0,0,0.05)",
           p: 2,
           height: "100%",
+          overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          overflow: "hidden",
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -182,9 +195,6 @@ export default function RoutingMasterView() {
             rowHeight={38}
             sx={{
               "& .MuiDataGrid-columnHeaders": {
-                backgroundColor: "#f2e8e8",
-              },
-              "& .MuiDataGrid-columnHeadersInner": {
                 backgroundColor: "#f2e8e8",
               },
               "& .MuiDataGrid-columnHeader": {

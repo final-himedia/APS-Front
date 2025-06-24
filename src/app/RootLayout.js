@@ -146,7 +146,7 @@ export default function RootLayout({ children }) {
         <main
           style={{
             paddingLeft: 0,
-            paddingRight: 16,
+            paddingRight: 0,
             height: "calc(100vh - 45px)",
             overflow: "auto",
           }}
