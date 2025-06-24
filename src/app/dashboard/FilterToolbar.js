@@ -22,7 +22,7 @@ export default function FilterToolbar() {
           borderRadius: 2,
           px: 2,
           py: 1.5,
-          mb: 4,
+          mb: 2,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -85,8 +85,8 @@ export default function FilterToolbar() {
                 key={colIndex}
                 sx={{
                   flex: 1,
-                  minWidth: 0,
-                  aspectRatio: "4 / 3",
+                  minWidth: 230,
+                  height: 320,
                   backgroundColor: "#fff",
                   borderRadius: 2,
                   boxShadow: "0 2px 6px rgba(0,0,0,0.05)",

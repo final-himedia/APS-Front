@@ -7,8 +7,8 @@ export default function DashboardLayout({ children }) {
       sx={{
         width: "100%",
         margin: "0 auto",
-        px: 4,
-        py: 2,
+        px: 1,
+        py: 1,
         backgroundColor: "#f5f5f5",
 
         height: "100%",
@@ -21,7 +21,6 @@ export default function DashboardLayout({ children }) {
       <Box
         sx={{
           flex: 1,
-          overflowY: "auto",
         }}
       >
         {children}
