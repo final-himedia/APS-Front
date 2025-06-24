@@ -18,6 +18,21 @@ import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SaveIcon from "@mui/icons-material/Save";
 import dayjs from "dayjs";
+import { registerLicense } from "@syncfusion/ej2-base";
+import {
+  GanttComponent,
+  Inject,
+  ColumnsDirective,
+  ColumnDirective,
+  Selection,
+  DayMarkers,
+  Edit,
+  Toolbar,
+} from "@syncfusion/ej2-react-gantt";
+
+registerLicense(
+  "Ngo9BigBOggjHTQxAR8/V1NNaF1cWWhPYVB2WmFZfVtgdVVMYVhbRH9PIiBoS35Rc0VlW3xccnVRRmlUWEF/VEBU"
+);
 
 // 더미 데이터
 const operations = [
@@ -41,6 +56,22 @@ const operations = [
     ],
   },
 ];
+
+const transformData = (operations) =>
+  operations.map((group, i) => ({
+    TaskID: i + 1,
+    TaskName: group.group,
+    StartDate: null,
+    EndDate: null,
+    subtasks: group.steps.map((step, j) => ({
+      TaskID: `${i + 1}.${j + 1}`,
+      TaskName: step.name,
+      StartDate: new Date(step.start),
+      EndDate: new Date(new Date(step.end).getTime() + 86400000), // end + 1 day
+      OperationID: step.id,
+      ResourceID: step.part,
+    })),
+  }));
 
 const dateRange = Array.from({ length: 25 }, (_, i) =>
   dayjs("2025-01-15").add(i, "day").format("MM/DD")
@@ -90,14 +121,14 @@ export default function ProductionGantt() {
             label="종료 날짜"
             size="small"
             type="date"
-            defaultValue="2025-02-08"
+            defaultValue="2025-12-08"
             InputLabelProps={{ shrink: true }}
           />
           <FormControl size="small" sx={{ minWidth: 180 }}>
             <InputLabel id="model-select-label">기종/호기</InputLabel>
             <Select
-              labelId="model-select-label" // ✅ InputLabel과 연결
-              label="기종/호기" // ✅ 꼭 있어야 함! 없으면 label floating 안됨
+              labelId="model-select-label" //  InputLabel과 연결
+              label="기종/호기" // 꼭 있어야 함! 없으면 label floating 안됨
               defaultValue="F404"
             >
               <MenuItem value="F404">F404 [10020250]</MenuItem>
@@ -154,25 +185,6 @@ export default function ProductionGantt() {
             <Box sx={{ width: "30%" }}>공정ID (operationdid)</Box>
             <Box sx={{ width: "30%" }}>자재 (partid)</Box>
           </Box>
-          {/* 데이터 */}
-          {operations.map((group) => (
-            <Box key={group.group}>
-              {group.steps.map((step, index) => (
-                <Box
-                  key={step.id}
-                  sx={{ display: "flex", px: 1, py: 0.5, fontSize: 12 }}
-                >
-                  {index === 0 && (
-                    <Box sx={{ width: "40%" }} rowSpan={group.steps.length}>
-                      {group.group}
-                    </Box>
-                  )}
-                  <Box sx={{ width: "30%" }}>{step.id}</Box>
-                  <Box sx={{ width: "30%" }}>{step.part}</Box>
-                </Box>
-              ))}
-            </Box>
-          ))}
         </Box>
 
         {/* 간트 바 영역 */}
