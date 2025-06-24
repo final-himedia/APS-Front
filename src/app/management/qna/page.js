@@ -357,7 +357,7 @@ export default function QnaPage() {
         <Divider
           sx={{
             borderBottomWidth: 2,
-            borderColor: "#808080",
+            borderColor: "#dd8080",
             width: "95%",
             mx: "auto",
           }}
