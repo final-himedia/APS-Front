@@ -1,0 +1,173 @@
+"use client";
+
+import { Button, Menu, MenuItem, Box, Stack, IconButton } from "@mui/material";
+import { useEffect, useState } from "react";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddIcon from "@mui/icons-material/Add";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
+export default function ResultToolBar({ upload, download }) {
+  const [exportAnchorEl, setExportAnchorEl] = useState(null);
+  const [importAnchorEl, setImportAnchorEl] = useState(null);
+  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
+  const [isCompact, setIsCompact] = useState(false);
+
+  const exportOpen = Boolean(exportAnchorEl);
+  const importOpen = Boolean(importAnchorEl);
+  const moreOpen = Boolean(moreAnchorEl);
+
+  const handleExportClick = (e) => setExportAnchorEl(e.currentTarget);
+  const handleExportClose = () => setExportAnchorEl(null);
+
+  const handleImportClick = (e) => setImportAnchorEl(e.currentTarget);
+  const handleImportClose = () => setImportAnchorEl(null);
+
+  const handleMoreClick = (e) => setMoreAnchorEl(e.currentTarget);
+  const handleMoreClose = () => setMoreAnchorEl(null);
+
+  const actionButtons = [
+    {
+      label: "레이아웃 저장",
+      icon: <SaveIcon fontSize="small" />,
+      onClick: () => {},
+    },
+    {
+      label: "레이아웃 삭제",
+      icon: <DeleteIcon fontSize="small" />,
+      onClick: () => {},
+      disabled: true,
+    },
+    {
+      label: "새로고침",
+      icon: <RefreshIcon fontSize="small" />,
+      onClick: () => {},
+    },
+  ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsCompact(window.innerWidth < 1500);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 1,
+        p: 1,
+        backgroundColor: "#f2e8e8",
+        border: "1px solid #d0d7e2",
+        borderRadius: 1,
+        mb: 1,
+        position: "relative",
+      }}
+    >
+      {/* 왼쪽: 데이터 관련 */}
+      <Stack direction="row" spacing={1} flexWrap="wrap">
+        <div>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<FileUploadIcon fontSize="small" />}
+            onClick={handleExportClick}
+            sx={{
+              px: 1.5,
+              color: "#3f3f3f",
+              borderColor: "#3f3f3f",
+            }}
+          >
+            데이터 내보내기
+          </Button>
+          <Menu
+            anchorEl={exportAnchorEl}
+            open={exportOpen}
+            onClose={handleExportClose}
+          >
+            <MenuItem onClick={download}>Excel 다운로드</MenuItem>
+            <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
+          </Menu>
+        </div>
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<FileDownloadIcon fontSize="small" />}
+          onClick={handleImportClick}
+          sx={{
+            px: 1.5,
+            color: "#3f3f3f",
+            borderColor: "#3f3f3f",
+          }}
+        >
+          데이터 가져오기
+        </Button>
+        <Menu
+          anchorEl={importAnchorEl}
+          open={importOpen}
+          onClose={handleImportClose}
+        >
+          <MenuItem onClick={upload}>Excel 업로드</MenuItem>
+          <MenuItem onClick={handleImportClose}>CSV 업로드</MenuItem>
+        </Menu>
+      </Stack>
+
+      {/* 오른쪽: 버튼들 or ... 아이콘 */}
+      {isCompact ? (
+        <>
+          <IconButton size="small" sx={{ p: 0.5 }} onClick={handleMoreClick}>
+            <MoreHorizIcon />
+          </IconButton>
+          <Menu
+            anchorEl={moreAnchorEl}
+            open={moreOpen}
+            onClose={handleMoreClose}
+          >
+            {actionButtons.map((btn, idx) => (
+              <MenuItem
+                key={idx}
+                onClick={() => {
+                  btn.onClick();
+                  handleMoreClose();
+                }}
+                disabled={btn.disabled}
+              >
+                {btn.icon}
+                <Box sx={{ ml: 1 }}>{btn.label}</Box>
+              </MenuItem>
+            ))}
+          </Menu>
+        </>
+      ) : (
+        <Stack direction="row" spacing={1}>
+          {actionButtons.map((btn, idx) => (
+            <Button
+              key={idx}
+              size="small"
+              variant="outlined"
+              startIcon={btn.icon}
+              onClick={btn.onClick}
+              disabled={btn.disabled}
+              sx={{
+                color: "#3f3f3f",
+                borderColor: "#3f3f3f",
+              }}
+            >
+              {btn.label}
+            </Button>
+          ))}
+        </Stack>
+      )}
+    </Box>
+  );
+}
