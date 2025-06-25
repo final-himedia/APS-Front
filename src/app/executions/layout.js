@@ -3,11 +3,14 @@
 import { useState } from "react";
 import { IconButton, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ScenarioList from "../standard/ScenarioList"; // ← 왼쪽 패널로 사용됨
+import ExeScenarioList from "../standard/ExeScenarioList";
 
-export default function ExecutionLayout({ children }) {
+// ✅ ExecutionsPage 직접 import
+import ExecutionsPage from "../executions/page";
+
+export default function ExecutionLayout() {
   const [showScenarioList, setShowScenarioList] = useState(true);
+  const [selectedScenarioIds, setSelectedScenarioIds] = useState([]);
 
   const SCENARIO_WIDTH = 240;
 
@@ -29,11 +32,15 @@ export default function ExecutionLayout({ children }) {
       {/* 왼쪽 시나리오 패널 */}
       <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
         {showScenarioList && (
-          <ScenarioList onClose={() => setShowScenarioList(false)} />
+          <ExeScenarioList
+            onClose={() => setShowScenarioList(false)}
+            selectedScenarioIds={selectedScenarioIds}
+            setSelectedScenarioIds={setSelectedScenarioIds}
+          />
         )}
       </Box>
 
-      {/* 중앙 콘텐츠 */}
+      {/* 중앙 콘텐츠 - children 대신 직접 실행 페이지 렌더링 */}
       <Box
         sx={{
           overflow: "hidden",
@@ -45,19 +52,13 @@ export default function ExecutionLayout({ children }) {
           backgroundColor: "#f5f5f5",
         }}
       >
-        <Box
-          sx={{
-            flex: 1,
-            overflowX: "auto",
-            overflowY: "hidden",
-            pb: 1,
-          }}
-        >
-          {children}
-        </Box>
+        <ExecutionsPage
+          selectedScenarioIds={selectedScenarioIds}
+          setSelectedScenarioIds={setSelectedScenarioIds}
+        />
       </Box>
 
-      {/* 왼쪽 열기 버튼 (닫혔을 때만 표시) */}
+      {/* 왼쪽 열기 버튼 */}
       {!showScenarioList && (
         <IconButton
           onClick={() => setShowScenarioList(true)}
