@@ -148,7 +148,6 @@ export default function RootLayout({ children }) {
             paddingLeft: 0,
             paddingRight: 0,
             height: "calc(100vh - 45px)",
-            overflow: "auto",
           }}
         >
           {children}
