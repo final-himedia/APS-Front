@@ -167,8 +167,9 @@ export default function Toolbar({ upload, download }) {
               onClick={btn.onClick}
               disabled={btn.disabled}
               sx={{
-            color: "#3f3f3f", // 글자색
-            borderColor: "#3f3f3f",}}
+                color: "#3f3f3f", // 글자색
+                borderColor: "#3f3f3f",
+              }}
             >
               {btn.label}
             </Button>

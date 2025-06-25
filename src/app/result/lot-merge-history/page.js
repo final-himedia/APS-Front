@@ -3,6 +3,7 @@
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
+import Toolbar from "@/app/standard/Toolbar";
 
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
