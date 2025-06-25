@@ -1,32 +1,40 @@
 "use client";
 
-import { Button, Menu, MenuItem, Box, Stack, IconButton } from "@mui/material";
+import { Button, Box, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 
-export default function ResultToolBar({ upload, download }) {
-  const [exportAnchorEl, setExportAnchorEl] = useState(null);
-  const [importAnchorEl, setImportAnchorEl] = useState(null);
-  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
+export default function ResultToolBar({
+  upload,
+  download,
+  selectedScenarioIds = [],
+}) {
   const [isCompact, setIsCompact] = useState(false);
 
-  const exportOpen = Boolean(exportAnchorEl);
-  const importOpen = Boolean(importAnchorEl);
-  const moreOpen = Boolean(moreAnchorEl);
+  useEffect(() => {
+    console.log("🧪 툴바에서 받은 selectedScenarioIds:", selectedScenarioIds);
 
-  
+    const handleResize = () => {
+      setIsCompact(window.innerWidth < 1500);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const actionButtons = [
     {
       label: "시작",
       icon: <PlayArrowIcon fontSize="small" />,
-      onClick: () => {},
+      onClick: () => {
+        console.log("✅ 선택된 시나리오:", selectedScenarioIds);
+      },
+      disabled: selectedScenarioIds.length === 0,
     },
     {
       label: "정지",
@@ -37,30 +45,24 @@ export default function ResultToolBar({ upload, download }) {
     {
       label: "새로고침",
       icon: <RefreshIcon fontSize="small" />,
-      onClick: () => {},
+      onClick: () => {
+        window.location.reload();
+      },
     },
     {
       label: "삭제",
       icon: <DeleteIcon fontSize="small" />,
-      onClick: () => {},
+      onClick: () => {
+        alert("삭제 기능 미구현");
+      },
     },
   ];
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsCompact(window.innerWidth < 1500);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "flex-start", // ← 왼쪽 정렬
+        justifyContent: "flex-start",
         alignItems: "center",
         flexWrap: "wrap",
         gap: 1,

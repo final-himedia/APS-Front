@@ -5,6 +5,10 @@ import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import ExecutionsToolBar from "@/app/standard/ExecutionsToolBar";
 
+import DownloadIcon from "@mui/icons-material/Download";
+import DescriptionIcon from "@mui/icons-material/Description";
+import IconButton from "@mui/material/IconButton";
+
 // 컬럼 정의
 const columns = [
   { field: "version", headerName: "버전", width: 40 },
@@ -15,15 +19,40 @@ const columns = [
   { field: "errorMessage", headerName: "에러 메시지", flex: 1 },
   { field: "schedule", headerName: "스케줄", flex: 1 },
   { field: "userId", headerName: "사용자ID", flex: 1 },
-  { field: "result", headerName: "결과", width: 40 },
-  { field: "log", headerName: "로그", width: 40 },
+  {
+    field: "result",
+    headerName: "결과",
+    width: 40,
+    renderCell: (params) => (
+      <IconButton
+        size="small"
+        onClick={() => alert(`결과 다운로드: ${params.row.id}`)}
+      >
+        <DownloadIcon fontSize="small" />
+      </IconButton>
+    ),
+  },
+  {
+    field: "log",
+    headerName: "로그",
+    width: 40,
+    renderCell: (params) => (
+      <IconButton
+        size="small"
+        onClick={() => alert(`로그 보기: ${params.row.id}`)}
+      >
+        <DescriptionIcon fontSize="small" />
+      </IconButton>
+    ),
+  },
 ];
 
-export default function ExecutionsPage() {
+// ✅ selectedScenarioIds, setSelectedScenarioIds를 props로 받음
+export default function ExecutionsPage({ selectedScenarioIds, setSelectedScenarioIds }) {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    // 임시 더미 데이터 (나중에 fetch로 교체)
+    // 임시 데이터 (나중에 API 연동 예정)
     setRows([
       {
         id: 1,
@@ -43,8 +72,13 @@ export default function ExecutionsPage() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      {/* ✅ 툴바에 selectedScenarioIds 전달 */}
       <Box sx={{ mt: 2, mb: 1 }}>
-        <ExecutionsToolBar upload={() => {}} download={() => {}} />
+        <ExecutionsToolBar
+          upload={() => {}}
+          download={() => {}}
+          selectedScenarioIds={selectedScenarioIds}
+        />
       </Box>
 
       <Box
