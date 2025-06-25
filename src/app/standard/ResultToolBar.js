@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Box,
-  Stack,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
+import { Button, Menu, MenuItem, Box, Stack, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,7 +10,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function Toolbar({ upload, download }) {
+export default function ResultToolBar({ upload, download }) {
   const [exportAnchorEl, setExportAnchorEl] = useState(null);
   const [importAnchorEl, setImportAnchorEl] = useState(null);
   const [moreAnchorEl, setMoreAnchorEl] = useState(null);
@@ -41,11 +30,14 @@ export default function Toolbar({ upload, download }) {
   const handleMoreClose = () => setMoreAnchorEl(null);
 
   const actionButtons = [
-    { label: "추가", icon: <AddIcon fontSize="small" />, onClick: () => {} },
-    { label: "삭제", icon: <DeleteIcon fontSize="small" />, onClick: () => {} },
     {
-      label: "저장",
+      label: "레이아웃 저장",
       icon: <SaveIcon fontSize="small" />,
+      onClick: () => {},
+    },
+    {
+      label: "레이아웃 삭제",
+      icon: <DeleteIcon fontSize="small" />,
       onClick: () => {},
       disabled: true,
     },
@@ -58,10 +50,10 @@ export default function Toolbar({ upload, download }) {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsCompact(window.innerWidth < 1300);
+      setIsCompact(window.innerWidth < 1500);
     };
 
-    handleResize(); // 초기 체크
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -71,7 +63,7 @@ export default function Toolbar({ upload, download }) {
       sx={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "flex-start",
+        alignItems: "center",
         flexWrap: "wrap",
         gap: 1,
         p: 1,
@@ -92,7 +84,7 @@ export default function Toolbar({ upload, download }) {
             onClick={handleExportClick}
             sx={{
               px: 1.5,
-              color: "#3f3f3f", // 글자색
+              color: "#3f3f3f",
               borderColor: "#3f3f3f",
             }}
           >
@@ -114,7 +106,7 @@ export default function Toolbar({ upload, download }) {
           onClick={handleImportClick}
           sx={{
             px: 1.5,
-            color: "#3f3f3f", // 글자색
+            color: "#3f3f3f",
             borderColor: "#3f3f3f",
           }}
         >
@@ -133,7 +125,7 @@ export default function Toolbar({ upload, download }) {
       {/* 오른쪽: 버튼들 or ... 아이콘 */}
       {isCompact ? (
         <>
-          <IconButton size="small" onClick={handleMoreClick}>
+          <IconButton size="small" sx={{ p: 0.5 }} onClick={handleMoreClick}>
             <MoreHorizIcon />
           </IconButton>
           <Menu
@@ -167,7 +159,7 @@ export default function Toolbar({ upload, download }) {
               onClick={btn.onClick}
               disabled={btn.disabled}
               sx={{
-                color: "#3f3f3f", // 글자색
+                color: "#3f3f3f",
                 borderColor: "#3f3f3f",
               }}
             >

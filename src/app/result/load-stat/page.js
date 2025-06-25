@@ -3,6 +3,7 @@
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
+import Toolbar from "@/app/standard/Toolbar"; // ✅ 툴바 임포트
 
 const columns = [
   { field: "id", headerName: "순번", width: 80 },
@@ -14,7 +15,18 @@ const columns = [
 export default function LoadStatPage() {
   const [rows, setRows] = useState([]);
 
-  useEffect(() => {
+  // ✅ 엑셀 업로드
+  const handleUpload = () => {
+    alert("엑셀 업로드 실행");
+  };
+
+  // ✅ 엑셀 다운로드
+  const handleDownload = () => {
+    alert("엑셀 다운로드 실행");
+  };
+
+  // ✅ 데이터 가져오기 함수
+  const fetchData = () => {
     fetch("http://localhost:8080/api/result/load-stat")
       .then((res) => res.json())
       .then((data) => {
@@ -26,11 +38,22 @@ export default function LoadStatPage() {
         }));
         setRows(formatted);
       });
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   return (
     <Box p={2}>
-      <Typography variant="h6">작업장 가동현황</Typography>
+      <Typography variant="h6" gutterBottom>
+        작업장 가동현황
+      </Typography>
+
+      {/* ✅ 공통 툴바 삽입 */}
+      <Toolbar upload={handleUpload} download={handleDownload} />
+
+      {/* ✅ 데이터 테이블 */}
       <DataGrid
         rows={rows}
         columns={columns}

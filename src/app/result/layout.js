@@ -11,8 +11,8 @@ export default function ResultLayout({ children }) {
   const [showScenarioList, setShowScenarioList] = useState(true);
   const [showResultPanel, setShowResultPanel] = useState(true);
 
-  const SCENARIO_WIDTH = 260;
-  const RESULT_WIDTH = 280;
+  const SCENARIO_WIDTH = 240;
+  const RESULT_WIDTH = 260;
 
   return (
     <Box
@@ -31,13 +31,7 @@ export default function ResultLayout({ children }) {
       }}
     >
       {/* 왼쪽 시나리오 목록 패널 */}
-      <Box
-        sx={{
-          width: "100%",
-          height: "100%",
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
         {showScenarioList && (
           <ScenarioList onClose={() => setShowScenarioList(false)} />
         )}
@@ -45,13 +39,26 @@ export default function ResultLayout({ children }) {
 
       {/* 가운데 콘텐츠 */}
       <Box
-        component="main"
         sx={{
-          overflow: "auto",
+          overflow: "hidden",
           minWidth: 0,
+          px: 2,
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          backgroundColor: "#f5f5f5",
         }}
       >
-        {children}
+        <Box
+          sx={{
+            flex: 1,
+            overflowX: "auto",
+            overflowY: "hidden",
+            pb: 1,
+          }}
+        >
+          {children}
+        </Box>
       </Box>
 
       {/* 오른쪽 결과 데이터 패널 */}
@@ -97,13 +104,13 @@ export default function ResultLayout({ children }) {
         )}
       </Box>
 
-      {/* 왼쪽 열기 버튼 (시나리오 목록) */}
+      {/* 왼쪽 열기 버튼 */}
       {!showScenarioList && (
         <IconButton
           onClick={() => setShowScenarioList(true)}
           sx={{
             position: "absolute",
-            left: 0,
+            left: 10,
             top: 10,
             zIndex: 1300,
             backgroundColor: "#fff",
