@@ -1,102 +1,113 @@
 "use client";
 
 import React, { useState } from "react";
+import { registerLicense } from "@syncfusion/ej2-base";
+import {
+  GanttComponent,
+  Toolbar,
+  Edit,
+  Selection,
+  Sort,
+  Reorder,
+  ContextMenu,
+  DayMarkers,
+  Inject,
+  ColumnDirective,
+  ColumnsDirective,
+} from "@syncfusion/ej2-react-gantt";
 import {
   Box,
-  Typography,
   Paper,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   TextField,
-  Switch,
-  FormControlLabel,
   Button,
+  FormControlLabel,
+  Switch,
+  Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SaveIcon from "@mui/icons-material/Save";
-import dayjs from "dayjs";
-import { registerLicense } from "@syncfusion/ej2-base";
-import {
-  GanttComponent,
-  Inject,
-  ColumnsDirective,
-  ColumnDirective,
-  Selection,
-  DayMarkers,
-  Edit,
-  Toolbar,
-} from "@syncfusion/ej2-react-gantt";
+import RefreshIcon from "@mui/icons-material/Search";
+import SaveIcon from "@mui/icons-material/Search";
 
+// Syncfusion 라이선스 등록
 registerLicense(
-  "Ngo9BigBOggjHTQxAR8/V1NNaF1cWWhPYVB2WmFZfVtgdVVMYVhbRH9PIiBoS35Rc0VlW3xccnVRRmlUWEF/VEBU"
+  "Ngo9BigBOggjHTQxAR8/ V1NNaF1cWWhPYVB2WmFZfVtgdVVMYV hbRH9PIiBoS35Rc0VlW3xccnVRRmlUWEF/VEBU"
 );
 
-// 더미 데이터
 const operations = [
   {
-    group: "LPT ROTOR ASSEMBLY",
-    steps: [
-      {
-        id: "LRA_0010",
-        part: "POCFLPT41",
-        name: "020",
-        start: "2025-01-23",
-        end: "2025-01-25",
-      },
-      {
-        id: "LRA_0020",
-        part: "POCFLPT41",
-        name: "020",
-        start: "2025-01-24",
-        end: "2025-01-26",
-      },
-    ],
+    OperationID: 1,
+    TaskName: "Product concept",
+    StartDate: new Date(2025, 3, 2),
+    EndDate: new Date(2025, 3, 8),
+    Duration: "5 days",
+  },
+  {
+    OperationID: 2,
+    TaskName: "Defining the product usage",
+    StartDate: new Date(2025, 3, 2),
+    EndDate: new Date(2025, 3, 8),
+    Duration: "3",
+    Progress: 30,
+    ParentTaskID: 1,
+  },
+  {
+    OperationID: 3,
+    TaskName: "Defining the target audience",
+    StartDate: new Date(2025, 3, 2),
+    EndDate: new Date(2025, 3, 4),
+    Duration: "3",
+    Progress: 40,
+    ParentTaskID: 1,
+  },
+  {
+    OperationID: 4,
+    TaskName: "Prepare product sketch and notes",
+    StartDate: new Date(2025, 3, 5),
+    EndDate: new Date(2025, 3, 8),
+    Duration: "2",
+    Progress: 30,
+    ParentTaskID: 1,
+    Predecessor: "2",
   },
 ];
-
-const transformData = (operations) =>
-  operations.map((group, i) => ({
-    TaskID: i + 1,
-    TaskName: group.group,
-    StartDate: null,
-    EndDate: null,
-    subtasks: group.steps.map((step, j) => ({
-      TaskID: `${i + 1}.${j + 1}`,
-      TaskName: step.name,
-      StartDate: new Date(step.start),
-      EndDate: new Date(new Date(step.end).getTime() + 86400000), // end + 1 day
-      OperationID: step.id,
-      ResourceID: step.part,
-    })),
-  }));
-
-const dateRange = Array.from({ length: 25 }, (_, i) =>
-  dayjs("2025-01-15").add(i, "day").format("MM/DD")
-);
 
 export default function ProductionGantt() {
   const [scenario, setScenario] = useState("S0100000");
 
+  const taskFields = {
+    id: "OperationID",
+    name: "TaskName",
+    startDate: "StartDate",
+    endDate: "EndDate",
+    duration: "Duration",
+    progress: "Progress",
+    parentID: "ParentTaskID",
+  };
+
+  const editSettings = {
+    allowEditing: true,
+    editMode: "Auto",
+    allowTaskbarEditing: true,
+  };
+
+  const labelSettings = {
+    rightLabel: "Resources",
+  };
+
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", p: 2, gap: 2 }}>
-      {/* 상단 필터 */}
-      <Paper
-        sx={{
-          p: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+    <Box sx={{ p: 2, width: "100%" }}>
+      {/* 필터 바 */}
+      <Paper sx={{ p: 2, mb: 2 }}>
         <Box
           sx={{
             display: "flex",
             gap: 2,
-            alignItems: "center",
             flexWrap: "wrap",
+            alignItems: "center",
           }}
         >
           <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -111,24 +122,24 @@ export default function ProductionGantt() {
             </Select>
           </FormControl>
           <TextField
-            label="시작 날짜"
-            size="small"
             type="date"
-            defaultValue="2025-01-15"
+            label="시작일"
+            size="small"
+            defaultValue="2025-03-15"
             InputLabelProps={{ shrink: true }}
           />
           <TextField
-            label="종료 날짜"
-            size="small"
             type="date"
-            defaultValue="2025-12-08"
+            label="종료일"
+            size="small"
+            defaultValue="2025-06-31"
             InputLabelProps={{ shrink: true }}
           />
           <FormControl size="small" sx={{ minWidth: 180 }}>
             <InputLabel id="model-select-label">기종/호기</InputLabel>
             <Select
-              labelId="model-select-label" //  InputLabel과 연결
-              label="기종/호기" // 꼭 있어야 함! 없으면 label floating 안됨
+              labelId="model-select-label"
+              label="기종/호기"
               defaultValue="F404"
             >
               <MenuItem value="F404">F404 [10020250]</MenuItem>
@@ -143,120 +154,58 @@ export default function ProductionGantt() {
             control={<Switch defaultChecked />}
             label="트리 열기/닫기"
           />
-
-          {/* 정렬 + 버튼 그룹 */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <FormControlLabel control={<Switch />} label="정렬" />
-            <Button variant="outlined" startIcon={<SearchIcon />} size="small">
-              검색
-            </Button>
-            <Button variant="outlined" startIcon={<RefreshIcon />} size="small">
-              초기화
-            </Button>
-            <Button variant="outlined" startIcon={<SaveIcon />} size="small">
-              저장
-            </Button>
-          </Box>
+          <FormControlLabel control={<Switch />} label="정렬" />
+          <Button variant="outlined" startIcon={<SearchIcon />} size="small">
+            검색
+          </Button>
+          <Button variant="outlined" startIcon={<RefreshIcon />} size="small">
+            초기화
+          </Button>
+          <Button variant="outlined" startIcon={<SaveIcon />} size="small">
+            저장
+          </Button>
         </Box>
       </Paper>
 
-      {/* 간트 영역 */}
-      <Paper sx={{ display: "flex", overflowX: "auto", height: 400 }}>
-        {/* 왼쪽 테이블 */}
-        <Box
-          sx={{
-            minWidth: 250,
-            borderRight: "1px solid #ddd",
-            bgcolor: "#f9f9f9",
-          }}
+      {/* 간트 차트 */}
+      <Box sx={{ width: "100%", position: "relative" }}>
+        <GanttComponent
+          dataSource={operations}
+          allowFiltering={true}
+          allowSorting={true}
+          taskFields={taskFields}
+          editSettings={editSettings}
+          labelSettings={labelSettings}
+          toolbar={["ExpandAll", "CollapseAll"]}
+          highlightWeekends
+          enableVirtualization={true}
+          splitterSettings={{ columnIndex: 2 }}
+          height="787px"
+          width="1622px"
         >
-          {/* 헤더 */}
-          <Box
-            sx={{
-              display: "flex",
-              fontWeight: "bold",
-              px: 1,
-              py: 1,
-              borderBottom: "1px solid #ccc",
-              fontSize: 13,
-            }}
-          >
-            <Box sx={{ width: "40%" }}>구분 (operationName)</Box>
-            <Box sx={{ width: "30%" }}>공정ID (operationdid)</Box>
-            <Box sx={{ width: "30%" }}>자재 (partid)</Box>
-          </Box>
-        </Box>
-
-        {/* 간트 바 영역 */}
-        <Box sx={{ minWidth: 1000 }}>
-          {/* 날짜 헤더 */}
-          <Box
-            sx={{
-              display: "flex",
-              borderBottom: "1px solid #ccc",
-              bgcolor: "#eee",
-            }}
-          >
-            {dateRange.map((date) => (
-              <Box
-                key={date}
-                sx={{
-                  width: 80,
-                  textAlign: "center",
-                  py: 1,
-                  borderRight: "1px solid #ddd",
-                  fontSize: 12,
-                  fontWeight: "bold",
-                }}
-              >
-                {date}
-              </Box>
-            ))}
-          </Box>
-          {/* 각 작업 바 */}
-          {operations.map((group) =>
-            group.steps.map((step) => {
-              const startIdx = dayjs(step.start).diff("2025-01-15", "day");
-              const span = dayjs(step.end).diff(dayjs(step.start), "day") + 1;
-              return (
-                <Box key={step.id} sx={{ display: "flex", height: 36 }}>
-                  {dateRange.map((_, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        width: 80,
-                        borderRight: "1px solid #eee",
-                        position: "relative",
-                      }}
-                    >
-                      {i === startIdx && (
-                        <Box
-                          sx={{
-                            position: "absolute",
-                            left: 0,
-                            top: 4,
-                            height: 28,
-                            width: `${span * 80}px`,
-                            bgcolor: "#a6d4fa",
-                            borderRadius: 1,
-                            fontSize: 12,
-                            px: 1,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {step.name}
-                        </Box>
-                      )}
-                    </Box>
-                  ))}
-                </Box>
-              );
-            })
-          )}
-        </Box>
-      </Paper>
+          <ColumnsDirective>
+            <ColumnDirective
+              field="OperationID"
+              headerText="작업공정ID"
+              width={150}
+            />
+            <ColumnDirective field="TaskName" headerText="작업명" width={200} />
+            <ColumnDirective
+              field="StartDate"
+              headerText="시작일"
+              width={120}
+              format="yyyy-MM-dd"
+            />
+            <ColumnDirective
+              field="EndDate"
+              headerText="종료일"
+              width={120}
+              format="yyyy-MM-dd"
+            />
+          </ColumnsDirective>
+          <Inject services={[Selection, Toolbar, DayMarkers, Edit, Sort]} />
+        </GanttComponent>
+      </Box>
     </Box>
   );
 }
