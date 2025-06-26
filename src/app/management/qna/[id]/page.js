@@ -107,19 +107,23 @@ export default function QnaDetailPage() {
   };
 
   const handleUpdatePost = async () => {
-    if (!editTitle.trim() || !editContent.trim()) return alert("제목과 내용을 입력해주세요.");
+    if (!editTitle.trim() || !editContent.trim())
+      return alert("제목과 내용을 입력해주세요.");
     const token = localStorage.getItem("token");
     if (!token) return alert("로그인이 필요합니다.");
 
     try {
-      const res = await fetch(`http://localhost:8080/api/management/qna/${post.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title: editTitle, content: editContent }),
-      });
+      const res = await fetch(
+        `http://localhost:8080/api/management/qna/${post.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title: editTitle, content: editContent }),
+        }
+      );
       if (!res.ok) throw new Error("수정 실패");
       const updatedPost = await res.json();
       updatedPost.name = post.name;
@@ -171,17 +175,22 @@ export default function QnaDetailPage() {
     if (!token) return alert("로그인이 필요합니다.");
 
     setCommentLoading(true);
-    fetch(`http://localhost:8080/api/management/qna/${id}/comment/${commentId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ content: editingContent }),
-    })
+    fetch(
+      `http://localhost:8080/api/management/qna/${id}/comment/${commentId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content: editingContent }),
+      }
+    )
       .then((res) => res.json())
       .then((updatedComment) => {
-        setComments((prev) => prev.map((c) => (c.id === commentId ? updatedComment : c)));
+        setComments((prev) =>
+          prev.map((c) => (c.id === commentId ? updatedComment : c))
+        );
         cancelEditing();
       })
       .catch(() => setCommentError("댓글 수정 실패"))
@@ -194,10 +203,13 @@ export default function QnaDetailPage() {
     if (!token) return alert("로그인이 필요합니다.");
 
     setCommentLoading(true);
-    fetch(`http://localhost:8080/api/management/qna/${id}/comment/${commentId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(
+      `http://localhost:8080/api/management/qna/${id}/comment/${commentId}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
       .then(() => setComments((prev) => prev.filter((c) => c.id !== commentId)))
       .catch(() => setCommentError("댓글 삭제 실패"))
       .finally(() => setCommentLoading(false));
@@ -215,38 +227,103 @@ export default function QnaDetailPage() {
 
       <Box sx={{ mb: 3, minHeight: 200 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-          <Typography sx={{ fontSize: "1.7rem", fontWeight: "bold" }}>{post.title}</Typography>
+          <Typography sx={{ fontSize: "1.7rem", fontWeight: "bold" }}>
+            {post.title}
+          </Typography>
           {post.writerId === myUserId && (
             <Stack direction="row" spacing={1}>
-              <Button size="small" variant="outlined" onClick={() => { startEdit(); setOpenEditDialog(true); }}>수정</Button>
-              <Button size="small" color="error" variant="outlined" onClick={handleDeletePost}>삭제</Button>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => {
+                  startEdit();
+                  setOpenEditDialog(true);
+                }}
+              >
+                수정
+              </Button>
+              <Button
+                size="small"
+                color="error"
+                variant="outlined"
+                onClick={handleDeletePost}
+              >
+                삭제
+              </Button>
             </Stack>
           )}
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           작성자: {post.name} | 작성일: {post.wroteAt?.slice(0, 10)}
         </Typography>
-        <Typography sx={{ whiteSpace: "pre-line", mt: 3, fontSize: "1.05rem" }}>{post.content}</Typography>
+        <Typography sx={{ whiteSpace: "pre-line", mt: 3, fontSize: "1.05rem" }}>
+          {post.content}
+        </Typography>
       </Box>
 
       <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
         <DialogTitle>게시글 수정</DialogTitle>
         <DialogContent>
-          <TextField fullWidth label="제목" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} margin="normal" />
-          <TextField fullWidth multiline rows={6} label="내용" value={editContent} onChange={(e) => setEditContent(e.target.value)} margin="normal" />
+          <TextField
+            fullWidth
+            label="제목"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            label="내용"
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            margin="normal"
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} sx={{ color: "#dd0000" }}>취소</Button>
-          <Button variant="contained" onClick={handleUpdatePost} sx={{ backgroundColor: "#dd0000", "&:hover": { backgroundColor: "#bb0000" } }}>저장</Button>
+          <Button
+            onClick={() => setOpenEditDialog(false)}
+            sx={{ color: "#dd0000" }}
+          >
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleUpdatePost}
+            sx={{
+              backgroundColor: "#dd0000",
+              "&:hover": { backgroundColor: "#bb0000" },
+            }}
+          >
+            저장
+          </Button>
         </DialogActions>
       </Dialog>
 
       <Divider sx={{ my: 3 }} />
 
       <Box sx={{ mb: 4 }}>
-        <TextField label="댓글 작성" multiline minRows={3} value={commentInput} onChange={(e) => setCommentInput(e.target.value)} fullWidth />
+        <TextField
+          label="댓글 작성"
+          multiline
+          minRows={3}
+          value={commentInput}
+          onChange={(e) => setCommentInput(e.target.value)}
+          fullWidth
+        />
         <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
-          <Button variant="contained" onClick={handleCommentSubmit} disabled={commentLoading} sx={{ backgroundColor: "#dd0000", "&:hover": { backgroundColor: "#bb0000" } }}>등록</Button>
+          <Button
+            variant="contained"
+            onClick={handleCommentSubmit}
+            disabled={commentLoading}
+            sx={{
+              backgroundColor: "#dd0000",
+              "&:hover": { backgroundColor: "#bb0000" },
+            }}
+          >
+            등록
+          </Button>
         </Box>
       </Box>
 
@@ -259,23 +336,76 @@ export default function QnaDetailPage() {
         {visibleComments.map((comment, index) => (
           <Box key={comment.id}>
             {index !== 0 && <Divider sx={{ my: 2 }} />}
-            <Typography fontWeight="bold" fontSize="0.9rem" color="text.secondary">
+            <Typography
+              fontWeight="bold"
+              fontSize="0.9rem"
+              color="text.secondary"
+            >
               작성자: {comment.name} | 작성일: {comment.wroteAt?.slice(0, 10)}
             </Typography>
             {editingCommentId === comment.id ? (
               <>
-                <TextField multiline minRows={3} fullWidth value={editingContent} onChange={(e) => setEditingContent(e.target.value)} disabled={commentLoading} />
+                <TextField
+                  multiline
+                  minRows={3}
+                  fullWidth
+                  value={editingContent}
+                  onChange={(e) => setEditingContent(e.target.value)}
+                  disabled={commentLoading}
+                />
                 <Stack direction="row" spacing={1} mt={1}>
-                  <Button variant="contained" size="small" onClick={() => saveEditing(comment.id)} disabled={commentLoading}>저장</Button>
-                  <Button variant="outlined" size="small" onClick={cancelEditing} disabled={commentLoading}>취소</Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={() => saveEditing(comment.id)}
+                    disabled={commentLoading}
+                    sx={{
+                      backgroundColor: "#dd0000",
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#aa0000",
+                      },
+                    }}
+                  >
+                    저장
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={cancelEditing}
+                    disabled={commentLoading}
+                    sx={{
+                      color: "#dd0000",
+                      borderColor: "#dd0000",
+                      "&:hover": {
+                        backgroundColor: "#ffeeee",
+                        borderColor: "#bb0000",
+                        color: "#bb0000",
+                      },
+                    }}
+                  >
+                    취소
+                  </Button>
                 </Stack>
               </>
             ) : (
               <>
-                <Typography sx={{ whiteSpace: "pre-line", mt: 0.5 }}>{comment.content}</Typography>
+                <Typography sx={{ whiteSpace: "pre-line", mt: 0.5 }}>
+                  {comment.content}
+                </Typography>
                 <Stack direction="row" spacing={1} mt={0.5}>
-                  <Button size="small" onClick={() => startEditing(comment)}>수정</Button>
-                  <Button size="small" color="error" onClick={() => deleteComment(comment.id)} disabled={commentLoading}>삭제</Button>
+                  <Button size="small" onClick={() => startEditing(comment)}>
+                    수정
+                  </Button>
+                  <Button
+                    size="small"
+                    color="error"
+                    onClick={() => deleteComment(comment.id)}
+                    disabled={commentLoading}
+                  >
+                    삭제
+                  </Button>
                 </Stack>
               </>
             )}
