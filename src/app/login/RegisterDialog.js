@@ -60,9 +60,9 @@ export default function RegisterDialog({ open, onClose }) {
       }
 
       const data = await res.json();
-    
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userId", data.user.id);
+
+      // localStorage.setItem("token", data.token);
+      // localStorage.setItem("userId", data.user.id);
 
       alert("회원가입이 완료되었습니다!");
       onClose();
