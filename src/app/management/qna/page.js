@@ -38,7 +38,7 @@ export default function QnaPage() {
   const [open, setOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
-  const [category, setCategory] = useState("normal");
+  const [category, setCategory] = useState("common");
   const [titleError, setTitleError] = useState(false);
   const [contentError, setContentError] = useState(false);
 
@@ -370,16 +370,30 @@ export default function QnaPage() {
           }}
         />
         <DialogContent>
-          <TextField
-            label="제목"
-            fullWidth
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            margin="normal"
-            error={titleError}
-            helperText={titleError ? "제목을 입력해주세요" : ""}
-          />
+          <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+            {/* 카테고리 선택 */}
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              size="small"
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="common">일반글</MenuItem>
+              <MenuItem value="notice">공지글</MenuItem>
+            </Select>
 
+            {/* 제목 입력 */}
+            <TextField
+              label="제목"
+              fullWidth
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              error={titleError}
+              helperText={titleError ? "제목을 입력해주세요" : ""}
+            />
+          </Box>
+
+          {/* 내용 입력창 */}
           <TextField
             label="내용"
             fullWidth
@@ -391,20 +405,6 @@ export default function QnaPage() {
             error={contentError}
             helperText={contentError ? "내용을 입력해주세요" : ""}
           />
-
-          {/* 카테고리 선택 추가 */}
-          <Box sx={{ mt: 2 }}>
-            <Typography sx={{ mb: 1 }}>카테고리</Typography>
-            <Select
-              fullWidth
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              size="small"
-            >
-              <MenuItem value="normal">일반글</MenuItem>
-              <MenuItem value="notice">공지글</MenuItem>
-            </Select>
-          </Box>
         </DialogContent>
 
         <DialogActions sx={{ justifyContent: "flex-end", px: 3, pb: 2 }}>
