@@ -25,6 +25,7 @@ const columns = [
     width: 40,
     renderCell: (params) => (
       <IconButton
+        title="결과 다운로드"
         size="small"
         onClick={() => alert(`결과 다운로드: ${params.row.id}`)}
       >
@@ -38,6 +39,7 @@ const columns = [
     width: 40,
     renderCell: (params) => (
       <IconButton
+        title="로그 보기"
         size="small"
         onClick={() => alert(`로그 보기: ${params.row.id}`)}
       >
@@ -48,7 +50,10 @@ const columns = [
 ];
 
 // ✅ selectedScenarioIds, setSelectedScenarioIds를 props로 받음
-export default function ExecutionsPage({ selectedScenarioIds, setSelectedScenarioIds }) {
+export default function ExecutionsPage({
+  selectedScenarioIds,
+  setSelectedScenarioIds,
+}) {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
