@@ -65,7 +65,6 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(result.user));
         localStorage.setItem("userId", result.user.id);
 
-
         // 유저별 lastPath 불러오기
         const lastPath = localStorage.getItem(`lastPath_${result.user.id}`);
 
