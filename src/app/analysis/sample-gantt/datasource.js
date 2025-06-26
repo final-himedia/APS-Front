@@ -7,6 +7,37 @@ export const projectResources = [
 
 export const data = [
   {
+    id: "ROUTING_001",
+    name: "ROUTING_001",
+  },
+  {
+    parentID: "ROUTING_001",
+    startDate: new Date("2025-06-24T00:00:00"),
+    id: "COS_00010",
+    workCenter: "1번 혼합라인",
+    name: "원료 해동",
+    tool: "김하나",
+    endDate: new Date("2025-06-24T13:54:00"),
+  },
+  {
+    parentID: "ROUTING_001",
+    startDate: new Date("2025-06-24T13:54:00"),
+    id: "COS_00020",
+    workCenter: "1번 혼합라인",
+    name: "원료 계량",
+    tool: "김하나",
+    endDate: new Date("2025-06-25T03:48:00"),
+  },
+  {
+    startDate: new Date("2025-06-25T03:48:00"),
+    id: 4,
+    name: "ROUTING_002",
+    endDate: new Date("2025-06-26T08:00:00"),
+  },
+];
+
+export const datas = [
+  {
     TaskID: 1,
     TaskName: "Project Initiation",
     StartDate: new Date("04/02/2019"),
