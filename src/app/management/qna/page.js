@@ -33,16 +33,19 @@ export default function QnaPage() {
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState([]);
-  const [allPosts, setAllPosts] = useState([]);
 
-  // 글쓰기 상태
+  // 글쓰기 다이얼로그 상태
   const [open, setOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
-  const [newCategory, setNewCategory] = useState("normal"); // ✅ 카테고리 state
+  const [category, setCategory] = useState("normal");
   const [titleError, setTitleError] = useState(false);
   const [contentError, setContentError] = useState(false);
 
+  // 전체 데이터 저장 (검색용)
+  const [allPosts, setAllPosts] = useState([]);
+
+  // QnA 리스트 불러오기 (작성자 이메일 포함, 카테고리 포함)
   const fetchQnaList = () => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:8080/api/management/qna/list", {
@@ -53,6 +56,10 @@ export default function QnaPage() {
         return res.json();
       })
       .then((data) => {
+        if (!Array.isArray(data)) {
+          console.error("❌ 서버 응답이 배열이 아님:", data);
+          return;
+        }
         const filtered = data.filter((d) => !d.deleted);
         setPosts(filtered);
         setAllPosts(filtered);
@@ -64,17 +71,42 @@ export default function QnaPage() {
     fetchQnaList();
   }, []);
 
-  // 탭 분기
-  const filteredPosts =
-    tab === 0 ? posts : posts.filter((post) => post.isNotice === true);
+  // 탭에 따른 필터링된 리스트
+  const filteredPosts = posts.filter((post) => {
+    if (tab === 1) {
+      // 공지글 탭
+      return post.category === "notice";
+    }
+    // 전체 탭
+    return true;
+  });
 
-  const paginatedPosts = filteredPosts.slice(
+  // 검색어 필터링 적용 (추가 - 옵션)
+  const searchedPosts = filteredPosts.filter((post) => {
+    if (!searchText.trim()) return true; // 검색어 없으면 모두 통과
+    const keyword = searchText.toLowerCase();
+
+    if (searchType === "title") {
+      return post.title.toLowerCase().includes(keyword);
+    } else if (searchType === "writer") {
+      return (
+        post.name?.toLowerCase().includes(keyword) ||
+        post.email?.toLowerCase().includes(keyword)
+      );
+    }
+    return true;
+  });
+
+  // 페이지네이션 처리
+  const paginatedPosts = searchedPosts.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
 
+  // 새 글 저장
   const handleSave = () => {
     let hasError = false;
+
     if (!newTitle.trim()) {
       setTitleError(true);
       hasError = true;
@@ -107,25 +139,26 @@ export default function QnaPage() {
         content: newContent,
         wroteAt,
         deleted: false,
-        isNotice: newCategory === "notice", // ✅ 공지글 여부
+        category, // 여기 카테고리 포함
       }),
     })
       .then((res) => {
         if (!res.ok) throw new Error("글 저장 실패");
         return res.json();
       })
-      .then(() => {
+      .then((result) => {
+        console.log("✅ 저장 성공:", result);
         fetchQnaList();
       })
       .catch((err) => {
-        console.error("❌ 저장 에러:", err);
-        alert("글 저장 중 오류 발생");
+        console.error("❌ 에러 발생:", err);
+        alert("글 저장 중 오류가 발생했습니다.");
       })
       .finally(() => {
         setOpen(false);
         setNewTitle("");
         setNewContent("");
-        setNewCategory("normal");
+        setCategory("normal");
       });
   };
 
@@ -153,19 +186,6 @@ export default function QnaPage() {
           onChange={(e) => setSearchText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              const keyword = searchText.toLowerCase();
-              const filtered = allPosts.filter((post) => {
-                if (searchType === "title") {
-                  return post.title.toLowerCase().includes(keyword);
-                } else if (searchType === "writer") {
-                  return (
-                    post.name?.toLowerCase().includes(keyword) ||
-                    post.email?.toLowerCase().includes(keyword)
-                  );
-                }
-                return true;
-              });
-              setPosts(filtered);
               setPage(1);
             }
           }}
@@ -174,29 +194,17 @@ export default function QnaPage() {
 
         <Button
           variant="text"
-          onClick={() => {
-            const keyword = searchText.toLowerCase();
-            const filtered = allPosts.filter((post) => {
-              if (searchType === "title") {
-                return post.title.toLowerCase().includes(keyword);
-              } else if (searchType === "writer") {
-                return (
-                  post.name?.toLowerCase().includes(keyword) ||
-                  post.email?.toLowerCase().includes(keyword)
-                );
-              }
-              return true;
-            });
-            setPosts(filtered);
-            setPage(1);
-          }}
           sx={{
             backgroundColor: "#f2e8e8",
             color: "#000000",
             px: 3,
             "&:hover": {
               backgroundColor: "#f5d2d2",
+              color: "#000000",
             },
+          }}
+          onClick={() => {
+            setPage(1);
           }}
         >
           검색
@@ -206,7 +214,10 @@ export default function QnaPage() {
       {/* 탭 */}
       <Tabs
         value={tab}
-        onChange={(e, v) => setTab(v)}
+        onChange={(e, v) => {
+          setTab(v);
+          setPage(1);
+        }}
         sx={{ mb: 2 }}
         TabIndicatorProps={{ style: { display: "none" } }}
       >
@@ -214,14 +225,18 @@ export default function QnaPage() {
           label="전체"
           sx={{
             color: "#666666",
+            position: "relative",
             "&.Mui-selected": {
               color: "#666666",
-              "&::after": {
-                content: '""',
-                display: "block",
-                height: "2px",
-                backgroundColor: "#666666",
-              },
+            },
+            "&.Mui-selected::after": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "2px",
+              backgroundColor: "#666666",
             },
           }}
         />
@@ -229,20 +244,24 @@ export default function QnaPage() {
           label="공지"
           sx={{
             color: "#dd0000",
+            position: "relative",
             "&.Mui-selected": {
               color: "#dd0000",
-              "&::after": {
-                content: '""',
-                display: "block",
-                height: "2px",
-                backgroundColor: "#dd0000",
-              },
+            },
+            "&.Mui-selected::after": {
+              content: '""',
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              width: "100%",
+              height: "2px",
+              backgroundColor: "#dd0000",
             },
           }}
         />
       </Tabs>
 
-      {/* 테이블 */}
+      {/* 게시판 테이블 */}
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -267,13 +286,15 @@ export default function QnaPage() {
                   <Link href={`/management/qna/${post.id}`} passHref>
                     <Typography
                       sx={{
-                        color: post.isNotice ? "#dd0000" : "grey",
-                        fontWeight: post.isNotice ? "bold" : "normal",
-                        textDecoration: "underline",
+                        color: post.category === "notice" ? "#dd0000" : "grey",
                         cursor: "pointer",
+                        textDecoration: "underline",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 0.5,
                       }}
                     >
-                      {post.isNotice ? "📌 " : ""}
+                      {post.category === "notice" && "🚨"} {/* 사이렌 이모지 */}
                       {post.title}
                     </Typography>
                   </Link>
@@ -289,13 +310,16 @@ export default function QnaPage() {
       {/* 페이지네이션 */}
       <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
         <Pagination
-          count={Math.ceil(filteredPosts.length / PAGE_SIZE)}
+          count={Math.ceil(searchedPosts.length / PAGE_SIZE)}
           page={page}
           onChange={(e, val) => setPage(val)}
           sx={{
             "& .Mui-selected": {
               backgroundColor: "#f2e8e8",
               color: "#fff",
+            },
+            "& .MuiPaginationItem-root": {
+              color: "#333",
             },
           }}
         />
@@ -307,13 +331,14 @@ export default function QnaPage() {
           variant="text"
           onClick={() => setOpen(true)}
           sx={{
-            backgroundColor: "#f2e8e8",
-            color: "#000",
             px: 3,
             py: 1,
             borderRadius: "12px",
+            backgroundColor: "#f2e8e8",
+            color: "#000000",
             "&:hover": {
               backgroundColor: "#f5d2d2",
+              color: "#000000",
             },
           }}
         >
@@ -327,6 +352,11 @@ export default function QnaPage() {
         onClose={() => setOpen(false)}
         fullWidth
         maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: 1,
+          },
+        }}
       >
         <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
           게시판 글쓰기
@@ -340,17 +370,6 @@ export default function QnaPage() {
           }}
         />
         <DialogContent>
-          {/* ✅ 글 유형 선택 */}
-          <Select
-            fullWidth
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            sx={{ mt: 2 }}
-          >
-            <MenuItem value="normal">일반글</MenuItem>
-            <MenuItem value="notice">공지글</MenuItem>
-          </Select>
-
           <TextField
             label="제목"
             fullWidth
@@ -360,6 +379,7 @@ export default function QnaPage() {
             error={titleError}
             helperText={titleError ? "제목을 입력해주세요" : ""}
           />
+
           <TextField
             label="내용"
             fullWidth
@@ -371,7 +391,22 @@ export default function QnaPage() {
             error={contentError}
             helperText={contentError ? "내용을 입력해주세요" : ""}
           />
+
+          {/* 카테고리 선택 추가 */}
+          <Box sx={{ mt: 2 }}>
+            <Typography sx={{ mb: 1 }}>카테고리</Typography>
+            <Select
+              fullWidth
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              size="small"
+            >
+              <MenuItem value="normal">일반글</MenuItem>
+              <MenuItem value="notice">공지글</MenuItem>
+            </Select>
+          </Box>
         </DialogContent>
+
         <DialogActions sx={{ justifyContent: "flex-end", px: 3, pb: 2 }}>
           <Button onClick={() => setOpen(false)} sx={{ color: "#808080" }}>
             취소
