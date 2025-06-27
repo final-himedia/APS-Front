@@ -5,7 +5,6 @@ import { IconButton, Box } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExeScenarioList from "../standard/ExeScenarioList";
 
-// ✅ ExecutionsPage 직접 import
 import ExecutionsPage from "../executions/page";
 
 export default function ExecutionLayout() {
@@ -40,7 +39,7 @@ export default function ExecutionLayout() {
         )}
       </Box>
 
-      {/* 중앙 콘텐츠 - children 대신 직접 실행 페이지 렌더링 */}
+      {/* 중앙 콘텐츠 - children 대신 직접 실행 페이지 렌더링하는 방법 */}
       <Box
         sx={{
           overflow: "hidden",

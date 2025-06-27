@@ -2,57 +2,27 @@
 
 import { Button, Menu, MenuItem, Box, Stack, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
-import SaveIcon from "@mui/icons-material/Save";
-import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import AddIcon from "@mui/icons-material/Add";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function ResultToolBar({ upload, download }) {
-  const [exportAnchorEl, setExportAnchorEl] = useState(null);
-  const [importAnchorEl, setImportAnchorEl] = useState(null);
-  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
+export default function ResultToolBar({ download, refresh }) {
   const [isCompact, setIsCompact] = useState(false);
-
-  const exportOpen = Boolean(exportAnchorEl);
-  const importOpen = Boolean(importAnchorEl);
-  const moreOpen = Boolean(moreAnchorEl);
-
-  const handleExportClick = (e) => setExportAnchorEl(e.currentTarget);
-  const handleExportClose = () => setExportAnchorEl(null);
-
-  const handleImportClick = (e) => setImportAnchorEl(e.currentTarget);
-  const handleImportClose = () => setImportAnchorEl(null);
-
-  const handleMoreClick = (e) => setMoreAnchorEl(e.currentTarget);
-  const handleMoreClose = () => setMoreAnchorEl(null);
+  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
+  const [exportMenuAnchor, setExportMenuAnchor] = useState(null);
 
   const actionButtons = [
     {
-      label: "레이아웃 저장",
-      icon: <SaveIcon fontSize="small" />,
-      onClick: () => {},
-    },
-    {
-      label: "레이아웃 삭제",
-      icon: <DeleteIcon fontSize="small" />,
-      onClick: () => {},
-      disabled: true,
-    },
-    {
       label: "새로고침",
       icon: <RefreshIcon fontSize="small" />,
-      onClick: () => {},
+      onClick: refresh,
     },
   ];
 
   useEffect(() => {
     const handleResize = () => {
-      setIsCompact(window.innerWidth < 1500);
+      setIsCompact(window.innerWidth < 1120);
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -74,14 +44,14 @@ export default function ResultToolBar({ upload, download }) {
         position: "relative",
       }}
     >
-      {/* 왼쪽: 데이터 관련 */}
+      {/* 왼쪽: 내보내기 */}
       <Stack direction="row" spacing={1} flexWrap="wrap">
         <div>
           <Button
             size="small"
             variant="outlined"
             startIcon={<FileUploadIcon fontSize="small" />}
-            onClick={handleExportClick}
+            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
             sx={{
               px: 1.5,
               color: "#3f3f3f",
@@ -91,56 +61,44 @@ export default function ResultToolBar({ upload, download }) {
             데이터 내보내기
           </Button>
           <Menu
-            anchorEl={exportAnchorEl}
-            open={exportOpen}
-            onClose={handleExportClose}
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
           >
-            <MenuItem onClick={download}>Excel 다운로드</MenuItem>
-            <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
+            <MenuItem
+              onClick={() => {
+                download();
+                setExportMenuAnchor(null);
+              }}
+            >
+              Excel 다운로드
+            </MenuItem>
           </Menu>
         </div>
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<FileDownloadIcon fontSize="small" />}
-          onClick={handleImportClick}
-          sx={{
-            px: 1.5,
-            color: "#3f3f3f",
-            borderColor: "#3f3f3f",
-          }}
-        >
-          데이터 가져오기
-        </Button>
-        <Menu
-          anchorEl={importAnchorEl}
-          open={importOpen}
-          onClose={handleImportClose}
-        >
-          <MenuItem onClick={upload}>Excel 업로드</MenuItem>
-          <MenuItem onClick={handleImportClose}>CSV 업로드</MenuItem>
-        </Menu>
       </Stack>
 
-      {/* 오른쪽: 버튼들 or ... 아이콘 */}
+      {/* 오른쪽: 새로고침 */}
       {isCompact ? (
         <>
-          <IconButton size="small" sx={{ p: 0.5 }} onClick={handleMoreClick}>
+          <IconButton
+            size="small"
+            sx={{ p: 0.5 }}
+            onClick={(e) => setMoreAnchorEl(e.currentTarget)}
+          >
             <MoreHorizIcon />
           </IconButton>
           <Menu
             anchorEl={moreAnchorEl}
-            open={moreOpen}
-            onClose={handleMoreClose}
+            open={Boolean(moreAnchorEl)}
+            onClose={() => setMoreAnchorEl(null)}
           >
             {actionButtons.map((btn, idx) => (
               <MenuItem
                 key={idx}
                 onClick={() => {
                   btn.onClick();
-                  handleMoreClose();
+                  setMoreAnchorEl(null);
                 }}
-                disabled={btn.disabled}
               >
                 {btn.icon}
                 <Box sx={{ ml: 1 }}>{btn.label}</Box>
@@ -157,7 +115,6 @@ export default function ResultToolBar({ upload, download }) {
               variant="outlined"
               startIcon={btn.icon}
               onClick={btn.onClick}
-              disabled={btn.disabled}
               sx={{
                 color: "#3f3f3f",
                 borderColor: "#3f3f3f",
