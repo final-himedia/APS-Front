@@ -22,9 +22,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState("");
+
+  // 비밀번호 찾기용
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetResult, setResetResult] = useState("");
+
   const router = useRouter();
 
-  // 저장된 이메일 불러오기
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
@@ -39,20 +43,15 @@ export default function LoginPage() {
     try {
       const response = await fetch("http://127.0.0.1:8080/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        // ✅ 더 이상 즐겨찾기를 삭제하지 않음
         Object.keys(localStorage).forEach((key) => {
-          if (key === "lastPath") {
-            localStorage.removeItem(key);
-          }
+          if (key === "lastPath") localStorage.removeItem(key);
         });
 
         if (rememberEmail) {
@@ -65,9 +64,7 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(result.user));
         localStorage.setItem("userId", result.user.id);
 
-        // 유저별 lastPath 불러오기
         const lastPath = localStorage.getItem(`lastPath_${result.user.id}`);
-
         if (lastPath && lastPath !== "/login") {
           router.push(lastPath);
           localStorage.removeItem(`lastPath_${result.user.id}`);
@@ -79,6 +76,34 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError("비밀번호를 정확히 입력해 주세요");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8080/api/auth/find-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: resetEmail }),
+        }
+      );
+
+      const result = await response.text();
+
+      if (response.ok) {
+        setResetResult("✅ 임시 비밀번호가 이메일로 전송되었습니다.");
+        setTimeout(() => {
+          setOpenResetPassword(false);
+          setResetResult("");
+          setResetEmail("");
+        }, 2000);
+      } else {
+        setResetResult(`❌ ${result}`);
+      }
+    } catch (error) {
+      setResetResult("❌ 서버 오류가 발생했습니다.");
     }
   };
 
@@ -132,12 +157,6 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           size="small"
-          InputProps={{
-            sx: {
-              fontSize: "14px",
-              padding: "6px 10px",
-            },
-          }}
         />
         <TextField
           fullWidth
@@ -147,12 +166,6 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           size="small"
-          InputProps={{
-            sx: {
-              fontSize: "14px",
-              padding: "6px 10px",
-            },
-          }}
         />
 
         <FormControlLabel
@@ -223,7 +236,11 @@ export default function LoginPage() {
       {/* 비밀번호 찾기 다이얼로그 */}
       <Dialog
         open={openResetPassword}
-        onClose={() => setOpenResetPassword(false)}
+        onClose={() => {
+          setOpenResetPassword(false);
+          setResetResult("");
+          setResetEmail("");
+        }}
         fullWidth
         maxWidth="xs"
       >
@@ -267,7 +284,22 @@ export default function LoginPage() {
             variant="outlined"
             margin="normal"
             size="small"
+            value={resetEmail}
+            onChange={(e) => setResetEmail(e.target.value)}
           />
+
+          {resetResult && (
+            <Typography
+              variant="caption"
+              sx={{
+                color: resetResult.startsWith("✅") ? "green" : "red",
+                mt: 1,
+                display: "block",
+              }}
+            >
+              {resetResult}
+            </Typography>
+          )}
 
           <Button
             variant="contained"
@@ -281,6 +313,7 @@ export default function LoginPage() {
               color: "#fff",
               borderRadius: "8px",
             }}
+            onClick={handleResetPassword}
           >
             비밀번호 재설정 링크 보내기
           </Button>
