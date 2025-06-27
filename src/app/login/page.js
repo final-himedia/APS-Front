@@ -50,19 +50,15 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok) {
-        Object.keys(localStorage).forEach((key) => {
-          if (key === "lastPath") localStorage.removeItem(key);
-        });
-
-        if (rememberEmail) {
-          localStorage.setItem("rememberedEmail", email);
-        } else {
-          localStorage.removeItem("rememberedEmail");
-        }
-
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
         localStorage.setItem("userId", result.user.id);
+
+        // ✅ 임시 비밀번호면 강제 이동
+        if (result.user.isTemporaryPassword) {
+          router.push("/user/change-password");
+          return;
+        }
 
         const lastPath = localStorage.getItem(`lastPath_${result.user.id}`);
         if (lastPath && lastPath !== "/login") {
