@@ -28,44 +28,12 @@ export default function ResultDataPanel({ isOpen, onOpen, onClose }) {
 
   const items = [
     { label: "Simulation", bold: true },
-    { label: "작업도구 사용 내역", indent: true, url: "/result/tool-usage" },
-    {
-      label: "제공품 미사용 내역",
-      indent: true,
-      url: "/result/unused-supplies",
-    },
-    {
-      label: "용액 일지 조회",
-      indent: true,
-      url: "/result/solution-log",
-    },
-    {
-      label: "계획오더 전송 로그",
-      indent: true,
-      url: "/result/order-log",
-    },
-    {
-      label: "공정 별 생산 수량 조회",
-      indent: true,
-      url: "/result/operation-quantity",
-    },
-    {
-      label: "LOT 병합 이력",
-      indent: true,
-      url: "/result/lot-merge-history",
-    },
-    {
-      label: "계획오더 조회",
-      indent: true,
-      url: "/result/order-list",
-    },
     {
       label: "작업장별 생산 계획",
       indent: true,
       url: "/result/workcenter-plan",
     },
     { label: "작업장 가동 현황", indent: true, url: "/result/load-stat" },
-    { label: "TaskAct", bold: true },
   ];
 
   const filteredItems = items.filter((item) =>

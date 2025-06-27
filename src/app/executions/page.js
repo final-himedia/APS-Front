@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import ExecutionsToolBar from "@/app/standard/ExecutionsToolBar";
+import ExecutionsToolBar from "@/app/executions/ExecutionsToolBar";
 
 import DownloadIcon from "@mui/icons-material/Download";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -16,12 +16,16 @@ export default function ExecutionsPage({
 }) {
   const [rows, setRows] = useState([]);
 
-  // ✅ 로그 모달용 상태
+  // 로그 모달용 상태
   const [logOpen, setLogOpen] = useState(false);
   const [logText, setLogText] = useState("");
   const [logTitle, setLogTitle] = useState("");
+  const [paginationModel, setPaginationModel] = useState({
+    pageSize: 10,
+    page: 0,
+  });
 
-  // ✅ 로그 버튼 클릭 시 처리
+  // 로그 버튼 클릭 시 처리
   const handleLogClick = (row) => {
     const dummyLog = `🧪 시나리오 ID: ${row.scenarioId || "(없음)"}\n버전: ${
       row.version
@@ -34,12 +38,14 @@ export default function ExecutionsPage({
   const columns = [
     { field: "version", headerName: "버전", width: 40 },
     { field: "status", headerName: "상태", width: 40 },
-    { field: "duration", headerName: "소요시간", width: 80 },
+    { field: "durationMinutes", headerName: "소요시간", width: 80 },
     { field: "startTime", headerName: "시작 시간", width: 140 },
     { field: "endTime", headerName: "종료 시간", width: 140 },
     { field: "errorMessage", headerName: "에러 메시지", flex: 1 },
     { field: "schedule", headerName: "스케줄", flex: 1 },
-    { field: "userId", headerName: "사용자ID", flex: 1 },
+    { field: "userId", headerName: "사용자ID", width: 80 },
+    { field: "scenarioId", headerName: "시나리오 ID", width: 80 },
+
     {
       field: "result",
       headerName: "결과",
@@ -48,7 +54,17 @@ export default function ExecutionsPage({
         <IconButton
           title="결과 다운로드"
           size="small"
-          onClick={() => alert(`결과 다운로드: ${params.row.id}`)}
+          onClick={() => {
+            const scenarioId = params.row.scenarioId;
+            if (scenarioId) {
+              window.open(
+                `http://localhost:8080/api/analysis/download?scenarioId=${scenarioId}`,
+                "_blank"
+              );
+            } else {
+              alert("시나리오 ID가 없습니다.");
+            }
+          }}
         >
           <DownloadIcon fontSize="small" />
         </IconButton>
@@ -71,7 +87,20 @@ export default function ExecutionsPage({
   ];
 
   useEffect(() => {
-    // 실행 결과 rows 불러오는 fetch 위치
+    fetch("http://localhost:8080/api/analysis/list")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const rowsWithId = data.map((item, index) => ({
+            ...item,
+            id: index + 1,
+          }));
+          setRows(rowsWithId);
+        }
+      })
+      .catch((err) => {
+        console.error("실행 결과 불러오기 실패", err);
+      });
   }, []);
 
   return (
@@ -96,6 +125,7 @@ export default function ExecutionsPage({
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          marginBottom: "16px",
         }}
       >
         <Typography variant="h6" gutterBottom>
@@ -106,8 +136,14 @@ export default function ExecutionsPage({
           <DataGrid
             rows={rows}
             columns={columns}
-            pageSizeOptions={[5, 10, 20]}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[5, 10, 15, 20]}
+            autoHeight={false}
             rowHeight={38}
+            onRowClick={(params) => {
+              setSelectedScenarioIds([params.row.scenarioId]); // ✅ 하나만 선택
+            }}
             sx={{
               "& .MuiDataGrid-columnHeaders": {
                 backgroundColor: "#f2e8e8",
@@ -118,8 +154,13 @@ export default function ExecutionsPage({
                 fontWeight: "bold",
               },
               border: 0,
-              minWidth: "900px",
+              minWidth: "1000px",
+              "& .MuiDataGrid-row.Mui-selected": {
+                backgroundColor: "#d0e8ff !important",
+              },
             }}
+            getRowId={(row) => row.id}
+            disableRowSelectionOnClick={false}
           />
         </Box>
       </Box>

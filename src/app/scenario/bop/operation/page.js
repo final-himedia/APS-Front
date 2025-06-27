@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
-import ExecutionsToolBar from "@/app/standard/ExecutionsToolBar"; // ✅ 수정됨
+import ExecutionsToolBar from "@/app/executions/ExecutionsToolBar"; // ✅ 수정됨
 import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [

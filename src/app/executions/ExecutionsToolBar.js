@@ -25,11 +25,17 @@ export default function ResultToolBar({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // 실행
   const handleStart = async () => {
     if (isRunning || selectedScenarioIds.length === 0) return;
     setIsRunning(true);
 
-    const userId = localStorage.getItem("userId") || "admin01";
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      alert("로그인이 필요합니다");
+      setIsRunning(false);
+      return;
+    }
 
     for (const scenarioId of selectedScenarioIds) {
       try {
@@ -44,11 +50,11 @@ export default function ResultToolBar({
         setRows((prev) => [
           ...prev,
           {
-            id: result.id || `${scenarioId}-${Date.now()}`,
+            id: `${scenarioId}-${Date.now()}`,
             scenarioId,
             version: result.version ?? "v1.0",
             status: result.status ?? "성공",
-            duration: `${result.durationMinutes ?? 0}분`,
+            duration: `${result.durationMinutes ?? 0}초`,
             startTime: result.startTime?.replace("T", " ") ?? "-",
             endTime: result.endTime?.replace("T", " ") ?? "-",
             errorMessage: result.errorMessage ?? "",
@@ -67,6 +73,43 @@ export default function ResultToolBar({
     setIsRunning(false);
   };
 
+  // 삭제
+  const handleDelete = async () => {
+    if (selectedScenarioIds.length === 0) {
+      alert("삭제할 시나리오를 선택해주세요.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `선택된 시나리오 ${selectedScenarioIds.join(", ")} 의 실행 이력을 삭제할까요?`
+    );
+    if (!confirmed) return;
+
+    try {
+      for (const scenarioId of selectedScenarioIds) {
+        const res = await fetch(
+          `http://localhost:8080/api/analysis/delete/${scenarioId}`,
+          { method: "DELETE" }
+        );
+        if (!res.ok) throw new Error("삭제 실패");
+
+        const result = await res.json();
+        console.log("🗑️ 삭제 결과:", result);
+
+        // DataGrid에서 제거
+        setRows((prev) =>
+          prev.filter((row) => row.scenarioId !== scenarioId)
+        );
+      }
+
+      alert("삭제 완료");
+    } catch (err) {
+      console.error("삭제 중 오류 발생:", err);
+      alert("삭제 실패");
+    }
+  };
+
+  // 버튼 목록
   const actionButtons = [
     {
       label: "시작",
@@ -92,9 +135,7 @@ export default function ResultToolBar({
     {
       label: "삭제",
       icon: <DeleteIcon fontSize="small" />,
-      onClick: () => {
-        alert("삭제 기능 미구현");
-      },
+      onClick: handleDelete,
     },
   ];
 
