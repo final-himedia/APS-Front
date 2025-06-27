@@ -2,6 +2,8 @@
 
 import { Box, TextField, MenuItem, Button, Stack } from "@mui/material";
 import { useState } from "react";
+import { PieChart } from '@mui/x-charts/PieChart';
+
 
 export default function FilterToolbar() {
   const [scenario, setScenario] = useState("S020000");
@@ -13,7 +15,7 @@ export default function FilterToolbar() {
 
   return (
     <>
-      {/* 🔍 필터 바 */}
+      {/* 필터 바 */}
       <Box
         sx={{
           width: "100%",
@@ -44,7 +46,7 @@ export default function FilterToolbar() {
           </TextField>
 
           <TextField
-            label="초기일자"
+            label="호기"
             select
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
@@ -70,7 +72,7 @@ export default function FilterToolbar() {
         </Button>
       </Box>
 
-      {/* 🔽 콘텐츠 카드 영역 */}
+      {/* 콘텐츠 카드 영역 */}
       <Box
         sx={{
           display: "flex",
@@ -80,19 +82,49 @@ export default function FilterToolbar() {
       >
         {[0, 1].map((rowIndex) => (
           <Box key={rowIndex} sx={{ display: "flex", gap: 3 }}>
-            {[0, 1, 2].map((colIndex) => (
-              <Box
-                key={colIndex}
-                sx={{
-                  flex: 1,
-                  minWidth: 230,
-                  height: 320,
-                  backgroundColor: "#fff",
-                  borderRadius: 2,
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                }}
-              />
-            ))}
+            {[0, 1, 2].map((colIndex) => {
+              const isTargetBox = rowIndex === 0 && colIndex === 1;
+
+              return (
+                <Box
+                  key={colIndex}
+                  sx={{
+                    flex: 1,
+                    minWidth: 230,
+                    height: 320,
+                    backgroundColor: "#fff",
+                    borderRadius: 2,
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+                    p: 2, // 안쪽 여백
+                    overflow: "hidden", // PieChart 넘침 방지
+                  }}
+                >
+                  {isTargetBox && (
+                    <PieChart
+                      series={[
+                        {
+                          data: [
+                            { id: 0, value: 10, label: "완료" },
+                            { id: 1, value: 5, label: "진행 중" },
+                            { id: 2, value: 2, label: "대기" },
+                          ],
+                          innerRadius: 30,
+                          outerRadius: 80,
+                          paddingAngle: 5,
+                          cornerRadius: 5,
+                          startAngle: 0,
+                          endAngle: 360,
+                          cx: 150,
+                          cy: 150,
+                        },
+                      ]}
+                      width={300}
+                      height={300}
+                    />
+                  )}
+                </Box>
+              );
+            })}
           </Box>
         ))}
       </Box>

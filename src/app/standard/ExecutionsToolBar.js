@@ -4,8 +4,6 @@ import { Button, Box, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
 
@@ -13,12 +11,12 @@ export default function ResultToolBar({
   upload,
   download,
   selectedScenarioIds = [],
+  setRows,
 }) {
   const [isCompact, setIsCompact] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
-    console.log("🧪 툴바에서 받은 selectedScenarioIds:", selectedScenarioIds);
-
     const handleResize = () => {
       setIsCompact(window.innerWidth < 1500);
     };
@@ -27,19 +25,61 @@ export default function ResultToolBar({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const handleStart = async () => {
+    if (isRunning || selectedScenarioIds.length === 0) return;
+    setIsRunning(true);
+
+    const userId = localStorage.getItem("userId") || "admin01";
+
+    for (const scenarioId of selectedScenarioIds) {
+      try {
+        const res = await fetch(
+          `http://localhost:8080/api/analysis/get?scenarioId=${scenarioId}&userId=${userId}`
+        );
+        if (!res.ok) throw new Error("실행 실패");
+
+        const result = await res.json();
+        console.log("✅ 실행 성공:", result);
+
+        setRows((prev) => [
+          ...prev,
+          {
+            id: result.id || `${scenarioId}-${Date.now()}`,
+            scenarioId,
+            version: result.version ?? "v1.0",
+            status: result.status ?? "성공",
+            duration: `${result.durationMinutes ?? 0}분`,
+            startTime: result.startTime?.replace("T", " ") ?? "-",
+            endTime: result.endTime?.replace("T", " ") ?? "-",
+            errorMessage: result.errorMessage ?? "",
+            schedule: "수동",
+            userId: result.userId ?? userId,
+            result: "OK",
+            log: "보기",
+          },
+        ]);
+      } catch (err) {
+        console.error("❌ 실행 실패:", err);
+        alert("실행 중 오류 발생");
+      }
+    }
+
+    setIsRunning(false);
+  };
+
   const actionButtons = [
     {
       label: "시작",
       icon: <PlayArrowIcon fontSize="small" />,
-      onClick: () => {
-        console.log("✅ 선택된 시나리오:", selectedScenarioIds);
-      },
-      disabled: selectedScenarioIds.length === 0,
+      onClick: handleStart,
+      disabled: selectedScenarioIds.length === 0 || isRunning,
     },
     {
       label: "정지",
       icon: <StopIcon fontSize="small" />,
-      onClick: () => {},
+      onClick: () => {
+        alert("정지 기능은 아직 구현되지 않았습니다.");
+      },
       disabled: true,
     },
     {

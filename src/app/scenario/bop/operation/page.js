@@ -2,183 +2,65 @@
 
 import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Typography,
-} from "@mui/material";
-import Toolbar from "@/app/standard/Toolbar";
-import CloseIcon from "@mui/icons-material/Close";
+import { Box, Typography } from "@mui/material";
+import ExecutionsToolBar from "@/app/standard/ExecutionsToolBar"; // ✅ 수정됨
 import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
-  { field: "id", headerName: "순번", width: 50 },
-  { field: "siteId", headerName: "플랜트", width: 60 },
-  { field: "operationId", headerName: "공정 코드", width: 80 },
-  { field: "operationName", headerName: "공정 명", flex: 1 },
-  { field: "runTime", headerName: "공정 실행 시간", flex: 1 },
-  { field: "yield", headerName: "공정 수율", width: 80 },
-  { field: "runTimeUom", headerName: "실행 시간 단위", flex: 1 },
-  { field: "operationType", headerName: "공정 유형", width: 80 },
-  { field: "waitTimeUom", headerName: "대기시간 단위", flex: 1 },
-  { field: "transferTimeUom", headerName: "이동시간 단위", flex: 1 },
-  { field: "scenarioId", headerName: "시나리오", width: 80 },
-  { field: "sourcingType", headerName: "sourcingType", flex: 1 },
+  { field: "id", headerName: "버전", width: 80 },
+  { field: "status", headerName: "상태", width: 80 },
+  { field: "durationMinutes", headerName: "소요시간", width: 100 },
+  { field: "startTime", headerName: "시작 시간", flex: 1 },
+  { field: "endTime", headerName: "종료 시간", flex: 1 },
+  { field: "errorMessage", headerName: "에러 메시지", flex: 1 },
+  { field: "scenarioId", headerName: "스케줄", width: 100 },
+  { field: "userId", headerName: "사용자ID", width: 100 },
+  { field: "result", headerName: "결과", width: 80, renderCell: () => "-" },
+  { field: "log", headerName: "로그", width: 80, renderCell: () => "-" },
 ];
 
-export default function OperationMasterView() {
+export default function ExecutionManageView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
-  const setScenarioId = useScenarioStore(
-    (state) => state.setSelectedScenarioId
-  );
-  const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
-  const [open, setOpen] = useState(false);
+  const [token, setToken] = useState(null);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    console.log("토큰:", storedToken);
-    if (storedToken) setToken(storedToken);
+    const t = localStorage.getItem("token");
+    if (t) setToken(t);
   }, []);
 
   useEffect(() => {
-    if (!scenarioId) setScenarioId("S010000");
-  }, [scenarioId, setScenarioId]);
-
-  const fetchOperationData = (token, id) => {
-    if (!token || !id) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/operation/${id}`, {
+    if (!scenarioId || !token) return;
+    fetch(`http://localhost:8080/api/analysis/get/${scenarioId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
-        const list = data.operations || [];
-        const formatted = list.map((item, index) => ({
-          id: index + 1,
-          siteId: item.operationId?.siteId,
-          operationId: item.operationId?.operationId,
-          operationName: item.operationName,
-          runTime: item.runTime,
-          yield: item.yield,
-          runTimeUom: item.runTimeUom,
-          operationType: item.operationType,
-          waitTimeUom: item.waitTimeUom,
-          transferTimeUom: item.transferTimeUom,
-          scenarioId: item.operationId?.scenarioId,
-          sourcingType: item.sourcingType,
+        const formatted = (data || []).map((item, idx) => ({
+          id: item.version ?? idx + 1,
+          status: item.status,
+          durationMinutes: item.durationMinutes,
+          startTime: item.startTime?.replace("T", " ") ?? "",
+          endTime: item.endTime?.replace("T", " ") ?? "",
+          errorMessage: item.errorMessage ?? "",
+          scenarioId: item.scenarioId,
+          userId: item.userId,
         }));
         setRows(formatted);
       })
-      .catch((err) => console.error("공정 데이터 가져오기 실패:", err));
-  };
-
-  useEffect(() => {
-    if (scenarioId && token) fetchOperationData(token, scenarioId);
+      .catch((err) => console.error("실행관리 조회 실패", err));
   }, [scenarioId, token]);
-
-  const handleOpenDialog = () => setOpen(true);
-  const handleCloseDialog = () => setOpen(false);
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file || !token || !scenarioId) return;
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("scenarioId", scenarioId);
-
-    fetch("http://localhost:8080/api/scenarios/bop/operation-upload", {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => {
-        if (res.ok) fetchOperationData(token, scenarioId);
-        else console.error("업로드 실패");
-      })
-      .finally(() => setOpen(false));
-  };
-
-  const handleDownloadExcel = () => {
-    if (!token || !scenarioId) return;
-    fetch(
-      `http://localhost:8080/api/scenarios/bop/operation-download?scenarioId=${scenarioId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
-      .then((res) => {
-        if (!res.ok) throw new Error("다운로드 실패");
-        return res.blob();
-      })
-      .then((blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "operation-master.xlsx");
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      })
-      .catch((err) => console.error("다운로드 오류:", err));
-  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       <Box sx={{ mt: 2 }}>
-        <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
-        <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
-            공정 마스터 파일 업로드
-            <IconButton onClick={handleCloseDialog}>
-              <CloseIcon />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            <Box
-              sx={{
-                border: "2px dashed #ccc",
-                borderRadius: 1,
-                height: 150,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                cursor: "pointer",
-              }}
-              onClick={() => document.getElementById("file-input")?.click()}
-            >
-              <Typography color="text.secondary">
-                등록할 파일을 선택하세요.
-              </Typography>
-              <input
-                id="file-input"
-                type="file"
-                accept=".xlsx,.xls"
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>취소</Button>
-          </DialogActions>
-        </Dialog>
+        <ExecutionsToolBar /> {/* ✅ 수정됨 */}
       </Box>
 
       <Box
@@ -195,7 +77,7 @@ export default function OperationMasterView() {
         }}
       >
         <Typography variant="h6" gutterBottom>
-          공정 마스터
+          실행 관리
         </Typography>
         <Box sx={{ flex: 1, overflow: "auto" }}>
           <DataGrid
