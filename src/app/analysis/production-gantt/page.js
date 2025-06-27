@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { registerLicense } from "@syncfusion/ej2-base";
 import {
   GanttComponent,
@@ -29,8 +29,9 @@ import {
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import RefreshIcon from "@mui/icons-material/Search";
-import SaveIcon from "@mui/icons-material/Search";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import SaveIcon from "@mui/icons-material/Save";
+import { DatasetRounded } from "@mui/icons-material";
 
 // Syncfusion 라이선스 등록
 registerLicense(
@@ -38,14 +39,62 @@ registerLicense(
 );
 
 export default function ProductionGantt() {
-  const [scenario, setScenario] = useState("S0100000");
+  const [scenarios, setScenarios] = useState([]);
+  const [scenario, setScenario] = useState(null);
   const [operations, setOperations] = useState([]);
+  const ganttRef = useRef(null);
+  const [isArrowShown, setIsArrowShown] = useState(true);
+  const [isSorted, setIsSorted] = useState(false);
+  const [sortedOperations, setSortedOperations] = useState([]);
+  const [isSortedDesc, setIsSortedDesc] = useState(false);
 
   useEffect(() => {
+    const fetchScenarios = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:8080/api/scenarios/list", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        setScenarios(data.scenarios);
+      } catch (err) {
+        console.error("시나리오 목록 로딩 실패:", err);
+      }
+    };
+    fetchScenarios();
+  }, []);
+
+  useEffect(() => {
+    if (!ganttRef.current) return;
+
+    const timer = setTimeout(() => {
+      const ganttElem = ganttRef.current.element;
+      if (!ganttElem) return;
+
+      const arrows = ganttElem.querySelectorAll(".e-connector-line-container");
+      arrows.forEach((arrow) => {
+        arrow.style.display = isArrowShown ? "block" : "none";
+      });
+    }, 200); // 렌더 완료 후 딜레이 (조절 가능)
+
+    return () => clearTimeout(timer);
+  }, [isArrowShown, operations]); // operations가 바뀌어도 갱신
+
+  useEffect(() => {
+    if (!scenario) return;
+
     const fetchOperations = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8080/api/analysis/gantt?scenarioId=S000001"
+          `http://localhost:8080/api/analysis/gantt?scenarioId=${scenario}`
         );
         const data = await res.json();
 
@@ -95,14 +144,21 @@ export default function ProductionGantt() {
           }
         });
 
+        if (isSortedDesc) {
+          processed.sort((a, b) => (a.id < b.id ? 1 : -1));
+        } else {
+          processed.sort((a, b) => (a.id > b.id ? 1 : -1));
+        }
+
         setOperations(processed);
       } catch (error) {
         console.error("데이터 불러오기 실패:", error);
+        setOperations([]);
       }
     };
 
     fetchOperations();
-  }, []);
+  }, [scenario, isSortedDesc]);
 
   const tooltipSettings = {
     showTooltip: true,
@@ -173,7 +229,7 @@ export default function ProductionGantt() {
   };
 
   const labelSettings = {
-    rightLabel: "Resources",
+    rightLabel: "name",
   };
 
   return (
@@ -191,12 +247,15 @@ export default function ProductionGantt() {
           <FormControl size="small" sx={{ minWidth: 160 }}>
             <InputLabel>시나리오</InputLabel>
             <Select
-              value={scenario}
+              value={scenario || ""}
               onChange={(e) => setScenario(e.target.value)}
               label="시나리오"
             >
-              <MenuItem value="S0100000">S0100000</MenuItem>
-              <MenuItem value="S0200000">S0200000</MenuItem>
+              {scenarios.map((s) => (
+                <MenuItem key={s.scenarioId} value={s.scenarioId}>
+                  {s.scenarioId}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           <TextField
@@ -210,7 +269,7 @@ export default function ProductionGantt() {
             type="date"
             label="종료일"
             size="small"
-            defaultValue="2025-06-31"
+            defaultValue="2025-06-30"
             InputLabelProps={{ shrink: true }}
           />
           <FormControl size="small" sx={{ minWidth: 180 }}>
@@ -225,14 +284,40 @@ export default function ProductionGantt() {
             </Select>
           </FormControl>
           <FormControlLabel
-            control={<Switch defaultChecked />}
+            control={
+              <Switch
+                checked={isArrowShown}
+                onChange={(e) => setIsArrowShown(e.target.checked)}
+              />
+            }
             label="화살표"
           />
           <FormControlLabel
-            control={<Switch defaultChecked />}
+            control={
+              <Switch
+                defaultChecked
+                onChange={(e) => {
+                  if (ganttRef.current) {
+                    if (e.target.checked) {
+                      ganttRef.current.expandAll();
+                    } else {
+                      ganttRef.current.collapseAll();
+                    }
+                  }
+                }}
+              />
+            }
             label="트리 열기/닫기"
           />
-          <FormControlLabel control={<Switch />} label="정렬" />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={isSortedDesc}
+                onChange={(e) => setIsSortedDesc(e.target.checked)}
+              />
+            }
+            label="정렬"
+          />
           <Button variant="outlined" startIcon={<SearchIcon />} size="small">
             검색
           </Button>
@@ -248,7 +333,8 @@ export default function ProductionGantt() {
       {/* 간트 차트 */}
       <Box sx={{ width: "100%", position: "relative" }}>
         <GanttComponent
-          dataSource={operations}
+          ref={ganttRef}
+          dataSource={isSorted ? sortedOperations : operations}
           taskFields={{
             id: "id",
             name: "name",
@@ -260,10 +346,10 @@ export default function ProductionGantt() {
           tooltipSettings={{
             showTooltip: true,
           }}
+          showDependencyLines={true}
           editSettings={editSettings}
           labelSettings={labelSettings}
           queryTaskbarInfo={handleTooltip}
-          toolbar={["ExpandAll", "CollapseAll"]}
           timelineSettings={{
             timelineUnitSize: 60,
             topTier: { unit: "Day", format: "MM/dd" },
@@ -291,7 +377,17 @@ export default function ProductionGantt() {
               format="yyyy-MM-dd"
             />
           </ColumnsDirective>
-          <Inject services={[Edit, Sort, Toolbar]} />
+          <Inject
+            services={[
+              Edit,
+              Sort,
+              Toolbar,
+              Selection,
+              Reorder,
+              ContextMenu,
+              DayMarkers,
+            ]}
+          />
         </GanttComponent>
       </Box>
     </Box>
