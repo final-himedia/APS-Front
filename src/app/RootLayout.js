@@ -4,8 +4,10 @@ import { usePathname, useRouter } from "next/navigation";
 import ListDivider from "./standard/ListDivider";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import IconButton from "@mui/material/IconButton";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Menu, MenuItem } from "@mui/material";
 import { useState, useEffect } from "react";
 
 export default function RootLayout({ children }) {
@@ -15,12 +17,39 @@ export default function RootLayout({ children }) {
   const sidebarWidth = 250;
   const [currentTime, setCurrentTime] = useState("");
 
+  // 드롭다운 메뉴 상태
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handlePasswordChange = () => {
+    handleMenuClose();
+    router.push("/management/user/change-password"); // ✅ 여기에 경로 반영
+  };
+
+  const handleLogout = () => {
+    handleMenuClose();
+    if (user?.id && pathname && pathname !== "/login") {
+      localStorage.setItem(`lastPath_${user.id}`, pathname);
+    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login");
+  };
+
   // localStorage에서 사용자 정보 읽기
   const userData =
     typeof window !== "undefined" ? localStorage.getItem("user") : null;
   const user = userData ? JSON.parse(userData) : null;
 
-  // 1. 현재 경로가 로그인 페이지가 아니면 유저별 lastPath 저장
+  // 현재 경로가 로그인 페이지가 아니면 유저별 lastPath 저장
   useEffect(() => {
     if (user?.id && pathname && pathname !== "/login") {
       localStorage.setItem(`lastPath_${user.id}`, pathname);
@@ -28,7 +57,6 @@ export default function RootLayout({ children }) {
   }, [pathname, user]);
 
   // 시간 갱신
-
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -45,18 +73,6 @@ export default function RootLayout({ children }) {
     const interval = setInterval(updateTime, 60000);
     return () => clearInterval(interval);
   }, []);
-
-  // 로그아웃 핸들러 - 로그아웃 전에 유저별 lastPath 저장, 그리고 토큰, 유저 정보 삭제
-  const handleLogout = () => {
-    if (user?.id && pathname && pathname !== "/login") {
-      localStorage.setItem(`lastPath_${user.id}`, pathname);
-    }
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    router.push("/login"); // 로그인 페이지로 이동
-  };
 
   // 로그인 페이지는 레이아웃 없이 children만 렌더링
   if (pathname === "/login") {
@@ -122,24 +138,26 @@ export default function RootLayout({ children }) {
               <Typography variant="caption">{user?.email}</Typography>
             </div>
             <Typography variant="caption">{currentTime}</Typography>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<LogoutIcon />}
-              onClick={handleLogout}
-              sx={{
-                color: "#555555",
-                borderColor: "#cccccc",
-                textTransform: "none",
-                "&:hover": {
-                  borderColor: "#999999",
-                  backgroundColor: "#f0f0f0",
-                },
-                minWidth: 80,
-              }}
+
+            <IconButton onClick={handleMenuOpen}>
+              <ArrowDropDownIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
-              로그아웃
-            </Button>
+              <MenuItem onClick={handlePasswordChange}>
+                <LockResetIcon fontSize="small" sx={{ mr: 1 }} />
+                비밀번호 변경
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
+                로그아웃
+              </MenuItem>
+            </Menu>
           </Box>
         </div>
 
