@@ -27,6 +27,7 @@ export default function ResultDataPanel({ isOpen, onOpen, onClose }) {
   const router = useRouter();
 
   const items = [
+
     { label: "Simulation", bold: true },
     {
       label: "작업장별 생산 계획",

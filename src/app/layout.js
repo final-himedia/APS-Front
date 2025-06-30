@@ -3,7 +3,7 @@ import RootLayout from "./RootLayout";
 import "./style.css";
 
 export const metadata = {
-  title: "CRAFT ERP",
+  title: "MADAY",
   description: "An integrated ERP system",
 };
 
