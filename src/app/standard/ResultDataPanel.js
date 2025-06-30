@@ -27,13 +27,14 @@ export default function ResultDataPanel({ isOpen, onOpen, onClose }) {
   const router = useRouter();
 
   const items = [
+
+    { label: "Simulation", bold: true },
     {
       label: "작업장별 생산 계획",
       indent: true,
       url: "/result/workcenter-plan",
     },
     { label: "작업장 가동 현황", indent: true, url: "/result/load-stat" },
-    { label: "TaskAct", bold: true },
   ];
 
   const filteredItems = items.filter((item) =>

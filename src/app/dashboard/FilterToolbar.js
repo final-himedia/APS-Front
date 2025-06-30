@@ -2,8 +2,14 @@
 
 import { Box, TextField, MenuItem, Button, Stack } from "@mui/material";
 import { useState } from "react";
-import { PieChart } from '@mui/x-charts/PieChart';
-
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 export default function FilterToolbar() {
   const [scenario, setScenario] = useState("S020000");
@@ -12,6 +18,14 @@ export default function FilterToolbar() {
   const handleSearch = () => {
     console.log("조회됨:", { scenario, startDate });
   };
+
+  const data = [
+    { name: "완료", value: 71 },
+    { name: "진행 중", value: 1 },
+    { name: "미진행", value: 23 },
+  ];
+
+  const COLORS = ["#3f51b5", "#ff7f7f", "#fbc02d"];
 
   return (
     <>
@@ -95,32 +109,34 @@ export default function FilterToolbar() {
                     backgroundColor: "#fff",
                     borderRadius: 2,
                     boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                    p: 2, // 안쪽 여백
-                    overflow: "hidden", // PieChart 넘침 방지
+                    p: 2,
+                    overflow: "hidden",
                   }}
                 >
                   {isTargetBox && (
-                    <PieChart
-                      series={[
-                        {
-                          data: [
-                            { id: 0, value: 10, label: "완료" },
-                            { id: 1, value: 5, label: "진행 중" },
-                            { id: 2, value: 2, label: "대기" },
-                          ],
-                          innerRadius: 30,
-                          outerRadius: 80,
-                          paddingAngle: 5,
-                          cornerRadius: 5,
-                          startAngle: 0,
-                          endAngle: 360,
-                          cx: 150,
-                          cy: 150,
-                        },
-                      ]}
-                      width={300}
-                      height={300}
-                    />
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={data}
+                          dataKey="value"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          labelLine={true}
+                          label={({ name }) => name}
+                        >
+                          {data.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend verticalAlign="bottom" height={30} />
+                      </PieChart>
+                    </ResponsiveContainer>
                   )}
                 </Box>
               );

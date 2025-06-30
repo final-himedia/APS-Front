@@ -183,12 +183,17 @@ export default function ExeScenarioList({
           <ListItemButton
             key={scenario.scenarioId}
             disableRipple
+            onClick={() => {
+              const id = scenario.scenarioId;
+              const isSelected = selectedScenarioIds.includes(id);
+              setSelectedScenarioIds(isSelected ? [] : [id]);
+            }}
             sx={{
               px: 1,
               py: 0.5,
-              cursor: "default",
+              cursor: "pointer",
               "&:hover": {
-                backgroundColor: "transparent",
+                backgroundColor: "#f0e0e0",
               },
             }}
           >
@@ -210,6 +215,7 @@ export default function ExeScenarioList({
                 padding: 0,
                 mr: 1,
               }}
+              onClick={(e) => e.stopPropagation()}
             />
 
             <ListItemText
