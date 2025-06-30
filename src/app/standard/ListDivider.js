@@ -130,17 +130,12 @@ export default function ListDivider({ onClose }) {
   const engineMenuItems = [
     { label: "시나리오 관리", href: "/scenario" },
     { label: "실행 관리", href: "/executions" },
-    { label: "스케줄 관리", href: "/schedule" },
     { label: "실행 결과", href: "/result/workcenter-plan" },
   ];
 
   const resultMenuItems = [
-    { label: "RTF 현황", href: "#" },
     { label: "대시보드", href: "/dashboard" },
-    { label: "자원 운영 간트", href: "#" },
     { label: "생산 계획 간트", href: "/analysis/production-gantt" },
-    { label: "설비 가동 현황", href: "#" },
-    { label: "시나리오 비교", href: "#" },
   ];
 
   const manageMenuItems = [
