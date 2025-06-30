@@ -272,17 +272,6 @@ export default function ProductionGantt() {
             defaultValue="2025-06-30"
             InputLabelProps={{ shrink: true }}
           />
-          <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel id="model-select-label">기종/호기</InputLabel>
-            <Select
-              labelId="model-select-label"
-              label="기종/호기"
-              defaultValue="F404"
-            >
-              <MenuItem value="F404">F404 [10020250]</MenuItem>
-              <MenuItem value="F100">F100 [12345678]</MenuItem>
-            </Select>
-          </FormControl>
           <FormControlLabel
             control={
               <Switch
