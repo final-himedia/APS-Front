@@ -22,6 +22,7 @@ export default function LoadStatPage() {
     (state) => state.setSelectedScenarioId
   );
   const [rows, setRows] = useState([]);
+  const [total, setTotal] = useState(0);
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 10,
     page: 0,
@@ -29,7 +30,7 @@ export default function LoadStatPage() {
 
   const handleDownload = () => {
     if (!scenarioId) return;
-    const url = `http://localhost:8080/api/execution/workcenter/download?scenarioId=${scenarioId}`;
+    const url = `http://localhost:8080/api/analysis/workcenter-download?scenarioId=${scenarioId}`;
     window.open(url, "_blank");
   };
 
@@ -51,6 +52,7 @@ export default function LoadStatPage() {
           automation: item.automation ?? "-",
         }));
         setRows(formatted);
+        setTotal(formatted.length);
       })
       .catch((err) => {
         console.error("작업장 목록 불러오기 실패:", err);
@@ -85,7 +87,7 @@ export default function LoadStatPage() {
         }}
       >
         <Typography variant="h6" gutterBottom>
-          작업장 가동 현황
+          📌 작업장 가동 현황 (총 {total}건)
         </Typography>
 
         <Box sx={{ flex: 1, overflow: "auto" }}>

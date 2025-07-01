@@ -7,7 +7,6 @@ import ResultToolBar from "@/app/standard/ResultToolBar";
 import useScenarioStore from "@/hooks/useScenarioStore";
 
 const columns = [
-
   { field: "id", headerName: "순번", width: 80 },
   { field: "workcenterId", headerName: "작업장 ID", width: 120 },
   { field: "workcenterName", headerName: "작업장 명", width: 150 },
@@ -20,7 +19,6 @@ const columns = [
   { field: "toolId", headerName: "설비 ID", width: 100 },
   { field: "toolName", headerName: "설비명", width: 100 },
   { field: "routingId", headerName: "라우팅 ID", width: 130 },
-
 ];
 
 export default function WorkcenterPlanView() {
@@ -36,33 +34,20 @@ export default function WorkcenterPlanView() {
     page: 0,
   });
 
-  // 초기 시나리오 자동 설정 (한번만 실행)
+  // 초기 시나리오 자동 설정
   useEffect(() => {
     if (!scenarioId) {
       setScenarioId("S000001");
     }
   }, [scenarioId, setScenarioId]);
 
-  // 시나리오 ID 변경 시 fetch 실행
+  // 시나리오 ID 변경 시 데이터 fetch
   useEffect(() => {
-
-    const scenarioId = "S000001"; // 시나리오 ID 고정
-    fetch(`http://localhost:8080/api/result/workcenter-plan/${scenarioId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const plans = data.plans || [];
-        const formatted = plans.map((plan) => ({
-          id: plan.no, // DataGrid 고유 ID
-          ...plan,
-          workcenterStartTime:
-            plan.workcenterStartTime?.replace("T", " ") ?? "-",
-          workcenterEndTime: plan.workcenterEndTime?.replace("T", " ") ?? "-",
-
     if (!scenarioId) return;
+
     fetch(`http://localhost:8080/api/result/workcenter-plan/${scenarioId}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("받은 데이터:", data);
         const formatted = (data?.plans || []).map((item, index) => ({
           id: index + 1,
           scenarioId: item.scenarioId ?? "-",
@@ -71,25 +56,21 @@ export default function WorkcenterPlanView() {
           workcenterId: item.workcenterId ?? "-",
           workcenterGroup: item.workcenterGroup ?? "-",
           workcenterName: item.workcenterName ?? "-",
-          workcenterStartTime: item.workcenterStartTime ?? "-",
-          workcenterEndTime: item.workcenterEndTime ?? "-",
+          workcenterStartTime:
+            item.workcenterStartTime?.replace("T", " ") ?? "-",
+          workcenterEndTime: item.workcenterEndTime?.replace("T", " ") ?? "-",
           operationId: item.operationId ?? "-",
           operationName: item.operationName ?? "-",
           operationType: item.operationType ?? "-",
           toolId: item.toolId ?? "-",
           toolName: item.toolName ?? "-",
-
         }));
 
         setRows(formatted);
-
         setTotal(data.total || 0);
       })
       .catch((err) => {
-        console.error("데이터 불러오기 실패 ❌", err)
-      })
-      .catch((err) => {
-        console.error("데이터 가져오기 실패:", err);
+        console.error("데이터 불러오기 실패 ❌", err);
       });
   }, [scenarioId]);
 
@@ -113,20 +94,14 @@ export default function WorkcenterPlanView() {
       })
       .catch((err) => {
         console.error("다운로드 오류:", err);
-
       });
   };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-
-
       <Box sx={{ mt: 2, mb: 1 }}>
         <ResultToolBar upload={() => {}} download={handleDownload} />
       </Box>
-
-
-      {/* 메인 카드 */}
 
       <Box
         sx={{
@@ -164,9 +139,7 @@ export default function WorkcenterPlanView() {
                 fontWeight: "bold",
               },
               border: 0,
-
               minWidth: "1200px",
-
             }}
           />
         </Box>
