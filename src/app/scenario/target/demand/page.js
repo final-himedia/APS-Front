@@ -187,7 +187,7 @@ export default function DemandView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpen(false)}>취소</Button>
+            <Button onClick={() => setOpen(false)} sx={{ color: "#000" }}>취소</Button>
           </DialogActions>
         </Dialog>
       </Box>
