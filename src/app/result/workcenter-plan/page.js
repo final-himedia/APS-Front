@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import ResultToolBar from "@/app/standard/ResultToolBar";
-import useScenarioStore from "@/hooks/useScenarioStore";
+import useScenarioStore from "@/hooks/useScenarioStore"; // ← import 추가
 
 const columns = [
-
   { field: "id", headerName: "순번", width: 80 },
   { field: "workcenterId", headerName: "작업장 ID", width: 120 },
   { field: "workcenterName", headerName: "작업장 명", width: 150 },
@@ -20,14 +19,11 @@ const columns = [
   { field: "toolId", headerName: "설비 ID", width: 100 },
   { field: "toolName", headerName: "설비명", width: 100 },
   { field: "routingId", headerName: "라우팅 ID", width: 130 },
-
 ];
 
 export default function WorkcenterPlanView() {
-  const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
-  const setScenarioId = useScenarioStore(
-    (state) => state.setSelectedScenarioId
-  );
+  const scenarioId = useScenarioStore((s) => s.selectedScenarioId);
+  const setScenarioId = useScenarioStore((s) => s.setSelectedScenarioId);
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -36,65 +32,53 @@ export default function WorkcenterPlanView() {
     page: 0,
   });
 
-  // 초기 시나리오 자동 설정 (한번만 실행)
+  // 1) 초기 시나리오 자동 설정 (한번만 실행)
   useEffect(() => {
     if (!scenarioId) {
       setScenarioId("S000001");
     }
   }, [scenarioId, setScenarioId]);
 
-  // 시나리오 ID 변경 시 fetch 실행
+  // 2) 시나리오 ID 변경 시 fetch 실행
   useEffect(() => {
+    if (!scenarioId) return; // scenarioId 없으면 중단
 
-    const scenarioId = "S000001"; // 시나리오 ID 고정
     fetch(`http://localhost:8080/api/result/workcenter-plan/${scenarioId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("서버 응답 에러");
+        return res.json();
+      })
       .then((data) => {
         const plans = data.plans || [];
-        const formatted = plans.map((plan) => ({
-          id: plan.no, // DataGrid 고유 ID
-          ...plan,
+        const formatted = plans.map((plan, idx) => ({
+          id: idx + 1, // DataGrid 고유 ID
+          scenarioId: plan.scenarioId ?? "-",
+          no: plan.no ?? "-",
+          routingId: plan.routingId ?? "-",
+          workcenterId: plan.workcenterId ?? "-",
+          workcenterGroup: plan.workcenterGroup ?? "-",
+          workcenterName: plan.workcenterName ?? "-",
           workcenterStartTime:
             plan.workcenterStartTime?.replace("T", " ") ?? "-",
           workcenterEndTime: plan.workcenterEndTime?.replace("T", " ") ?? "-",
-
-    if (!scenarioId) return;
-    fetch(`http://localhost:8080/api/result/workcenter-plan/${scenarioId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("받은 데이터:", data);
-        const formatted = (data?.plans || []).map((item, index) => ({
-          id: index + 1,
-          scenarioId: item.scenarioId ?? "-",
-          no: item.no ?? "-",
-          routingId: item.routingId ?? "-",
-          workcenterId: item.workcenterId ?? "-",
-          workcenterGroup: item.workcenterGroup ?? "-",
-          workcenterName: item.workcenterName ?? "-",
-          workcenterStartTime: item.workcenterStartTime ?? "-",
-          workcenterEndTime: item.workcenterEndTime ?? "-",
-          operationId: item.operationId ?? "-",
-          operationName: item.operationName ?? "-",
-          operationType: item.operationType ?? "-",
-          toolId: item.toolId ?? "-",
-          toolName: item.toolName ?? "-",
-
+          operationId: plan.operationId ?? "-",
+          operationName: plan.operationName ?? "-",
+          operationType: plan.operationType ?? "-",
+          toolId: plan.toolId ?? "-",
+          toolName: plan.toolName ?? "-",
         }));
-
         setRows(formatted);
-
-        setTotal(data.total || 0);
+        setTotal(data.total ?? formatted.length);
       })
       .catch((err) => {
-        console.error("데이터 불러오기 실패 ❌", err)
-      })
-      .catch((err) => {
-        console.error("데이터 가져오기 실패:", err);
+        console.error("데이터 불러오기 실패:", err);
       });
   }, [scenarioId]);
 
+  // 다운로드 핸들러
   const handleDownload = () => {
     if (!scenarioId) return;
+
     fetch(
       `http://localhost:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
     )
@@ -106,28 +90,23 @@ export default function WorkcenterPlanView() {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", "workcenter-plan.xlsx");
+        link.download = "workcenter-plan.xlsx";
         document.body.appendChild(link);
         link.click();
         link.remove();
       })
       .catch((err) => {
         console.error("다운로드 오류:", err);
-
       });
   };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-
-
       <Box sx={{ mt: 2, mb: 1 }}>
         <ResultToolBar upload={() => {}} download={handleDownload} />
       </Box>
 
-
       {/* 메인 카드 */}
-
       <Box
         sx={{
           border: "1px solid #e0e0e0",
@@ -164,9 +143,7 @@ export default function WorkcenterPlanView() {
                 fontWeight: "bold",
               },
               border: 0,
-
               minWidth: "1200px",
-
             }}
           />
         </Box>
