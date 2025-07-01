@@ -32,12 +32,15 @@ export default function WorkcenterPlanView() {
     page: 0,
   });
 
+
   // 1) 초기 시나리오 자동 설정 (한번만 실행)
+
   useEffect(() => {
     if (!scenarioId) {
       setScenarioId("S000001");
     }
   }, [scenarioId, setScenarioId]);
+
 
   // 2) 시나리오 ID 변경 시 fetch 실행
   useEffect(() => {
@@ -66,12 +69,19 @@ export default function WorkcenterPlanView() {
           operationType: plan.operationType ?? "-",
           toolId: plan.toolId ?? "-",
           toolName: plan.toolName ?? "-",
+
         }));
         setRows(formatted);
+
         setTotal(data.total ?? formatted.length);
       })
       .catch((err) => {
         console.error("데이터 불러오기 실패:", err);
+
+        setTotal(data.total || 0);
+      })
+      .catch((err) => {
+        console.error("데이터 불러오기 실패 ❌", err);
       });
   }, [scenarioId]);
 
@@ -106,7 +116,8 @@ export default function WorkcenterPlanView() {
         <ResultToolBar upload={() => {}} download={handleDownload} />
       </Box>
 
-      {/* 메인 카드 */}
+
+
       <Box
         sx={{
           border: "1px solid #e0e0e0",

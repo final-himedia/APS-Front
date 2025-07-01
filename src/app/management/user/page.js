@@ -181,7 +181,7 @@ export default function UserManagementPage() {
           justifyContent: "flex-end",
           alignItems: "center",
           p: 1,
-          backgroundColor: "#f9f9f9",
+          backgroundColor: "#f2e8e8",
           border: "1px solid #d0d7e2",
           borderRadius: 1,
           mb: 1,
@@ -192,6 +192,14 @@ export default function UserManagementPage() {
           variant="outlined"
           startIcon={<AddIcon fontSize="small" />}
           onClick={handleAdd}
+          sx={{
+            borderColor: "#3f3f3f",
+            color: "#3f3f3f",
+            "&:hover": {
+              borderColor: "#3f3f3f",
+              backgroundColor: "#f5f5f5",
+            },
+          }}
         >
           추가
         </Button>
@@ -238,7 +246,7 @@ export default function UserManagementPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditOpen(false)}>취소</Button>
+          <Button onClick={() => setEditOpen(false)} sx={{ color: "#000" }}>취소</Button>
           <Button variant="contained" onClick={() => handleSaveEdit(editData)}>
             저장
           </Button>

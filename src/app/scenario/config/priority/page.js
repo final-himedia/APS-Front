@@ -176,7 +176,7 @@ export default function PriorityView() {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleCloseDialog}>취소</Button>
+            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>취소</Button>
           </DialogActions>
         </Dialog>
       </Box>

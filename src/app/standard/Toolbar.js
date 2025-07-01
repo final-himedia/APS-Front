@@ -104,7 +104,6 @@ export default function Toolbar({ upload, download }) {
             onClose={handleExportClose}
           >
             <MenuItem onClick={download}>Excel 다운로드</MenuItem>
-            <MenuItem onClick={handleExportClose}>CSV 다운로드</MenuItem>
           </Menu>
         </div>
         <Button
@@ -126,7 +125,6 @@ export default function Toolbar({ upload, download }) {
           onClose={handleImportClose}
         >
           <MenuItem onClick={upload}>Excel 업로드</MenuItem>
-          <MenuItem onClick={handleImportClose}>CSV 업로드</MenuItem>
         </Menu>
       </Stack>
 
