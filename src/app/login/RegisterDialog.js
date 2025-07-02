@@ -14,13 +14,17 @@ import LockIcon from "@mui/icons-material/Lock";
 import { useState } from "react";
 
 export default function RegisterDialog({ open, onClose }) {
+  // 입력값 상태
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+
+  // 상태 관리
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // 회원가입 요청 처리
   const handleRegister = async () => {
     if (!email || !name || !password || !confirm) {
       setError("모든 항목을 입력해주세요.");
@@ -61,15 +65,14 @@ export default function RegisterDialog({ open, onClose }) {
 
       const data = await res.json();
 
-      // localStorage.setItem("token", data.token);
-      // localStorage.setItem("userId", data.user.id);
-
       alert("회원가입이 완료되었습니다!");
+
+      // 다이얼로그 닫고 입력 초기화
       onClose();
       setEmail("");
+      setName("");
       setPassword("");
       setConfirm("");
-      setName("");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,7 +94,7 @@ export default function RegisterDialog({ open, onClose }) {
           justifyContent: "start",
         }}
       >
-        {/* 상단 로고 */}
+        {/* 로고 */}
         <Box sx={{ textAlign: "left", mb: 3, ml: -1 }}>
           <img
             src="/logo/main-logo.png"
@@ -100,7 +103,7 @@ export default function RegisterDialog({ open, onClose }) {
           />
         </Box>
 
-        {/* 입력 필드들 */}
+        {/* 이메일 입력 */}
         <TextField
           fullWidth
           placeholder="이메일주소"
@@ -116,6 +119,7 @@ export default function RegisterDialog({ open, onClose }) {
           }}
         />
 
+        {/* 이름 입력 */}
         <TextField
           fullWidth
           placeholder="이름"
@@ -131,6 +135,7 @@ export default function RegisterDialog({ open, onClose }) {
           }}
         />
 
+        {/* 비밀번호 입력 */}
         <TextField
           fullWidth
           placeholder="비밀번호"
@@ -147,6 +152,7 @@ export default function RegisterDialog({ open, onClose }) {
           }}
         />
 
+        {/* 비밀번호 확인 */}
         <TextField
           fullWidth
           placeholder="비밀번호 확인"
@@ -166,7 +172,7 @@ export default function RegisterDialog({ open, onClose }) {
         {/* 에러 메시지 */}
         {error && <Box sx={{ color: "red", fontSize: 13, mt: 1 }}>{error}</Box>}
 
-        {/* 캐릭터 이미지 */}
+        {/* 오른쪽 아래 캐릭터 이미지 */}
         <Box
           component="img"
           src="/logo/MAIDAYlogin.png"
