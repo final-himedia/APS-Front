@@ -134,7 +134,7 @@ export default function ForecastPanel() {
   );
 
   return (
-    <Box sx={{ p: 2, backgroundColor: "#fcf7f3" }}>
+    <Box sx={{ p: 2, backgroundColor: "#f2e8e8" }}>
       <Typography variant="h5" fontWeight="bold" mb={2}>
         수요예측
       </Typography>
@@ -164,7 +164,7 @@ export default function ForecastPanel() {
         />
         <Button
           variant="contained"
-          sx={{ backgroundColor: "#cbb8a9" }}
+          sx={{ backgroundColor: "#c39696" }}
           onClick={handleSearch}
         >
           검색
@@ -175,7 +175,7 @@ export default function ForecastPanel() {
           onClick={handleUpload}
           disabled={!file}
           size="small"
-          sx={{ backgroundColor: file ? "#cbb8a9" : undefined }}
+          sx={{ backgroundColor: file ? "#c39696" : undefined }}
         >
           업로드
         </Button>
