@@ -13,22 +13,26 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import RegisterDialog from "./RegisterDialog";
+import RegisterDialog from "./RegisterDialog"; // 회원가입 다이얼로그
 
 export default function LoginPage() {
-  const [openRegister, setOpenRegister] = useState(false);
-  const [openResetPassword, setOpenResetPassword] = useState(false);
+  // 🔒 로그인 관련 상태
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberEmail, setRememberEmail] = useState(false);
   const [error, setError] = useState("");
 
-  // 비밀번호 찾기용
+  // 🔄 비밀번호 찾기용 상태
+  const [openResetPassword, setOpenResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetResult, setResetResult] = useState("");
 
+  // 📝 회원가입 다이얼로그 상태
+  const [openRegister, setOpenRegister] = useState(false);
+
   const router = useRouter();
 
+  // 📌 이메일 저장 복원
   useEffect(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
@@ -37,6 +41,7 @@ export default function LoginPage() {
     }
   }, []);
 
+  // 🧠 로그인 처리
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -54,12 +59,19 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(result.user));
         localStorage.setItem("userId", result.user.id);
 
-        // ✅ 임시 비밀번호면 강제 이동
+        if (rememberEmail) {
+          localStorage.setItem("rememberedEmail", email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+
+        // 임시 비밀번호일 경우 비밀번호 변경 페이지로 이동
         if (result.user.isTemporaryPassword) {
           router.push("/user/change-password");
           return;
         }
 
+        // 마지막 방문 경로로 이동
         const lastPath = localStorage.getItem(`lastPath_${result.user.id}`);
         if (lastPath && lastPath !== "/login") {
           router.push(lastPath);
@@ -75,6 +87,7 @@ export default function LoginPage() {
     }
   };
 
+  // 🔁 비밀번호 찾기 처리
   const handleResetPassword = async () => {
     try {
       const response = await fetch(
@@ -114,6 +127,7 @@ export default function LoginPage() {
         bgcolor: "#f5f5f5",
       }}
     >
+      {/* 🧾 로그인 박스 */}
       <Box
         component="form"
         onSubmit={handleLogin}
@@ -164,6 +178,7 @@ export default function LoginPage() {
           size="small"
         />
 
+        {/* 아이디 기억하기 */}
         <FormControlLabel
           control={
             <Checkbox
@@ -174,12 +189,14 @@ export default function LoginPage() {
           label="아이디 기억하기"
         />
 
+        {/* 에러 메시지 */}
         {error && (
           <Typography color="error" variant="caption">
             {error}
           </Typography>
         )}
 
+        {/* 로그인 버튼 */}
         <Button
           type="submit"
           fullWidth
@@ -195,7 +212,7 @@ export default function LoginPage() {
           로그인
         </Button>
 
-        {/* 링크: 비번찾기 / 회원가입 */}
+        {/* 링크: 비밀번호 찾기 & 회원가입 */}
         <Box
           sx={{
             display: "flex",
@@ -223,13 +240,13 @@ export default function LoginPage() {
         </Box>
       </Box>
 
-      {/* 회원가입 다이얼로그 */}
+      {/* 📌 회원가입 다이얼로그 */}
       <RegisterDialog
         open={openRegister}
         onClose={() => setOpenRegister(false)}
       />
 
-      {/* 비밀번호 찾기 다이얼로그 */}
+      {/* 📌 비밀번호 찾기 다이얼로그 */}
       <Dialog
         open={openResetPassword}
         onClose={() => {
@@ -248,7 +265,7 @@ export default function LoginPage() {
             textAlign: "center",
           }}
         >
-          {/* 로고 */}
+          {/* 다이얼로그 로고 */}
           <Box
             sx={{
               position: "absolute",
@@ -274,6 +291,7 @@ export default function LoginPage() {
             비밀번호를 찾을 이메일을 입력해주세요.
           </Typography>
 
+          {/* 이메일 입력 */}
           <TextField
             fullWidth
             placeholder="가입한 이메일"
@@ -284,6 +302,7 @@ export default function LoginPage() {
             onChange={(e) => setResetEmail(e.target.value)}
           />
 
+          {/* 결과 메시지 */}
           {resetResult && (
             <Typography
               variant="caption"
@@ -297,6 +316,7 @@ export default function LoginPage() {
             </Typography>
           )}
 
+          {/* 비밀번호 재설정 버튼 */}
           <Button
             variant="contained"
             fullWidth

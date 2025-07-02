@@ -25,27 +25,28 @@ import {
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 10; // 한 페이지에 보여줄 게시글 개수
 
 export default function QnaPage() {
-  const [tab, setTab] = useState(0);
-  const [searchType, setSearchType] = useState("title");
-  const [searchText, setSearchText] = useState("");
-  const [page, setPage] = useState(1);
-  const [posts, setPosts] = useState([]);
+  // 1. 상태 변수 선언
+  const [tab, setTab] = useState(0); // 탭 (전체, 공지)
+  const [searchType, setSearchType] = useState("title"); // 검색 조건 (제목/작성자)
+  const [searchText, setSearchText] = useState(""); // 검색어
+  const [page, setPage] = useState(1); // 현재 페이지 번호
+  const [posts, setPosts] = useState([]); // 현재 필터링된 게시글 리스트
 
-  // 글쓰기 다이얼로그 상태
-  const [open, setOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-  const [newContent, setNewContent] = useState("");
-  const [category, setCategory] = useState("common");
-  const [titleError, setTitleError] = useState(false);
-  const [contentError, setContentError] = useState(false);
+  // 글쓰기 다이얼로그 상태 변수
+  const [open, setOpen] = useState(false); // 글쓰기 다이얼로그 열림 여부
+  const [newTitle, setNewTitle] = useState(""); // 새 글 제목
+  const [newContent, setNewContent] = useState(""); // 새 글 내용
+  const [category, setCategory] = useState("common"); // 새 글 카테고리 (일반글 or 공지글)
+  const [titleError, setTitleError] = useState(false); // 제목 입력 오류 여부
+  const [contentError, setContentError] = useState(false); // 내용 입력 오류 여부
 
-  // 전체 데이터 저장 (검색용)
+  // 전체 게시글 저장 (검색, 필터링용)
   const [allPosts, setAllPosts] = useState([]);
 
-  // QnA 리스트 불러오기 (작성자 이메일 포함, 카테고리 포함)
+  // 2. 게시글 리스트 API 호출 및 초기화 함수
   const fetchQnaList = () => {
     const token = localStorage.getItem("token");
     fetch("http://localhost:8080/api/management/qna/list", {
@@ -60,35 +61,38 @@ export default function QnaPage() {
           console.error("❌ 서버 응답이 배열이 아님:", data);
           return;
         }
-        const filtered = data.filter((d) => !d.deleted);
-        setPosts(filtered);
-        setAllPosts(filtered);
+        const filtered = data.filter((d) => !d.deleted); // 삭제된 글은 제외
+        setPosts(filtered); // 화면에 보여줄 글 리스트 세팅
+        setAllPosts(filtered); // 검색 등 전체 데이터 저장
       })
       .catch((err) => console.error("❌ QnA fetch 에러:", err));
   };
 
+  // 3. 컴포넌트 첫 렌더링 시 게시글 목록 불러오기
   useEffect(() => {
     fetchQnaList();
   }, []);
 
-  // 탭에 따른 필터링된 리스트
+  // 4. 탭(전체, 공지)에 따른 게시글 필터링
   const filteredPosts = posts.filter((post) => {
     if (tab === 1) {
-      // 공지글 탭
+      // 공지 탭이면 카테고리 'notice'인 글만 보여줌
       return post.category === "notice";
     }
-    // 전체 탭
+    // 전체 탭이면 모두 통과
     return true;
   });
 
-  // 검색어 필터링 적용 (추가 - 옵션)
+  // 5. 검색 조건과 검색어에 따른 추가 필터링
   const searchedPosts = filteredPosts.filter((post) => {
     if (!searchText.trim()) return true; // 검색어 없으면 모두 통과
     const keyword = searchText.toLowerCase();
 
     if (searchType === "title") {
+      // 제목 검색
       return post.title.toLowerCase().includes(keyword);
     } else if (searchType === "writer") {
+      // 작성자 이름 혹은 이메일 검색
       return (
         post.name?.toLowerCase().includes(keyword) ||
         post.email?.toLowerCase().includes(keyword)
@@ -97,16 +101,17 @@ export default function QnaPage() {
     return true;
   });
 
-  // 페이지네이션 처리
+  // 6. 페이지네이션 (현재 페이지에 맞는 게시글만 자름)
   const paginatedPosts = searchedPosts.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
 
-  // 새 글 저장
+  // 7. 새 글 저장 처리 함수 (POST API 호출)
   const handleSave = () => {
     let hasError = false;
 
+    // 입력값 검증 - 제목과 내용이 빈 문자열이면 오류 처리
     if (!newTitle.trim()) {
       setTitleError(true);
       hasError = true;
@@ -121,12 +126,14 @@ export default function QnaPage() {
       setContentError(false);
     }
 
-    if (hasError) return;
+    if (hasError) return; // 오류 있으면 저장 취소
 
+    // 토큰, 작성자 아이디, 작성 시간 세팅
     const token = localStorage.getItem("token");
     const writerId = Number(localStorage.getItem("userId"));
     const wroteAt = new Date().toISOString();
 
+    // 서버에 새 글 POST 요청
     fetch("http://localhost:8080/api/management/qna", {
       method: "POST",
       headers: {
@@ -139,7 +146,7 @@ export default function QnaPage() {
         content: newContent,
         wroteAt,
         deleted: false,
-        category, // 여기 카테고리 포함
+        category, // 카테고리도 같이 보냄
       }),
     })
       .then((res) => {
@@ -148,13 +155,14 @@ export default function QnaPage() {
       })
       .then((result) => {
         console.log("✅ 저장 성공:", result);
-        fetchQnaList();
+        fetchQnaList(); // 저장 후 게시글 목록 갱신
       })
       .catch((err) => {
         console.error("❌ 에러 발생:", err);
         alert("글 저장 중 오류가 발생했습니다.");
       })
       .finally(() => {
+        // 저장 후 다이얼로그 닫고 입력 초기화
         setOpen(false);
         setNewTitle("");
         setNewContent("");
@@ -164,11 +172,12 @@ export default function QnaPage() {
 
   return (
     <Box sx={{ p: 3, maxWidth: "1000px", mx: "auto" }}>
+      {/* 제목 */}
       <Typography variant="h6" gutterBottom>
         Q&A 게시판
       </Typography>
 
-      {/* 검색 */}
+      {/* 8. 검색 영역 */}
       <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
         <Select
           size="small"
@@ -186,7 +195,7 @@ export default function QnaPage() {
           onChange={(e) => setSearchText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              setPage(1);
+              setPage(1); // 검색 시 페이지 1로 초기화
             }
           }}
           sx={{ width: 300 }}
@@ -204,22 +213,22 @@ export default function QnaPage() {
             },
           }}
           onClick={() => {
-            setPage(1);
+            setPage(1); // 검색 버튼 클릭 시 페이지 1 초기화
           }}
         >
           검색
         </Button>
       </Stack>
 
-      {/* 탭 */}
+      {/* 9. 탭 영역 (전체, 공지) */}
       <Tabs
         value={tab}
         onChange={(e, v) => {
           setTab(v);
-          setPage(1);
+          setPage(1); // 탭 변경 시 페이지 1로 초기화
         }}
         sx={{ mb: 2 }}
-        TabIndicatorProps={{ style: { display: "none" } }}
+        TabIndicatorProps={{ style: { display: "none" } }} // 밑줄 숨김
       >
         <Tab
           label="전체"
@@ -261,7 +270,7 @@ export default function QnaPage() {
         />
       </Tabs>
 
-      {/* 게시판 테이블 */}
+      {/* 10. 게시글 테이블 */}
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -283,6 +292,7 @@ export default function QnaPage() {
               <TableRow key={post.id}>
                 <TableCell>{post.id}</TableCell>
                 <TableCell>
+                  {/* 제목 클릭 시 상세 페이지 링크 */}
                   <Link href={`/management/qna/${post.id}`} passHref>
                     <Typography
                       sx={{
@@ -294,7 +304,8 @@ export default function QnaPage() {
                         gap: 0.5,
                       }}
                     >
-                      {post.category === "notice" && "🚨"} {/* 사이렌 이모지 */}
+                      {post.category === "notice" && "🚨"}{" "}
+                      {/* 공지글이면 사이렌 이모지 */}
                       {post.title}
                     </Typography>
                   </Link>
@@ -307,7 +318,7 @@ export default function QnaPage() {
         </TableBody>
       </Table>
 
-      {/* 페이지네이션 */}
+      {/* 11. 페이지네이션 UI */}
       <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
         <Pagination
           count={Math.ceil(searchedPosts.length / PAGE_SIZE)}
@@ -325,7 +336,7 @@ export default function QnaPage() {
         />
       </Box>
 
-      {/* 글쓰기 버튼 */}
+      {/* 12. 글쓰기 버튼 */}
       <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
         <Button
           variant="text"
@@ -346,7 +357,7 @@ export default function QnaPage() {
         </Button>
       </Box>
 
-      {/* 글쓰기 다이얼로그 */}
+      {/* 13. 글쓰기 다이얼로그 */}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
