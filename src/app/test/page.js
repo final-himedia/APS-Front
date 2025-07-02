@@ -332,7 +332,7 @@ export default function ForecastPanel() {
           </ResponsiveContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>닫기</Button>
+          <Button onClick={() => setOpenDialog(false)} sx={{ color: "#906262" }}>닫기</Button>
         </DialogActions>
       </Dialog>
     </Box>
