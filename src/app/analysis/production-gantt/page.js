@@ -35,7 +35,7 @@ import { DatasetRounded } from "@mui/icons-material";
 
 // Syncfusion 라이선스 등록
 registerLicense(
-  "Ngo9BigBOggjHTQxAR8/ V1NNaF1cWWhPYVB2WmFZfVtgdVVMYV hbRH9PIiBoS35Rc0VlW3xccnVRRmlUWEF/VEBU"
+  "Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhecnRRQ2RcUUd+W0FWYEk="
 );
 
 export default function ProductionGantt() {
