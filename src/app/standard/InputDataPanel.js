@@ -33,11 +33,6 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
     { label: "자재 마스터", indent: true, url: "/scenario/bop/part" },
     { label: "BOM", indent: true, url: "/scenario/bop/bom" },
     { label: "플랜트 마스터", indent: true, url: "/scenario/bop/site" },
-    {
-      label: "공정 순서",
-      indent: true,
-      url: "/scenario/bop/operation-routing",
-    },
     { label: "Config", bold: true },
     { label: "우선순위", indent: true, url: "/scenario/config/priority" },
     { label: "Resource", bold: true },
@@ -171,9 +166,9 @@ export default function InputDataPanel({ isOpen, onOpen, onClose }) {
         <Box
           sx={{
             position: "absolute",
-            top: "50%", // 👉 세로 중앙 정렬
-            transform: "translateY(-50%)", // 👉 정확히 가운데로 맞추기
-            right: 0, // 👉 오른쪽 끝에 붙이기
+            top: "50%",
+            transform: "translateY(-50%)",
+            right: 0,
             zIndex: 1200,
           }}
         >
