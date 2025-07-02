@@ -136,6 +136,7 @@ export default function ListDivider({ onClose }) {
   const resultMenuItems = [
     { label: "대시보드", href: "/dashboard" },
     { label: "생산 계획 간트", href: "/analysis/production-gantt" },
+    { label: "수요예측", href: "/test" },
   ];
 
   const manageMenuItems = [
