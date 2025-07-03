@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { registerLicense } from "@syncfusion/ej2-base";
 import {
   GanttComponent,
   Toolbar,
@@ -32,11 +31,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SaveIcon from "@mui/icons-material/Save";
 import { DatasetRounded } from "@mui/icons-material";
-
-// Syncfusion 라이선스 등록
-registerLicense(
-  "Ngo9BigBOggjHTQxAR8/ V1NNaF1cWWhPYVB2WmFZfVtgdVVMYV hbRH9PIiBoS35Rc0VlW3xccnVRRmlUWEF/VEBU"
-);
 
 export default function ProductionGantt() {
   const [scenarios, setScenarios] = useState([]);

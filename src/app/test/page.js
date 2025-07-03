@@ -134,7 +134,7 @@ export default function ForecastPanel() {
   );
 
   return (
-    <Box sx={{ p: 2, backgroundColor: "#fcf7f3" }}>
+    <Box sx={{ p: 2, backgroundColor: "#f2e8e8" }}>
       <Typography variant="h5" fontWeight="bold" mb={2}>
         수요예측
       </Typography>
@@ -164,7 +164,7 @@ export default function ForecastPanel() {
         />
         <Button
           variant="contained"
-          sx={{ backgroundColor: "#cbb8a9" }}
+          sx={{ backgroundColor: "#c39696" }}
           onClick={handleSearch}
         >
           검색
@@ -175,7 +175,7 @@ export default function ForecastPanel() {
           onClick={handleUpload}
           disabled={!file}
           size="small"
-          sx={{ backgroundColor: file ? "#cbb8a9" : undefined }}
+          sx={{ backgroundColor: file ? "#c39696" : undefined }}
         >
           업로드
         </Button>
@@ -242,7 +242,7 @@ export default function ForecastPanel() {
       </Stack>
 
       {forecastTable.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 1, mt: 0.5 }}>
+        <Paper variant="outlined" sx={{ p: 1, mt: 0.5, minHeight: 327 }}>
           <Typography fontWeight="bold" mb={0}>
             예측 상세표
           </Typography>
@@ -314,10 +314,10 @@ export default function ForecastPanel() {
                 label={{
                   value: "수요량",
                   position: "insideLeft",
-                  offset: 0,
-                  dx: 100,
-                  dy: -110,
-                  style: { textAnchor: "middle", fontSize: 14 },
+                  offset: 70,
+                  dy: -185,
+                  dx: -10,
+                  style: { textAnchor: "middle" },
                 }}
               />
               <Tooltip />
@@ -332,7 +332,12 @@ export default function ForecastPanel() {
           </ResponsiveContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>닫기</Button>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            sx={{ color: "#906262" }}
+          >
+            닫기
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

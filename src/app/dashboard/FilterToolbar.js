@@ -1,7 +1,14 @@
 "use client";
 
-import { Box, TextField, MenuItem, Button, Stack } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  TextField,
+  MenuItem,
+  Stack,
+  Button,
+} from "@mui/material";
 import {
   PieChart,
   Pie,
@@ -9,27 +16,84 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
 } from "recharts";
 
-export default function FilterToolbar() {
-  const [scenario, setScenario] = useState("S020000");
-  const [startDate, setStartDate] = useState("100202501_01");
+export default function DashboardCharts() {
+  const [scenario, setScenario] = useState("S010000");
+  const [barData, setBarData] = useState([]);
+  const [pieData, setPieData] = useState([]);
 
-  const handleSearch = () => {
-    console.log("조회됨:", { scenario, startDate });
+  const fetchChartData = async (scenarioId) => {
+    try {
+      const [barRes, pieRes] = await Promise.all([
+        fetch(
+          `15.164.98.31:8080/api/execution/top5-operation?scenarioId=${scenarioId}`
+        ),
+        fetch(
+          `15.164.98.31:8080/api/execution/total-time-routing?scenarioId=${scenarioId}`
+        ),
+      ]);
+
+      if (!barRes.ok) throw new Error("Top 5 작업량 응답 실패");
+      if (!pieRes.ok) throw new Error("Routing 시간 응답 실패");
+
+      const barJson = await barRes.json();
+      const pieJson = await pieRes.json();
+
+      console.log("📦 barJson:", barJson);
+      console.log("📦 pieJson:", pieJson);
+
+      const barFormatted = barJson.map((item) => ({
+        name: item.operationId || "알 수 없음",
+        value: item.durationMinutes || 0,
+      }));
+
+      const pieFormatted = pieJson.map((item) => ({
+        name: item.routingId || "미정 라우팅",
+        value: item.totalDurationMinutes || 0,
+      }));
+
+      setBarData(barFormatted);
+      setPieData(pieFormatted);
+    } catch (err) {
+      console.error("🔥 데이터 불러오기 실패:", err.message);
+    }
   };
 
-  const data = [
-    { name: "완료", value: 71 },
-    { name: "진행 중", value: 1 },
-    { name: "미진행", value: 23 },
-  ];
+  useEffect(() => {
+    fetchChartData(scenario);
+  }, [scenario]);
 
-  const COLORS = ["#3f51b5", "#ff7f7f", "#fbc02d"];
+  const handleSearch = () => {
+    fetchChartData(scenario);
+  };
+
+  const maxBarValue = Math.max(...barData.map((d) => d.value), 0);
+
+  // 파이차트 색상: 많은 값부터 진하게
+  const sortedPie = [...pieData].sort((a, b) => b.value - a.value);
+  const pieColorSteps = [
+    "#c39696",
+    "#d7a6a6",
+    "#e2bdbd",
+    "#f2d6d6",
+    "#f8e4e4",
+    "#f9f1f1",
+    "#f4f4f4",
+    "#ededed",
+    "#e5e5e5",
+    "#dddddd",
+    "#d5d5d5",
+    "#cdcdcd",
+  ];
 
   return (
     <>
-      {/* 필터 바 */}
+      {/* 필터바 */}
       <Box
         sx={{
           width: "100%",
@@ -55,19 +119,7 @@ export default function FilterToolbar() {
             size="small"
             sx={{ minWidth: 160 }}
           >
-            <MenuItem value="S020000">S020000</MenuItem>
             <MenuItem value="S010000">S010000</MenuItem>
-          </TextField>
-
-          <TextField
-            label="호기"
-            select
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            size="small"
-            sx={{ minWidth: 180 }}
-          >
-            <MenuItem value="100202501_01">100202501_01</MenuItem>
           </TextField>
         </Stack>
 
@@ -86,63 +138,97 @@ export default function FilterToolbar() {
         </Button>
       </Box>
 
-      {/* 콘텐츠 카드 영역 */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
-        }}
-      >
-        {[0, 1].map((rowIndex) => (
-          <Box key={rowIndex} sx={{ display: "flex", gap: 3 }}>
-            {[0, 1, 2].map((colIndex) => {
-              const isTargetBox = rowIndex === 0 && colIndex === 1;
+      {/* 차트 영역 */}
+      <Box sx={{ display: "flex", gap: 2, height: 700, mt: 1 }}>
+        {/* 왼쪽: 막대그래프 */}
+        <Box
+          sx={{
+            resize: "horizontal",
+            overflow: "auto",
+            minWidth: 250,
+            maxWidth: "70%",
+            width: "50%",
+            backgroundColor: "#fff",
+            borderRadius: 2,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+            p: 2,
+          }}
+        >
+          <Typography variant="h6" fontWeight="bold" mb={4}>
+            Top 5 작업량
+          </Typography>
 
-              return (
-                <Box
-                  key={colIndex}
-                  sx={{
-                    flex: 1,
-                    minWidth: 230,
-                    height: 320,
-                    backgroundColor: "#fff",
-                    borderRadius: 2,
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-                    p: 2,
-                    overflow: "hidden",
-                  }}
+          {barData.length === 0 ? (
+            <Typography color="textSecondary">데이터가 없습니다.</Typography>
+          ) : (
+            <ResponsiveContainer width="100%" height="75%">
+              <BarChart
+                layout="vertical"
+                data={barData}
+                margin={{ top: 20, bottom: 20, left: 40 }}
+              >
+                <XAxis type="number" />
+                <YAxis dataKey="name" type="category" />
+                <Bar dataKey="value" barSize={50}>
+                  {barData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.value === maxBarValue ? "#c39696" : "#d7d7d7"}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </Box>
+
+        {/* 오른쪽: 파이차트 */}
+        <Box
+          sx={{
+            flex: 1,
+            backgroundColor: "#fff",
+            borderRadius: 2,
+            boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+            p: 2,
+            overflow: "hidden",
+          }}
+        >
+          <Typography variant="h6" fontWeight="bold" mb={2}>
+            공정별 시간 데이터
+          </Typography>
+
+          {pieData.length === 0 ? (
+            <Typography color="textSecondary">데이터가 없습니다.</Typography>
+          ) : (
+            <ResponsiveContainer width="100%" height="90%">
+              <PieChart>
+                <Pie
+                  data={sortedPie}
+                  dataKey="value"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={100}
+                  outerRadius={170}
+                  label={({ name }) =>
+                    name.length > 15 ? name.slice(0, 12) + "..." : name
+                  }
                 >
-                  {isTargetBox && (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={data}
-                          dataKey="value"
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={90}
-                          labelLine={true}
-                          label={({ name }) => name}
-                        >
-                          {data.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend verticalAlign="bottom" height={30} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  )}
-                </Box>
-              );
-            })}
-          </Box>
-        ))}
+                  {sortedPie.map((entry, index) => {
+                    const color =
+                      pieColorSteps[index % pieColorSteps.length] || "#e0e0e0";
+                    return <Cell key={`cell-${index}`} fill={color} />;
+                  })}
+                </Pie>
+                <Tooltip />
+                <Legend
+                  verticalAlign="bottom"
+                  height={80}
+                  wrapperStyle={{ marginTop: -30 }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
+        </Box>
       </Box>
     </>
   );

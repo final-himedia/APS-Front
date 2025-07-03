@@ -1,3 +1,5 @@
+import { Box, IconButton } from "@mui/material";
+
 export default function HeaderTabs({ showSidebar, onSidebarOpen }) {
   return (
     <Box
@@ -11,9 +13,7 @@ export default function HeaderTabs({ showSidebar, onSidebarOpen }) {
       }}
     >
       {!showSidebar && (
-        <IconButton size="small" onClick={onSidebarOpen}>
-          <EastIcon fontSize="small" />
-        </IconButton>
+        <IconButton size="small" onClick={onSidebarOpen}></IconButton>
       )}
     </Box>
   );

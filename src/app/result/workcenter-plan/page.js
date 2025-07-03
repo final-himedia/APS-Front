@@ -7,17 +7,17 @@ import ResultToolBar from "@/app/standard/ResultToolBar";
 import useScenarioStore from "@/hooks/useScenarioStore"; // ← import 추가
 
 const columns = [
-  { field: "id", headerName: "순번", width: 80 },
-  { field: "workcenterId", headerName: "작업장 ID", width: 120 },
-  { field: "workcenterName", headerName: "작업장 명", width: 150 },
-  { field: "operationId", headerName: "공정 ID", width: 130 },
-  { field: "operationName", headerName: "공정명", width: 150 },
-  { field: "operationType", headerName: "공정 타입", width: 130 },
+  { field: "id", headerName: "순번", width: 50 },
+  { field: "workcenterId", headerName: "작업장 ID", width: 90 },
+  { field: "workcenterName", headerName: "작업장 명", width: 120 },
+  { field: "operationId", headerName: "공정 ID", flex: 1 },
+  { field: "operationName", headerName: "공정명", width: 110 },
+  { field: "operationType", headerName: "공정 타입", flex: 1 },
   { field: "workcenterStartTime", headerName: "시작 시간", width: 180 },
   { field: "workcenterEndTime", headerName: "종료 시간", width: 180 },
-  { field: "workcenterGroup", headerName: "작업장 그룹", width: 130 },
+  { field: "workcenterGroup", headerName: "작업장 그룹", flex: 1 },
   { field: "toolId", headerName: "설비 ID", width: 100 },
-  { field: "toolName", headerName: "설비명", width: 100 },
+  { field: "toolName", headerName: "설비명", width: 90 },
   { field: "routingId", headerName: "라우팅 ID", width: 130 },
 ];
 
@@ -149,7 +149,7 @@ export default function WorkcenterPlanView() {
                 fontWeight: "bold",
               },
               border: 0,
-              minWidth: "1200px",
+              minWidth: "1500px",
             }}
           />
         </Box>

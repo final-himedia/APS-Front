@@ -11,12 +11,15 @@ import {
   DialogContent,
   TextField,
   DialogActions,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import AddIcon from "@mui/icons-material/Add";
+import { useRouter } from "next/navigation";
 // 생략된 import 및 useState/handlers 등은 그대로 유지
 
 export default function UserManagementPage() {
@@ -26,6 +29,8 @@ export default function UserManagementPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const router = useRouter();
 
   const fetchUsers = () => {
     const token = localStorage.getItem("token");
@@ -117,8 +122,33 @@ export default function UserManagementPage() {
       });
   };
 
-  const handleResetPassword = (row) => {
-    console.log("비밀번호 초기화 클릭:", row);
+  const handleResetPassword = async (row) => {
+    if (!window.confirm(`${row.name} 님의 비밀번호를 초기화하시겠습니까?`))
+      return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("15.164.98.31:8080/api/auth/find-password", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: row.userId }),
+      });
+
+      const result = await response.text();
+
+      if (response.ok) {
+        alert("✅ 임시 비밀번호가 이메일로 전송되었습니다.");
+      } else {
+        alert(`❌ 초기화 실패: ${result}`);
+      }
+    } catch (error) {
+      alert("❌ 서버 오류가 발생했습니다.");
+      console.error(error);
+    }
   };
 
   const handleSelectionChange = (ids) => {
@@ -127,7 +157,7 @@ export default function UserManagementPage() {
 
   const columns = [
     { field: "id", headerName: "순번", width: 80 },
-    { field: "userId", headerName: "사용자 ID", width: 200 },
+    { field: "userId", headerName: "사용자 ID" },
     { field: "name", headerName: "이름", width: 150 },
     { field: "roles", headerName: "역할", width: 250 },
     {
@@ -174,48 +204,25 @@ export default function UserManagementPage() {
         사용자 관리
       </Typography>
 
-      {/* 툴바: 추가 버튼만 */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          p: 1,
-          backgroundColor: "#f2e8e8",
-          border: "1px solid #d0d7e2",
-          borderRadius: 1,
-          mb: 1,
-        }}
-      >
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<AddIcon fontSize="small" />}
-          onClick={handleAdd}
-          sx={{
-            borderColor: "#3f3f3f",
-            color: "#3f3f3f",
-            "&:hover": {
-              borderColor: "#3f3f3f",
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          추가
-        </Button>
-      </Box>
-
       {/* 사용자 목록 테이블 */}
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        onRowSelectionModelChange={handleSelectionChange}
-        sx={{ border: 0, mt: 1 }}
-        rowHeight={42}
-      />
-
+      <Box width={930}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          onRowSelectionModelChange={handleSelectionChange}
+          sx={{
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "#f2e8e8",
+              color: "#000",
+              fontWeight: "bold",
+            },
+            border: 0, //f2e8e8 수정
+          }}
+          rowHeight={42}
+        />
+      </Box>
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>사용자 수정</DialogTitle>
         <DialogContent>
