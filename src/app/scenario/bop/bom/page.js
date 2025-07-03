@@ -62,7 +62,7 @@ export default function BomView() {
 
   const fetchData = (token, scenarioId) => {
     if (!token || !scenarioId) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/bom/${scenarioId}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/bop/bom/${scenarioId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -103,7 +103,7 @@ export default function BomView() {
   const handleDownload = () => {
     if (!token || !scenarioId) return;
     fetch(
-      `http://localhost:8080/api/scenarios/bop/bom-download?scenarioId=${scenarioId}`,
+      `15.164.98.31:8080/api/scenarios/bop/bom-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -134,7 +134,7 @@ export default function BomView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/bom-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/bop/bom-upload", {
       method: "POST",
       body: formData,
       headers: {

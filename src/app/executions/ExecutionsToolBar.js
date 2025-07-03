@@ -40,7 +40,7 @@ export default function ResultToolBar({
     for (const scenarioId of selectedScenarioIds) {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/analysis/get?scenarioId=${scenarioId}&userId=${userId}`
+          `15.164.98.31:8080/api/analysis/get?scenarioId=${scenarioId}&userId=${userId}`
         );
         if (!res.ok) throw new Error("실행 실패");
 
@@ -88,7 +88,7 @@ export default function ResultToolBar({
     try {
       for (const scenarioId of selectedScenarioIds) {
         const res = await fetch(
-          `http://localhost:8080/api/analysis/delete/${scenarioId}`,
+          `15.164.98.31:8080/api/analysis/delete/${scenarioId}`,
           { method: "DELETE" }
         );
         if (!res.ok) throw new Error("삭제 실패");

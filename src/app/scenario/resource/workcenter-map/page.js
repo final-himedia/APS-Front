@@ -58,7 +58,7 @@ export default function WorkCenterMap() {
   const fetchData = (token, id) => {
     if (!token || !id) return;
 
-    fetch(`http://localhost:8080/api/scenarios/resource/workcentermap/${id}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/resource/workcentermap/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -103,7 +103,7 @@ export default function WorkCenterMap() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/resource/workcentermap-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/resource/workcentermap-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -121,7 +121,7 @@ export default function WorkCenterMap() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/scenarios/resource/workcentermap-download?scenarioId=${scenarioId}`,
+      `15.164.98.31:8080/api/scenarios/resource/workcentermap-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

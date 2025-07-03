@@ -49,7 +49,7 @@ export default function ToolMaster() {
   const fetchData = (token, id) => {
     if (!token || !id) return;
 
-    fetch(`http://localhost:8080/api/scenarios/resource/tool-master/${id}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/resource/tool-master/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -89,7 +89,7 @@ export default function ToolMaster() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/resource/tool-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/resource/tool-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -106,7 +106,7 @@ export default function ToolMaster() {
   const handleDownload = () => {
     if (!token || !scenarioId) return;
 
-    fetch(`http://localhost:8080/api/scenarios/resource/tool-download?scenarioId=${scenarioId}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/resource/tool-download?scenarioId=${scenarioId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

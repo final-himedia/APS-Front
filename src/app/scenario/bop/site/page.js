@@ -41,7 +41,7 @@ export default function PlantMasterView() {
   const fetchSiteData = () => {
     if (!token || !scenarioId) return;
 
-    fetch(`http://localhost:8080/api/scenarios/bop/site/${scenarioId}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/bop/site/${scenarioId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -70,7 +70,7 @@ export default function PlantMasterView() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/scenarios/bop/site-download?scenarioId=${scenarioId}`,
+      `15.164.98.31:8080/api/scenarios/bop/site-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export default function PlantMasterView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/site-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/bop/site-upload", {
       method: "POST",
       body: formData,
       headers: {

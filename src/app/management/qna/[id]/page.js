@@ -60,7 +60,7 @@ export default function QnaDetailPage() {
     }
 
     // 게시글 상세 불러오기
-    fetch(`http://localhost:8080/api/management/qna/detail/${id}`, {
+    fetch(`15.164.98.31:8080/api/management/qna/detail/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -77,7 +77,7 @@ export default function QnaDetailPage() {
       .finally(() => setLoading(false));
 
     // 댓글 리스트 불러오기
-    fetch(`http://localhost:8080/api/management/qna/${id}/comment/list`, {
+    fetch(`15.164.98.31:8080/api/management/qna/${id}/comment/list`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -102,7 +102,7 @@ export default function QnaDetailPage() {
     const token = localStorage.getItem("token");
     if (!token) return alert("로그인이 필요합니다.");
 
-    fetch(`http://localhost:8080/api/management/qna/${id}`, {
+    fetch(`15.164.98.31:8080/api/management/qna/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -130,7 +130,7 @@ export default function QnaDetailPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/management/qna/${post.id}`,
+        `15.164.98.31:8080/api/management/qna/${post.id}`,
         {
           method: "PUT",
           headers: {
@@ -158,7 +158,7 @@ export default function QnaDetailPage() {
     if (!token) return alert("로그인이 필요합니다.");
 
     setCommentLoading(true);
-    fetch(`http://localhost:8080/api/management/qna/${id}/comment`, {
+    fetch(`15.164.98.31:8080/api/management/qna/${id}/comment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -198,7 +198,7 @@ export default function QnaDetailPage() {
 
     setCommentLoading(true);
     fetch(
-      `http://localhost:8080/api/management/qna/${id}/comment/${commentId}`,
+      `15.164.98.31:8080/api/management/qna/${id}/comment/${commentId}`,
       {
         method: "PUT",
         headers: {
@@ -227,7 +227,7 @@ export default function QnaDetailPage() {
 
     setCommentLoading(true);
     fetch(
-      `http://localhost:8080/api/management/qna/${id}/comment/${commentId}`,
+      `15.164.98.31:8080/api/management/qna/${id}/comment/${commentId}`,
       {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
