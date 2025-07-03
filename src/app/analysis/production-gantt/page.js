@@ -1,11 +1,8 @@
 "use client";
 
-// Syncfusion 라이선스 등록
-registerLicense(
-  "Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXhecnRRQ2RcUUd+W0FWYEk="
-);
 
-import { registerLicense } from "@syncfusion/ej2-base";
+
+
 
 import React, { useEffect, useRef, useState } from "react";
 import {

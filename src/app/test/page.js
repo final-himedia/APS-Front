@@ -242,7 +242,7 @@ export default function ForecastPanel() {
       </Stack>
 
       {forecastTable.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 1, mt: 0.5 }}>
+        <Paper variant="outlined" sx={{ p: 1, mt: 0.5, minHeight: 327 }}>
           <Typography fontWeight="bold" mb={0}>
             예측 상세표
           </Typography>
@@ -314,10 +314,10 @@ export default function ForecastPanel() {
                 label={{
                   value: "수요량",
                   position: "insideLeft",
-                  offset: 0,
-                  dx: 100,
-                  dy: -110,
-                  style: { textAnchor: "middle", fontSize: 14 },
+                  offset: 70,
+                  dy: -185,
+                  dx: -10,
+                  style: { textAnchor: "middle" },
                 }}
               />
               <Tooltip />
@@ -332,7 +332,12 @@ export default function ForecastPanel() {
           </ResponsiveContainer>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} sx={{ color: "#906262" }}>닫기</Button>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            sx={{ color: "#906262" }}
+          >
+            닫기
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
