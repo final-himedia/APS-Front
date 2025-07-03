@@ -11,6 +11,8 @@ import {
   DialogContent,
   TextField,
   DialogActions,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -158,7 +160,7 @@ export default function UserManagementPage() {
 
   const columns = [
     { field: "id", headerName: "순번", width: 80 },
-    { field: "userId", headerName: "사용자 ID", width: 200 },
+    { field: "userId", headerName: "사용자 ID" },
     { field: "name", headerName: "이름", width: 150 },
     { field: "roles", headerName: "역할", width: 250 },
     {
@@ -206,16 +208,24 @@ export default function UserManagementPage() {
       </Typography>
 
       {/* 사용자 목록 테이블 */}
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSizeOptions={[5, 10]}
-        checkboxSelection
-        onRowSelectionModelChange={handleSelectionChange}
-        sx={{ border: 0, mt: 1 }}
-        rowHeight={42}
-      />
-
+      <Box width={930}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSizeOptions={[5, 10]}
+          checkboxSelection
+          onRowSelectionModelChange={handleSelectionChange}
+          sx={{
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "#f2e8e8",
+              color: "#000",
+              fontWeight: "bold",
+            },
+            border: 0, //f2e8e8 수정
+          }}
+          rowHeight={42}
+        />
+      </Box>
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>사용자 수정</DialogTitle>
         <DialogContent>
