@@ -46,7 +46,7 @@ export default function WorkcenterPlanView() {
   useEffect(() => {
     if (!scenarioId) return; // scenarioId 없으면 중단
 
-    fetch(`http://localhost:8080/api/result/workcenter-plan/${scenarioId}`)
+    fetch(`15.164.98.31:8080/api/result/workcenter-plan/${scenarioId}`)
       .then((res) => {
         if (!res.ok) throw new Error("서버 응답 에러");
         return res.json();
@@ -90,7 +90,7 @@ export default function WorkcenterPlanView() {
     if (!scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
+      `15.164.98.31:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
     )
       .then((res) => {
         if (!res.ok) throw new Error("다운로드 실패");

@@ -48,7 +48,7 @@ export default function PartMasterView() {
 
   const fetchData = (token, id) => {
     if (!token || !id) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/part/${id}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/bop/part/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -88,7 +88,7 @@ export default function PartMasterView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/part-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/bop/part-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -104,7 +104,7 @@ export default function PartMasterView() {
 
   const handleDownloadExcel = () => {
     if (!token || !scenarioId) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/part-download?scenarioId=${scenarioId}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/bop/part-download?scenarioId=${scenarioId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

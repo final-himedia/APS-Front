@@ -87,7 +87,7 @@ export default function ExecutionsPage({
   ];
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/analysis/list")
+    fetch("15.164.98.31:8080/api/analysis/list")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {

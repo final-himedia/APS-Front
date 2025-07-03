@@ -35,7 +35,7 @@ export default function UserManagementPage() {
   const fetchUsers = () => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:8080/api/management/user", {
+    fetch("15.164.98.31:8080/api/management/user", {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export default function UserManagementPage() {
 
     if (!window.confirm(`${row.name} 님을 삭제하시겠습니까?`)) return;
 
-    fetch(`http://localhost:8080/api/management/user/${row.userId}`, {
+    fetch(`15.164.98.31:8080/api/management/user/${row.userId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -97,7 +97,7 @@ export default function UserManagementPage() {
     const token = localStorage.getItem("token");
     console.log(editData);
 
-    fetch(`http://localhost:8080/api/management/user/${editData.id}`, {
+    fetch(`15.164.98.31:8080/api/management/user/${editData.id}`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -130,7 +130,7 @@ export default function UserManagementPage() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "http://127.0.0.1:8080/api/auth/find-password",
+        "15.164.98.31:8080/api/auth/find-password",
         {
           method: "POST",
           headers: {

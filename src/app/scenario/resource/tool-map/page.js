@@ -52,7 +52,7 @@ export default function ToolMap() {
   const fetchData = (token, id) => {
     if (!token || !id) return;
 
-    fetch(`http://localhost:8080/api/scenarios/resource/tool-map/${id}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/resource/tool-map/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -89,7 +89,7 @@ export default function ToolMap() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/resource/toolmap-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/resource/toolmap-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -107,7 +107,7 @@ export default function ToolMap() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/scenarios/resource/toolmap-download?scenarioId=${scenarioId}`,
+      `15.164.98.31:8080/api/scenarios/resource/toolmap-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

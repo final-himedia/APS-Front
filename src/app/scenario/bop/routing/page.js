@@ -50,7 +50,7 @@ export default function RoutingMasterView() {
 
   const fetchData = (token, id) => {
     if (!token || !id) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/routing/${id}`, {
+    fetch(`15.164.98.31:8080/api/scenarios/bop/routing/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -84,7 +84,7 @@ export default function RoutingMasterView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/routing-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/bop/routing-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -101,7 +101,7 @@ export default function RoutingMasterView() {
   const handleDownloadExcel = () => {
     if (!token || !scenarioId) return;
     fetch(
-      `http://localhost:8080/api/scenarios/bop/routing-download?scenarioId=${scenarioId}`,
+      `15.164.98.31:8080/api/scenarios/bop/routing-download?scenarioId=${scenarioId}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }

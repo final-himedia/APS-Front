@@ -60,7 +60,7 @@ export default function DemandView() {
   const fetchData = async (token, id) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/api/scenarios/target/demand/${id}`,
+        `15.164.98.31:8080/api/scenarios/target/demand/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -99,7 +99,7 @@ export default function DemandView() {
     if (!token || !scenarioId) return;
     try {
       const res = await fetch(
-        `http://localhost:8080/api/scenarios/target/demand-download?scenarioId=${scenarioId}`,
+        `15.164.98.31:8080/api/scenarios/target/demand-download?scenarioId=${scenarioId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -131,7 +131,7 @@ export default function DemandView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/target/demand-upload", {
+    fetch("15.164.98.31:8080/api/scenarios/target/demand-upload", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
