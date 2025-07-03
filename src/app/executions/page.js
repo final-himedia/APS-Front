@@ -58,7 +58,7 @@ export default function ExecutionsPage({
             const scenarioId = params.row.scenarioId;
             if (scenarioId) {
               window.open(
-                `http://localhost:8080/api/analysis/download?scenarioId=${scenarioId}`,
+                `15.164.98.31:8080/api/analysis/download?scenarioId=${scenarioId}`,
                 "_blank"
               );
             } else {
