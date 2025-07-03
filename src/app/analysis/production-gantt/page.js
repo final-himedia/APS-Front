@@ -52,7 +52,7 @@ export default function ProductionGantt() {
     const fetchScenarios = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/scenarios/list", {
+        const res = await fetch("http://15.164.98.31:8080/api/scenarios/list", {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export default function ProductionGantt() {
     const fetchOperations = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/analysis/gantt?scenarioId=${scenario}`
+          `http://15.164.98.31:8080/api/analysis/gantt?scenarioId=${scenario}`
         );
         const data = await res.json();
 

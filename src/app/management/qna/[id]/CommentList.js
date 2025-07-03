@@ -16,9 +16,12 @@ export default function CommentList({ postId }) {
   const fetchComments = () => {
     if (!token) return; // 토큰 없으면 요청 안 보냄 (비로그인 상태)
 
-    fetch(`http://localhost:8080/api/management/qna/${postId}/comment/list`, {
-      headers: { Authorization: `Bearer ${token}` }, // 인증 헤더 포함
-    })
+    fetch(
+      `http://15.164.98.31:8080/api/management/qna/${postId}/comment/list`,
+      {
+        headers: { Authorization: `Bearer ${token}` }, // 인증 헤더 포함
+      }
+    )
       .then((res) => {
         if (!res.ok) throw new Error("댓글 불러오기 실패"); // 실패 시 에러
         return res.json(); // 응답을 JSON으로 파싱

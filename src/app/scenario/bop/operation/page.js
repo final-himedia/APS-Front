@@ -58,7 +58,7 @@ export default function OperationMasterView() {
 
   const fetchOperationData = (token, id) => {
     if (!token || !id) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/operationRoute/${id}`, {
+    fetch(`http://15.164.98.31:8080/api/scenarios/bop/operationRoute/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -102,7 +102,7 @@ export default function OperationMasterView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/operationRoute-upload", {
+    fetch("http://15.164.98.31:8080api/scenarios/bop/operationRoute-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -120,7 +120,7 @@ export default function OperationMasterView() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/scenarios/bop/operationRoute-download?scenarioId=${scenarioId}`,
+      `http://15.164.98.31:8080/api/scenarios/bop/operationRoute-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

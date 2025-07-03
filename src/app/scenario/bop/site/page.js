@@ -41,7 +41,7 @@ export default function PlantMasterView() {
   const fetchSiteData = () => {
     if (!token || !scenarioId) return;
 
-    fetch(`http://localhost:8080/api/scenarios/bop/site/${scenarioId}`, {
+    fetch(`http://15.164.98.31:8080/api/scenarios/bop/site/${scenarioId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -70,7 +70,7 @@ export default function PlantMasterView() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/scenarios/bop/site-download?scenarioId=${scenarioId}`,
+      `http://15.164.98.31:8080/api/scenarios/bop/site-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export default function PlantMasterView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/site-upload", {
+    fetch("http://15.164.98.31:8080/api/scenarios/bop/site-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -157,7 +157,9 @@ export default function PlantMasterView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>취소</Button>
+            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>
+              취소
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

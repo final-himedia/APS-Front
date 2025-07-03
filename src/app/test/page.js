@@ -57,7 +57,7 @@ export default function ForecastPanel() {
 
   const fetchForecast = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/predict");
+      const res = await fetch("http://15.164.98.31:8080/api/predict");
       const json = await res.json();
 
       const formatted = json.map((item) => ({
@@ -110,7 +110,7 @@ export default function ForecastPanel() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:5000/api/upload-file", {
+      const res = await fetch("http://15.164.98.31:8080/api/upload-file", {
         method: "POST",
         body: formData,
       });

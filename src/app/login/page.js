@@ -46,7 +46,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:8080/api/auth/login", {
+      const response = await fetch("15.164.98.31:8080/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -91,7 +91,7 @@ export default function LoginPage() {
   const handleResetPassword = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8080/api/auth/find-password",
+        "http://15.164.98.31:8080/api/auth/find-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

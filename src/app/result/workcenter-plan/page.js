@@ -32,7 +32,6 @@ export default function WorkcenterPlanView() {
     page: 0,
   });
 
-
   // 1) 초기 시나리오 자동 설정 (한번만 실행)
 
   useEffect(() => {
@@ -41,12 +40,11 @@ export default function WorkcenterPlanView() {
     }
   }, [scenarioId, setScenarioId]);
 
-
   // 2) 시나리오 ID 변경 시 fetch 실행
   useEffect(() => {
     if (!scenarioId) return; // scenarioId 없으면 중단
 
-    fetch(`http://localhost:8080/api/result/workcenter-plan/${scenarioId}`)
+    fetch(`http://15.164.98.31:8080/api/result/workcenter-plan/${scenarioId}`)
       .then((res) => {
         if (!res.ok) throw new Error("서버 응답 에러");
         return res.json();
@@ -69,7 +67,6 @@ export default function WorkcenterPlanView() {
           operationType: plan.operationType ?? "-",
           toolId: plan.toolId ?? "-",
           toolName: plan.toolName ?? "-",
-
         }));
         setRows(formatted);
 
@@ -90,7 +87,7 @@ export default function WorkcenterPlanView() {
     if (!scenarioId) return;
 
     fetch(
-      `http://localhost:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
+      `http://15.164.98.31:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
     )
       .then((res) => {
         if (!res.ok) throw new Error("다운로드 실패");
@@ -115,8 +112,6 @@ export default function WorkcenterPlanView() {
       <Box sx={{ mt: 2, mb: 1 }}>
         <ResultToolBar upload={() => {}} download={handleDownload} />
       </Box>
-
-
 
       <Box
         sx={{

@@ -12,7 +12,7 @@ export default function DashboardLayout({ children }) {
         backgroundColor: "#f5f5f5",
 
         height: "100%",
-        overflow: "hidden", 
+        overflow: "hidden",
         display: "flex",
         flexDirection: "column",
         boxSizing: "border-box",

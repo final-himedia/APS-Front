@@ -27,7 +27,9 @@ const columns = [
 
 export default function ToolMaster() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
-  const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
 
   const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
@@ -49,7 +51,7 @@ export default function ToolMaster() {
   const fetchData = (token, id) => {
     if (!token || !id) return;
 
-    fetch(`http://localhost:8080/api/scenarios/resource/tool-master/${id}`, {
+    fetch(`http://15.164.98.31:8080/api/scenarios/resource/tool-master/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -89,7 +91,7 @@ export default function ToolMaster() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/resource/tool-upload", {
+    fetch("http://15.164.98.31:8080/api/scenarios/resource/tool-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -106,11 +108,14 @@ export default function ToolMaster() {
   const handleDownload = () => {
     if (!token || !scenarioId) return;
 
-    fetch(`http://localhost:8080/api/scenarios/resource/tool-download?scenarioId=${scenarioId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(
+      `http://15.164.98.31:8080/api/scenarios/resource/tool-download?scenarioId=${scenarioId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((res) => {
         if (!res.ok) throw new Error("다운로드 실패");
         return res.blob();
@@ -133,7 +138,9 @@ export default function ToolMaster() {
         <Toolbar upload={handleOpenDialog} download={handleDownload} />
 
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             작업도구 마스터 파일 업로드
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
@@ -167,7 +174,9 @@ export default function ToolMaster() {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>취소</Button>
+            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>
+              취소
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

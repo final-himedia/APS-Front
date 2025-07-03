@@ -31,11 +31,16 @@ const columns = [
 
 export default function PartMasterView() {
   const scenarioId = useScenarioStore((state) => state.selectedScenarioId);
-  const setScenarioId = useScenarioStore((state) => state.setSelectedScenarioId);
+  const setScenarioId = useScenarioStore(
+    (state) => state.setSelectedScenarioId
+  );
   const [token, setToken] = useState(null);
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
-  const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -48,7 +53,7 @@ export default function PartMasterView() {
 
   const fetchData = (token, id) => {
     if (!token || !id) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/part/${id}`, {
+    fetch(`http://15.164.98.31:8080/api/scenarios/bop/part/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -88,7 +93,7 @@ export default function PartMasterView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("http://localhost:8080/api/scenarios/bop/part-upload", {
+    fetch("http://15.164.98.31:8080/api/scenarios/bop/part-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -104,11 +109,14 @@ export default function PartMasterView() {
 
   const handleDownloadExcel = () => {
     if (!token || !scenarioId) return;
-    fetch(`http://localhost:8080/api/scenarios/bop/part-download?scenarioId=${scenarioId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(
+      `http://15.164.98.31:8080/api/scenarios/bop/part-download?scenarioId=${scenarioId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((res) => {
         if (!res.ok) throw new Error("다운로드 실패");
         return res.blob();
@@ -130,7 +138,9 @@ export default function PartMasterView() {
       <Box sx={{ mt: 2 }}>
         <Toolbar upload={handleOpenDialog} download={handleDownloadExcel} />
         <Dialog open={open} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             자재 마스터 업로드
             <IconButton onClick={handleCloseDialog}>
               <CloseIcon />
@@ -162,7 +172,9 @@ export default function PartMasterView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>취소</Button>
+            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>
+              취소
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

@@ -24,7 +24,7 @@ export default function ChangePasswordPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/auth/change-password",
+        "http://15.164.98.31:8080/api/auth/change-password",
         {
           method: "PUT",
           headers: {
