@@ -36,7 +36,7 @@ export default function ScenarioList({ onClose }) {
   const handleAddScenario = ({ scenarioId, scenarioName }) => {
     const token = localStorage.getItem("token");
 
-    fetch("15.164.98.31:8080/api/scenarios", {
+    fetch("http://15.164.98.31:8080/api/scenarios", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export default function ScenarioList({ onClose }) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchScenarioData = (token) => {
-    const url = `15.164.98.31:8080/api/scenarios/list`;
+    const url = `http://15.164.98.31:8080/api/scenarios/list`;
     fetch(url, {
       method: "GET",
       headers: {

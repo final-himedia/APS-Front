@@ -30,7 +30,7 @@ export default function LoadStatPage() {
 
   const handleDownload = () => {
     if (!scenarioId) return;
-    const url = `15.164.98.31:8080/api/analysis/workcenter-download?scenarioId=${scenarioId}`;
+    const url = `http://15.164.98.31:8080/api/analysis/workcenter-download?scenarioId=${scenarioId}`;
     window.open(url, "_blank");
   };
 
@@ -38,7 +38,7 @@ export default function LoadStatPage() {
     if (!scenarioId) return;
 
     fetch(
-      `15.164.98.31:8080/api/execution/workcenter?scenarioId=${scenarioId}`
+      `http://15.164.98.31:8080/api/execution/workcenter?scenarioId=${scenarioId}`
     )
       .then((res) => res.json())
       .then((data) => {

@@ -8,7 +8,7 @@ export default function PartPage() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8080/api/part/test") // 실제 API 주소 맞게 수정
+      .get("http://15.164.98.31:8080/api/part/test") // 실제 API 주소 맞게 수정
       .then((res) => {
         if (res.data?.parts) {
           setParts(res.data.parts);

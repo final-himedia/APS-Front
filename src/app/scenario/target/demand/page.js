@@ -60,7 +60,7 @@ export default function DemandView() {
   const fetchData = async (token, id) => {
     try {
       const res = await fetch(
-        `15.164.98.31:8080/api/scenarios/target/demand/${id}`,
+        `http://15.164.98.31:8080/api/scenarios/target/demand/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -99,7 +99,7 @@ export default function DemandView() {
     if (!token || !scenarioId) return;
     try {
       const res = await fetch(
-        `15.164.98.31:8080/api/scenarios/target/demand-download?scenarioId=${scenarioId}`,
+        `http://15.164.98.31:8080/api/scenarios/target/demand-download?scenarioId=${scenarioId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -131,7 +131,7 @@ export default function DemandView() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("15.164.98.31:8080/api/scenarios/target/demand-upload", {
+    fetch("http://15.164.98.31:8080/api/scenarios/target/demand-upload", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -155,7 +155,9 @@ export default function DemandView() {
           fullWidth
           maxWidth="sm"
         >
-          <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
+          <DialogTitle
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             판매오더 업로드
             <IconButton onClick={() => setOpen(false)}>
               <CloseIcon />
@@ -187,7 +189,9 @@ export default function DemandView() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpen(false)} sx={{ color: "#000" }}>취소</Button>
+            <Button onClick={() => setOpen(false)} sx={{ color: "#000" }}>
+              취소
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

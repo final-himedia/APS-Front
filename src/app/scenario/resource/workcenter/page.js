@@ -56,7 +56,7 @@ export default function WorkCenter() {
   const fetchData = (token, id) => {
     if (!token || !id) return;
 
-    fetch(`15.164.98.31:8080/api/scenarios/resource/workcenter/${id}`, {
+    fetch(`http://15.164.98.31:8080/api/scenarios/resource/workcenter/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -99,7 +99,7 @@ export default function WorkCenter() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("15.164.98.31:8080/api/scenarios/resource/workcenter-upload", {
+    fetch("http://15.164.98.31:8080/api/scenarios/resource/workcenter-upload", {
       method: "POST",
       body: formData,
       headers: {
@@ -117,7 +117,7 @@ export default function WorkCenter() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `15.164.98.31:8080/api/scenarios/resource/workcenter-download?scenarioId=${scenarioId}`,
+      `http://15.164.98.31:8080/api/scenarios/resource/workcenter-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

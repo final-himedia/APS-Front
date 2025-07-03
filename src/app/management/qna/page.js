@@ -49,7 +49,7 @@ export default function QnaPage() {
   // 2. 게시글 리스트 API 호출 및 초기화 함수
   const fetchQnaList = () => {
     const token = localStorage.getItem("token");
-    fetch("15.164.98.31:8080/api/management/qna/list", {
+    fetch("http://15.164.98.31:8080/api/management/qna/list", {
       headers: token ? { Authorization: "Bearer " + token } : {},
     })
       .then((res) => {
@@ -134,7 +134,7 @@ export default function QnaPage() {
     const wroteAt = new Date().toISOString();
 
     // 서버에 새 글 POST 요청
-    fetch("15.164.98.31:8080/api/management/qna", {
+    fetch("http://15.164.98.31:8080/api/management/qna", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

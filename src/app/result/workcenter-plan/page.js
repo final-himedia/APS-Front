@@ -10,12 +10,12 @@ const columns = [
   { field: "id", headerName: "순번", width: 50 },
   { field: "workcenterId", headerName: "작업장 ID", width: 90 },
   { field: "workcenterName", headerName: "작업장 명", width: 120 },
-  { field: "operationId", headerName: "공정 ID", flex:1 },
+  { field: "operationId", headerName: "공정 ID", flex: 1 },
   { field: "operationName", headerName: "공정명", width: 110 },
-  { field: "operationType", headerName: "공정 타입", flex:1 },
+  { field: "operationType", headerName: "공정 타입", flex: 1 },
   { field: "workcenterStartTime", headerName: "시작 시간", width: 180 },
   { field: "workcenterEndTime", headerName: "종료 시간", width: 180 },
-  { field: "workcenterGroup", headerName: "작업장 그룹", flex:1 },
+  { field: "workcenterGroup", headerName: "작업장 그룹", flex: 1 },
   { field: "toolId", headerName: "설비 ID", width: 100 },
   { field: "toolName", headerName: "설비명", width: 90 },
   { field: "routingId", headerName: "라우팅 ID", width: 130 },
@@ -32,7 +32,6 @@ export default function WorkcenterPlanView() {
     page: 0,
   });
 
-
   // 1) 초기 시나리오 자동 설정 (한번만 실행)
 
   useEffect(() => {
@@ -41,12 +40,11 @@ export default function WorkcenterPlanView() {
     }
   }, [scenarioId, setScenarioId]);
 
-
   // 2) 시나리오 ID 변경 시 fetch 실행
   useEffect(() => {
     if (!scenarioId) return; // scenarioId 없으면 중단
 
-    fetch(`15.164.98.31:8080/api/result/workcenter-plan/${scenarioId}`)
+    fetch(`http://15.164.98.31:8080/api/result/workcenter-plan/${scenarioId}`)
       .then((res) => {
         if (!res.ok) throw new Error("서버 응답 에러");
         return res.json();
@@ -69,7 +67,6 @@ export default function WorkcenterPlanView() {
           operationType: plan.operationType ?? "-",
           toolId: plan.toolId ?? "-",
           toolName: plan.toolName ?? "-",
-
         }));
         setRows(formatted);
 
@@ -90,7 +87,7 @@ export default function WorkcenterPlanView() {
     if (!scenarioId) return;
 
     fetch(
-      `15.164.98.31:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
+      `http://15.164.98.31:8080/api/result/workcenter-plan/download?scenarioId=${scenarioId}`
     )
       .then((res) => {
         if (!res.ok) throw new Error("다운로드 실패");
@@ -115,8 +112,6 @@ export default function WorkcenterPlanView() {
       <Box sx={{ mt: 2, mb: 1 }}>
         <ResultToolBar upload={() => {}} download={handleDownload} />
       </Box>
-
-
 
       <Box
         sx={{

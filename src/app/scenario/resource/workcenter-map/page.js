@@ -58,11 +58,14 @@ export default function WorkCenterMap() {
   const fetchData = (token, id) => {
     if (!token || !id) return;
 
-    fetch(`15.164.98.31:8080/api/scenarios/resource/workcentermap/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(
+      `http://15.164.98.31:8080/api/scenarios/resource/workcentermap/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((res) => res.json())
       .then((data) => {
         const list = data.workcenterMaps || [];
@@ -103,13 +106,16 @@ export default function WorkCenterMap() {
     formData.append("file", file);
     formData.append("scenarioId", scenarioId);
 
-    fetch("15.164.98.31:8080/api/scenarios/resource/workcentermap-upload", {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(
+      "http://15.164.98.31:8080/api/scenarios/resource/workcentermap-upload",
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((res) => {
         if (res.ok) fetchData(token, scenarioId);
         else console.error("업로드 실패");
@@ -121,7 +127,7 @@ export default function WorkCenterMap() {
     if (!token || !scenarioId) return;
 
     fetch(
-      `15.164.98.31:8080/api/scenarios/resource/workcentermap-download?scenarioId=${scenarioId}`,
+      `http://15.164.98.31:8080/api/scenarios/resource/workcentermap-download?scenarioId=${scenarioId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -186,7 +192,9 @@ export default function WorkCenterMap() {
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>취소</Button>
+            <Button onClick={handleCloseDialog} sx={{ color: "#000" }}>
+              취소
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

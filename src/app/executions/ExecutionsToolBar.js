@@ -40,7 +40,7 @@ export default function ResultToolBar({
     for (const scenarioId of selectedScenarioIds) {
       try {
         const res = await fetch(
-          `15.164.98.31:8080/api/analysis/get?scenarioId=${scenarioId}&userId=${userId}`
+          `http://15.164.98.31:8080/api/analysis/get?scenarioId=${scenarioId}&userId=${userId}`
         );
         if (!res.ok) throw new Error("실행 실패");
 
@@ -81,14 +81,16 @@ export default function ResultToolBar({
     }
 
     const confirmed = window.confirm(
-      `선택된 시나리오 ${selectedScenarioIds.join(", ")} 의 실행 이력을 삭제할까요?`
+      `선택된 시나리오 ${selectedScenarioIds.join(
+        ", "
+      )} 의 실행 이력을 삭제할까요?`
     );
     if (!confirmed) return;
 
     try {
       for (const scenarioId of selectedScenarioIds) {
         const res = await fetch(
-          `15.164.98.31:8080/api/analysis/delete/${scenarioId}`,
+          `http://15.164.98.31:8080/api/analysis/delete/${scenarioId}`,
           { method: "DELETE" }
         );
         if (!res.ok) throw new Error("삭제 실패");
@@ -97,9 +99,7 @@ export default function ResultToolBar({
         console.log("🗑️ 삭제 결과:", result);
 
         // DataGrid에서 제거
-        setRows((prev) =>
-          prev.filter((row) => row.scenarioId !== scenarioId)
-        );
+        setRows((prev) => prev.filter((row) => row.scenarioId !== scenarioId));
       }
 
       alert("삭제 완료");

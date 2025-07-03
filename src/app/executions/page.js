@@ -58,7 +58,7 @@ export default function ExecutionsPage({
             const scenarioId = params.row.scenarioId;
             if (scenarioId) {
               window.open(
-                `15.164.98.31:8080/api/analysis/download?scenarioId=${scenarioId}`,
+                `http://15.164.98.31:8080/api/analysis/download?scenarioId=${scenarioId}`,
                 "_blank"
               );
             } else {
@@ -87,7 +87,7 @@ export default function ExecutionsPage({
   ];
 
   useEffect(() => {
-    fetch("15.164.98.31:8080/api/analysis/list")
+    fetch("http://15.164.98.31:8080/api/analysis/list")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
