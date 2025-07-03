@@ -273,7 +273,7 @@ export default function QnaPage() {
       {/* 10. 게시글 테이블 */}
       <Table size="small">
         <TableHead>
-          <TableRow>
+          <TableRow sx={{ backgroundColor: "#f2e8e8" }}>
             <TableCell>번호</TableCell>
             <TableCell>제목</TableCell>
             <TableCell>작성자</TableCell>
