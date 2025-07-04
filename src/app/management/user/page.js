@@ -129,14 +129,17 @@ export default function UserManagementPage() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("15.164.98.31:8080/api/auth/find-password", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: row.userId }),
-      });
+      const response = await fetch(
+        "http://15.164.98.31:8080/api/auth/find-password",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: row.userId }),
+        }
+      );
 
       const result = await response.text();
 

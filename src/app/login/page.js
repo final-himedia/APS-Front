@@ -46,7 +46,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch("15.164.98.31:8080/api/auth/login", {
+      const response = await fetch("http://15.164.98.31:8080/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

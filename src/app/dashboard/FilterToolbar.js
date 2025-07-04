@@ -31,10 +31,10 @@ export default function DashboardCharts() {
     try {
       const [barRes, pieRes] = await Promise.all([
         fetch(
-          `15.164.98.31:8080/api/execution/top5-operation?scenarioId=${scenarioId}`
+          `http://15.164.98.31:8080/api/execution/top5-operation?scenarioId=${scenarioId}`
         ),
         fetch(
-          `15.164.98.31:8080/api/execution/total-time-routing?scenarioId=${scenarioId}`
+          `http://15.164.98.31:8080/api/execution/total-time-routing?scenarioId=${scenarioId}`
         ),
       ]);
 
