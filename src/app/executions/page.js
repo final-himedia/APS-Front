@@ -15,7 +15,7 @@ export default function ExecutionsPage({
   setSelectedScenarioIds,
 }) {
   const [rows, setRows] = useState([]);
-  const token = localStorage.getItem("token");
+
   // 로그 모달용 상태
   const [logOpen, setLogOpen] = useState(false);
   const [logText, setLogText] = useState("");
@@ -87,11 +87,7 @@ export default function ExecutionsPage({
   ];
 
   useEffect(() => {
-    fetch("http://15.164.98.31:8080/api/analysis/list", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch("http://15.164.98.31:8080/api/analysis/list", {})
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
